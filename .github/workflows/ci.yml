@@ -153,38 +153,35 @@ jobs:
 
           CUSTOM_EMOJI_ID = "5321283442577527159"
 
+          def utf16_len(s: str) -> int:
+            return len(s.encode("utf-16-le")) // 2
+
           if not items:
             text = f"Новых видео с {last_check_str} нет."
             entities = None
           else:
-            header = f"Новые видео с {last_check_str}:"
-            lines = [header]
+            text = f"Новые видео с {last_check_str}:"
             entities = []
 
-            bullet_char = "*"  # 1 ASCII-символ, чтобы offset/length совпадали
-
-            current_offset = len(header) + 1  # + '\n' после заголовка
-
+            text += "\n"
             for pub, title, url in items:
               ts = pub.strftime("%Y-%m-%d %H:%M")
-
               if url:
-                line = f"{bullet_char} [{ts}] {title} – {url}"
+                line_without_bullet = f" [{ts}] {title} – {url}"
               else:
-                line = f"{bullet_char} [{ts}] {title}"
+                line_without_bullet = f" [{ts}] {title}"
 
-              lines.append(line)
+              offset = utf16_len(text)  # позиция, куда поставим '*'
+              text += "*" + line_without_bullet + "\n"
 
               entities.append({
-                "offset": current_offset,
+                "offset": offset,
                 "length": 1,
                 "type": "custom_emoji",
                 "custom_emoji_id": CUSTOM_EMOJI_ID,
               })
 
-              current_offset += len(line) + 1  # длина строки + '\n'
-
-            text = "\n".join(lines)
+            text = text.rstrip("\n")
 
           token = os.environ.get("TELEGRAM_TOKEN")
           chat_id = os.environ.get("CHAT_ID")
@@ -197,6 +194,7 @@ jobs:
           payload = {
             "chat_id": chat_id,
             "text": text,
+            "disable_web_page_preview": True,
           }
 
           if entities:
@@ -224,6 +222,7 @@ jobs:
           date -u +%Y-%m-%dT%H:%M:%SZ > timestamp.txt
 
       - name: commit timestamp
+        if: false
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
