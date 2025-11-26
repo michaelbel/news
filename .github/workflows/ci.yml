@@ -160,10 +160,14 @@ jobs:
             text = f"Новых видео с {last_check_str} нет."
             entities = None
           else:
-            text = f"Новые видео с {last_check_str}:"
+            header = f"Новые видео с {last_check_str}:"
+            text = header + "\n"
             entities = []
 
-            text += "\n"
+            bullet_char = "🙂"  # обычный эмодзи, Telegram его заменит на кастомный
+
+            bullet_len = utf16_len(bullet_char)
+
             for pub, title, url in items:
               ts = pub.strftime("%Y-%m-%d %H:%M")
               if url:
@@ -171,12 +175,12 @@ jobs:
               else:
                 line_without_bullet = f" [{ts}] {title}"
 
-              offset = utf16_len(text)  # позиция, куда поставим '*'
-              text += "*" + line_without_bullet + "\n"
+              offset = utf16_len(text)  # позиция эмодзи в UTF-16
+              text += bullet_char + line_without_bullet + "\n"
 
               entities.append({
                 "offset": offset,
-                "length": 1,
+                "length": bullet_len,
                 "type": "custom_emoji",
                 "custom_emoji_id": CUSTOM_EMOJI_ID,
               })
