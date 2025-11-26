@@ -33,6 +33,11 @@ jobs:
           if [ -f timestamp.txt ]; then
             VALUE="$(tr -d '\n' < timestamp.txt)"
             echo "Using existing timestamp: $VALUE"
+            if [ -z "$VALUE" ]; then
+              VALUE="$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ)"
+              echo "timestamp.txt was empty, using: $VALUE"
+              echo "$VALUE" > timestamp.txt
+            fi
           else
             VALUE="$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ)"
             echo "timestamp.txt not found, using: $VALUE"
@@ -43,6 +48,9 @@ jobs:
       - name: check youtube feeds and send telegram
         env:
           LAST_CHECK: ${{ steps.timestamp.outputs.value }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          THREAD_ID: ${{ secrets.TELEGRAM_THREAD_ID }}
         run: |
           python3 - << 'PY'
           import os
@@ -50,9 +58,9 @@ jobs:
           import json
           import urllib.request
           import xml.etree.ElementTree as ET
-          from datetime import datetime, timezone
+          from datetime import datetime, timezone, timedelta
 
-          last_check_str = os.environ["LAST_CHECK"]
+          last_check_str = os.environ.get("LAST_CHECK") or ""
 
           def parse_iso(s: str):
             s = s.strip()
@@ -68,10 +76,15 @@ jobs:
               dt = dt.astimezone(timezone.utc)
             return dt
 
-          last_check = parse_iso(last_check_str)
-          if last_check is None:
-            print(f"Cannot parse LAST_CHECK={last_check_str}", file=sys.stderr)
-            sys.exit(1)
+          if not last_check_str.strip():
+            last_check = datetime.now(timezone.utc) - timedelta(days=1)
+            last_check_str = last_check.strftime("%Y-%m-%dT%H:%M:%SZ")
+            print(f"LAST_CHECK is empty, fallback to {last_check_str}", file=sys.stderr)
+          else:
+            last_check = parse_iso(last_check_str)
+            if last_check is None:
+              print(f"Cannot parse LAST_CHECK={last_check_str}", file=sys.stderr)
+              sys.exit(1)
 
           items = []
 
