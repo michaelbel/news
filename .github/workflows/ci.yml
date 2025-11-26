@@ -151,16 +151,39 @@ jobs:
 
           items.sort(key=lambda x: x[0])
 
+          CUSTOM_EMOJI_ID = "5321283442577527159"
+
           if not items:
             text = f"Новых видео с {last_check_str} нет."
+            entities = None
           else:
-            lines = [f"Новые видео с {last_check_str}:"]
+            header = f"Новые видео с {last_check_str}:"
+            lines = [header]
+            entities = []
+
+            bullet_char = "*"  # 1 ASCII-символ, чтобы offset/length совпадали
+
+            current_offset = len(header) + 1  # + '\n' после заголовка
+
             for pub, title, url in items:
               ts = pub.strftime("%Y-%m-%d %H:%M")
+
               if url:
-                lines.append(f"- [{ts}] {title} – {url}")
+                line = f"{bullet_char} [{ts}] {title} – {url}"
               else:
-                lines.append(f"- [{ts}] {title}")
+                line = f"{bullet_char} [{ts}] {title}"
+
+              lines.append(line)
+
+              entities.append({
+                "offset": current_offset,
+                "length": 1,
+                "type": "custom_emoji",
+                "custom_emoji_id": CUSTOM_EMOJI_ID,
+              })
+
+              current_offset += len(line) + 1  # длина строки + '\n'
+
             text = "\n".join(lines)
 
           token = os.environ.get("TELEGRAM_TOKEN")
@@ -175,6 +198,10 @@ jobs:
             "chat_id": chat_id,
             "text": text,
           }
+
+          if entities:
+            payload["entities"] = entities
+
           if thread_id:
             try:
               payload["message_thread_id"] = int(thread_id)
