@@ -162,8 +162,8 @@ jobs:
             lines.append("")
             for pub, title, url in items:
               local_pub = pub.astimezone(local_tz)
-              ts = local_pub.strftime("%d.%m.%Y в %H:%M")
-              line = f"{ts} [{title}]({url})"
+              ts = local_pub.strftime("%d.%m.%Y")
+              line = f"{ts} – [{title}]({url})"
               lines.append(line)
               lines.append("")
             text = "\n".join(lines).rstrip()
@@ -212,7 +212,7 @@ jobs:
           git add timestamp.txt
           if git diff --cached --quiet; then
             echo "No changes to commit"
-          else
+          else:
             git commit -m "Update timestamp"
             git push
           fi
