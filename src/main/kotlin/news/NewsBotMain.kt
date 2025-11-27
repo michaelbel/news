@@ -33,57 +33,56 @@ fun buildMessage(
     val zone = ZoneId.of("Europe/Berlin")
     val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
 
-    val lines = mutableListOf<String>()
+    val sb = StringBuilder()
 
     // блок YouTube
-    lines += "*Новые YouTube-видео*"
-    lines += ""
+    sb.append("<b>Новые YouTube-видео</b>\n\n")
     if (youtubeItems.isEmpty()) {
-        lines += "Новых видео нет."
+        sb.append("Новых видео нет.\n\n")
     } else {
         for (item in youtubeItems) {
             val local = item.published.atZone(zone)
             val dateStr = local.format(dateFormatter)
-            val line = "$dateStr – [${escapeMarkdown(item.title)}](${item.url})"
-            lines += line
-            lines += ""
+            sb.append(dateStr)
+                .append(" – ")
+                .append("<a href=\"")
+                .append(escapeHtml(item.url))
+                .append("\">")
+                .append(escapeHtml(item.title))
+                .append("</a>")
+                .append("\n\n")
         }
     }
 
-    // пустая строка между блоками
-    lines += ""
-
     // блок Android Developers Blog
-    lines += "*Новые статьи Android Developers Blog*"
-    lines += ""
+    sb.append("\n<b>Новые статьи Android Developers Blog</b>\n\n")
     if (blogItems.isEmpty()) {
-        lines += "Новых статей нет."
+        sb.append("Новых статей нет.\n")
     } else {
         for (item in blogItems) {
             val local = item.published.atZone(zone)
             val dateStr = local.format(dateFormatter)
-            val line = "$dateStr – [${escapeMarkdown(item.title)}](${item.url})"
-            lines += line
-            lines += ""
+            sb.append(dateStr)
+                .append(" – ")
+                .append("<a href=\"")
+                .append(escapeHtml(item.url))
+                .append("\">")
+                .append(escapeHtml(item.title))
+                .append("</a>")
+                .append("\n\n")
         }
     }
 
-    return lines.joinToString("\n").trimEnd()
+    return sb.toString().trim()
 }
 
-fun escapeMarkdown(text: String): String {
-    val specials = listOf(
-        "\\", "_", "*", "[", "]", "(", ")", "~",
-        "`", ">", "#", "+", "-", "=", "|", "{",
-        "}", ".", "!"
-    )
-    var result = text
-    for (ch in specials) {
-        result = result.replace(ch, "\\$ch")
-    }
-    return result
+fun escapeHtml(text: String): String {
+    return text
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;")
 }
-
 
 fun sendTelegram(text: String) {
     val token = System.getenv("TELEGRAM_TOKEN").orEmpty()
@@ -111,21 +110,21 @@ fun sendTelegram(text: String) {
         }
         append("\"text\":\"").append(jsonText).append("\",")
         append("\"disable_web_page_preview\":true,")
-        append("\"parse_mode\":\"MarkdownV2\"") // важно: V2, как в escapeMarkdown
+        append("\"parse_mode\":\"HTML\"")
         append("}")
     }
 
     System.err.println("Payload for Telegram: $payload")
 
     val url = "https://api.telegram.org/bot$token/sendMessage"
-    val client = java.net.http.HttpClient.newHttpClient()
-    val request = java.net.http.HttpRequest.newBuilder()
-        .uri(java.net.URI(url))
+    val client = HttpClient.newHttpClient()
+    val request = HttpRequest.newBuilder()
+        .uri(URI(url))
         .header("Content-Type", "application/json")
-        .POST(java.net.http.HttpRequest.BodyPublishers.ofString(payload))
+        .POST(HttpRequest.BodyPublishers.ofString(payload))
         .build()
 
-    val response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString())
+    val response = client.send(request, HttpResponse.BodyHandlers.ofString())
     System.err.println("Telegram response: ${response.statusCode()}")
     System.err.println("Telegram body: ${response.body()}")
 
