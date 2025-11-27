@@ -3,7 +3,7 @@ name: news-bot
 on:
   push:
   schedule:
-    - cron: '0 6 * * *'   # раз в день в 06:00 UTC
+    - cron: '0 6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -27,6 +27,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: setup jdk 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
       - name: read timestamp
         id: timestamp
         run: |
@@ -45,160 +51,14 @@ jobs:
           fi
           echo "value=$VALUE" >> "$GITHUB_OUTPUT"
 
-      - name: check youtube feeds and send telegram
+      - name: run news bot (Kotlin)
         env:
           LAST_CHECK: ${{ steps.timestamp.outputs.value }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           THREAD_ID: ${{ secrets.TELEGRAM_THREAD_ID }}
         run: |
-          python3 - << 'PY'
-          import os
-          import sys
-          import json
-          import urllib.request
-          import xml.etree.ElementTree as ET
-          from datetime import datetime, timezone, timedelta
-          from zoneinfo import ZoneInfo
-
-          last_check_str = os.environ.get("LAST_CHECK") or ""
-
-          def parse_iso(s: str):
-            s = s.strip()
-            if s.endswith("Z"):
-              s = s[:-1] + "+00:00"
-            try:
-              dt = datetime.fromisoformat(s)
-            except ValueError:
-              return None
-            if dt.tzinfo is None:
-              dt = dt.replace(tzinfo=timezone.utc)
-            else:
-              dt = dt.astimezone(timezone.utc)
-            return dt
-
-          if not last_check_str.strip():
-            last_check = datetime.now(timezone.utc) - timedelta(days=1)
-            last_check_str = last_check.strftime("%Y-%m-%dT%H:%M:%SZ")
-            print(f"LAST_CHECK is empty, fallback to {last_check_str}", file=sys.stderr)
-          else:
-            last_check = parse_iso(last_check_str)
-            if last_check is None:
-              print(f"Cannot parse LAST_CHECK={last_check_str}", file=sys.stderr)
-              sys.exit(1)
-
-          items = []
-
-          try:
-            f = open("youtube.txt", encoding="utf-8")
-          except FileNotFoundError:
-            print("youtube.txt not found, skip", file=sys.stderr)
-            sys.exit(0)
-
-          with f:
-            for line in f:
-              line = line.strip()
-              if not line or line.startswith("#"):
-                continue
-              feed = line.split("#", 1)[0].strip()
-              if not feed:
-                continue
-
-              print(f"Fetching {feed}", file=sys.stderr)
-              try:
-                with urllib.request.urlopen(feed) as resp:
-                  data = resp.read()
-              except Exception as e:
-                print(f"Failed to fetch {feed}: {e}", file=sys.stderr)
-                continue
-
-              try:
-                root = ET.fromstring(data)
-              except Exception as e:
-                print(f"Failed to parse XML for {feed}: {e}", file=sys.stderr)
-                continue
-
-              ns = {
-                "atom": "http://www.w3.org/2005/Atom",
-                "yt": "http://www.youtube.com/xml/schemas/2015",
-              }
-
-              for entry in root.findall("atom:entry", ns):
-                published_el = entry.find("atom:published", ns)
-                if published_el is None or not published_el.text:
-                  continue
-                published = parse_iso(published_el.text)
-                if published is None or published <= last_check:
-                  continue
-
-                title_el = entry.find("atom:title", ns)
-                if title_el is not None and title_el.text:
-                  title = title_el.text.strip()
-                else:
-                  title = "(no title)"
-
-                video_id_el = entry.find("yt:videoId", ns)
-                video_id = ""
-                if video_id_el is not None and video_id_el.text:
-                  video_id = video_id_el.text.strip()
-
-                if video_id:
-                  url = f"https://www.youtube.com/watch?v={video_id}"
-                else:
-                  link_el = entry.find("atom:link[@rel='alternate']", ns)
-                  url = link_el.get("href") if link_el is not None else ""
-
-                items.append((published, title, url))
-
-          items.sort(key=lambda x: x[0])
-
-          local_tz = ZoneInfo("Europe/Berlin")
-
-          if not items:
-            text = "*Новые YouTube-видео*\n\nНовых видео нет."
-          else:
-            lines = []
-            lines.append("*Новые YouTube-видео*")
-            lines.append("")
-            for pub, title, url in items:
-              local_pub = pub.astimezone(local_tz)
-              ts = local_pub.strftime("%d.%m.%Y")
-              line = f"{ts} – [{title}]({url})"
-              lines.append(line)
-              lines.append("")
-            text = "\n".join(lines).rstrip()
-
-          token = os.environ.get("TELEGRAM_TOKEN")
-          chat_id = os.environ.get("CHAT_ID")
-          thread_id = os.environ.get("THREAD_ID")
-
-          if not token or not chat_id:
-            print("TELEGRAM_TOKEN or CHAT_ID not set, skip send", file=sys.stderr)
-            sys.exit(0)
-
-          payload = {
-            "chat_id": chat_id,
-            "text": text,
-            "disable_web_page_preview": True,
-            "parse_mode": "Markdown",
-          }
-
-          if thread_id:
-            try:
-              payload["message_thread_id"] = int(thread_id)
-            except ValueError:
-              payload["message_thread_id"] = thread_id
-
-          data = json.dumps(payload).encode("utf-8")
-          req = urllib.request.Request(
-            f"https://api.telegram.org/bot{token}/sendMessage",
-            data=data,
-            headers={"Content-Type": "application/json"},
-          )
-
-          with urllib.request.urlopen(req) as resp:
-            resp.read()
-          PY
+          ./gradlew run
 
       - name: update timestamp
         run: |
@@ -212,7 +72,7 @@ jobs:
           git add timestamp.txt
           if git diff --cached --quiet; then
             echo "No changes to commit"
-          else:
+          else
             git commit -m "Update timestamp"
             git push
           fi
