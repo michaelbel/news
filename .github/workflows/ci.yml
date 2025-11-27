@@ -59,6 +59,7 @@ jobs:
           import urllib.request
           import xml.etree.ElementTree as ET
           from datetime import datetime, timezone, timedelta
+          from zoneinfo import ZoneInfo
 
           last_check_str = os.environ.get("LAST_CHECK") or ""
 
@@ -151,41 +152,21 @@ jobs:
 
           items.sort(key=lambda x: x[0])
 
-          CUSTOM_EMOJI_ID = "5321283442577527159"
-
-          def utf16_len(s: str) -> int:
-            return len(s.encode("utf-16-le")) // 2
+          local_tz = ZoneInfo("Europe/Berlin")
 
           if not items:
-            text = f"Новых видео с {last_check_str} нет."
-            entities = None
+            text = "*Новые YouTube-видео*\n\nНовых видео нет."
           else:
-            header = f"Новые видео с {last_check_str}:"
-            text = header + "\n"
-            entities = []
-
-            bullet_char = "🙂"  # обычный эмодзи, Telegram его заменит на кастомный
-
-            bullet_len = utf16_len(bullet_char)
-
+            lines = []
+            lines.append("*Новые YouTube-видео*")
+            lines.append("")
             for pub, title, url in items:
-              ts = pub.strftime("%Y-%m-%d %H:%M")
-              if url:
-                line_without_bullet = f" [{ts}] {title} – {url}"
-              else:
-                line_without_bullet = f" [{ts}] {title}"
-
-              offset = utf16_len(text)  # позиция эмодзи в UTF-16
-              text += bullet_char + line_without_bullet + "\n"
-
-              entities.append({
-                "offset": offset,
-                "length": bullet_len,
-                "type": "custom_emoji",
-                "custom_emoji_id": CUSTOM_EMOJI_ID,
-              })
-
-            text = text.rstrip("\n")
+              local_pub = pub.astimezone(local_tz)
+              ts = local_pub.strftime("%d.%m.%Y в %H:%M")
+              line = f"{ts} [{title}]({url})"
+              lines.append(line)
+              lines.append("")
+            text = "\n".join(lines).rstrip()
 
           token = os.environ.get("TELEGRAM_TOKEN")
           chat_id = os.environ.get("CHAT_ID")
@@ -199,10 +180,8 @@ jobs:
             "chat_id": chat_id,
             "text": text,
             "disable_web_page_preview": True,
+            "parse_mode": "Markdown",
           }
-
-          if entities:
-            payload["entities"] = entities
 
           if thread_id:
             try:
