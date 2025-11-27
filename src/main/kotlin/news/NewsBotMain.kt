@@ -84,6 +84,7 @@ fun escapeMarkdown(text: String): String {
     return result
 }
 
+
 fun sendTelegram(text: String) {
     val token = System.getenv("TELEGRAM_TOKEN").orEmpty()
     val chatId = System.getenv("CHAT_ID").orEmpty()
@@ -93,6 +94,9 @@ fun sendTelegram(text: String) {
         System.err.println("TELEGRAM_TOKEN or CHAT_ID not set, skip send")
         return
     }
+
+    System.err.println("Preparing to send Telegram message")
+    System.err.println("Text length = ${text.length}")
 
     val jsonText = text
         .replace("\\", "\\\\")
@@ -107,18 +111,25 @@ fun sendTelegram(text: String) {
         }
         append("\"text\":\"").append(jsonText).append("\",")
         append("\"disable_web_page_preview\":true,")
-        append("\"parse_mode\":\"Markdown\"")
+        append("\"parse_mode\":\"MarkdownV2\"") // важно: V2, как в escapeMarkdown
         append("}")
     }
 
+    System.err.println("Payload for Telegram: $payload")
+
     val url = "https://api.telegram.org/bot$token/sendMessage"
-    val client = HttpClient.newHttpClient()
-    val request = HttpRequest.newBuilder()
-        .uri(URI(url))
+    val client = java.net.http.HttpClient.newHttpClient()
+    val request = java.net.http.HttpRequest.newBuilder()
+        .uri(java.net.URI(url))
         .header("Content-Type", "application/json")
-        .POST(HttpRequest.BodyPublishers.ofString(payload))
+        .POST(java.net.http.HttpRequest.BodyPublishers.ofString(payload))
         .build()
 
-    val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+    val response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString())
     System.err.println("Telegram response: ${response.statusCode()}")
+    System.err.println("Telegram body: ${response.body()}")
+
+    if (response.statusCode() != 200) {
+        error("Telegram send failed with status ${response.statusCode()}")
+    }
 }
