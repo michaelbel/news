@@ -1,7 +1,15 @@
 package news.youtube
 
+import news.Timestamp
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.time.Instant
+import javax.xml.parsers.DocumentBuilderFactory
+
 data class YoutubeItem(
-    val published: java.time.Instant,
+    val published: Instant,
     val title: String,
     val url: String
 )
@@ -68,11 +76,11 @@ private val feeds = listOf(
 
 object YoutubeProvider {
 
-    fun fetchItems(lastCheck: java.time.Instant): List<YoutubeItem> {
+    fun fetchItems(lastCheck: Instant): List<YoutubeItem> {
         if (feeds.isEmpty()) return emptyList()
 
-        val client = java.net.http.HttpClient.newHttpClient()
-        val factory = javax.xml.parsers.DocumentBuilderFactory.newInstance().apply {
+        val client = HttpClient.newHttpClient()
+        val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }
 
@@ -81,13 +89,13 @@ object YoutubeProvider {
         for (feed in feeds) {
             System.err.println("Fetching ${feed.url}")
 
-            val request = java.net.http.HttpRequest.newBuilder()
-                .uri(java.net.URI(feed.url))
+            val request = HttpRequest.newBuilder()
+                .uri(URI(feed.url))
                 .GET()
                 .build()
 
             val xml = try {
-                val resp = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString())
+                val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
                 resp.body()
             } catch (e: Exception) {
                 System.err.println("Failed to fetch ${feed.url}: ${e.message}")
@@ -132,7 +140,7 @@ object YoutubeProvider {
                 }
 
                 if (publishedStr == null) continue
-                val published = news.Timestamp.parseIso(publishedStr) ?: continue
+                val published = Timestamp.parseIso(publishedStr) ?: continue
                 if (published <= lastCheck) continue
 
                 val safeTitle = title

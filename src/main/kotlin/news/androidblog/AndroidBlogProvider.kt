@@ -1,7 +1,15 @@
 package news.androidblog
 
+import news.Timestamp
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.time.Instant
+import javax.xml.parsers.DocumentBuilderFactory
+
 data class AndroidBlogItem(
-    val published: java.time.Instant,
+    val published: Instant,
     val title: String,
     val url: String
 )
@@ -11,9 +19,9 @@ object AndroidBlogProvider {
     private const val FEED_URL: String =
         "https://android-developers.blogspot.com/atom.xml"
 
-    fun fetchItems(lastCheck: java.time.Instant): List<AndroidBlogItem> {
-        val client = java.net.http.HttpClient.newHttpClient()
-        val factory = javax.xml.parsers.DocumentBuilderFactory.newInstance().apply {
+    fun fetchItems(lastCheck: Instant): List<AndroidBlogItem> {
+        val client = HttpClient.newHttpClient()
+        val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }
 
@@ -21,13 +29,13 @@ object AndroidBlogProvider {
 
         System.err.println("Fetching $FEED_URL")
 
-        val request = java.net.http.HttpRequest.newBuilder()
-            .uri(java.net.URI(FEED_URL))
+        val request = HttpRequest.newBuilder()
+            .uri(URI(FEED_URL))
             .GET()
             .build()
 
         val xml = try {
-            val resp = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString())
+            val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
             resp.body()
         } catch (e: Exception) {
             System.err.println("Failed to fetch $FEED_URL: ${e.message}")
@@ -70,7 +78,7 @@ object AndroidBlogProvider {
             }
 
             if (publishedStr == null) continue
-            val published = news.Timestamp.parseIso(publishedStr) ?: continue
+            val published = Timestamp.parseIso(publishedStr) ?: continue
             if (published <= lastCheck) continue
 
             val safeTitle = title
