@@ -6,6 +6,8 @@ import news.androidweekly.AndroidWeeklyItem
 import news.androidweekly.AndroidWeeklyProvider
 import news.kotlinblog.KotlinBlogItem
 import news.kotlinblog.KotlinBlogProvider
+import news.proandroiddev.ProAndroidDevItem
+import news.proandroiddev.ProAndroidDevProvider
 import news.youtube.YoutubeItem
 import news.youtube.YoutubeProvider
 import java.net.URI
@@ -65,6 +67,16 @@ fun main() {
             emptyList()
         }
 
+    val proAndroidDevItems: List<ProAndroidDevItem> =
+        if (NewsFeatures.PRO_ANDROID_DEV_ENABLED) {
+            val items = ProAndroidDevProvider.fetchItems(lastCheck)
+            logInfo("ProAndroidDev items collected (after filter): ${items.size}")
+            items
+        } else {
+            logInfo("ProAndroidDev parsing disabled by feature flag")
+            emptyList()
+        }
+
     endSection()
 
     logSection("Build messages")
@@ -73,10 +85,12 @@ fun main() {
         androidBlogItems = androidBlogItems,
         kotlinBlogItems = kotlinBlogItems,
         androidWeeklyItems = androidWeeklyItems,
+        proAndroidDevItems = proAndroidDevItems,
         youtubeEnabled = NewsFeatures.YOUTUBE_ENABLED,
         androidBlogEnabled = NewsFeatures.ANDROID_BLOG_ENABLED,
         kotlinBlogEnabled = NewsFeatures.KOTLIN_BLOG_ENABLED,
-        androidWeeklyEnabled = NewsFeatures.ANDROID_WEEKLY_ENABLED
+        androidWeeklyEnabled = NewsFeatures.ANDROID_WEEKLY_ENABLED,
+        proAndroidDevEnabled = NewsFeatures.PRO_ANDROID_DEV_ENABLED
     )
     logInfo("Built messages count: ${messages.size}")
     endSection()
@@ -96,10 +110,12 @@ fun buildMessages(
     androidBlogItems: List<AndroidBlogItem>,
     kotlinBlogItems: List<KotlinBlogItem>,
     androidWeeklyItems: List<AndroidWeeklyItem>,
+    proAndroidDevItems: List<ProAndroidDevItem>,
     youtubeEnabled: Boolean,
     androidBlogEnabled: Boolean,
     kotlinBlogEnabled: Boolean,
-    androidWeeklyEnabled: Boolean
+    androidWeeklyEnabled: Boolean,
+    proAndroidDevEnabled: Boolean
 ): List<String> {
     val zone = ZoneId.of("Europe/Berlin")
     val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
@@ -237,10 +253,42 @@ fun buildMessages(
         flushChunk(sb)
     }
 
+    fun appendProAndroidDevChunks() {
+        if (!proAndroidDevEnabled) return
+        if (proAndroidDevItems.isEmpty()) return
+
+        val header = "<b>Новые статьи ProAndroidDev</b>\n\n"
+        var sb = StringBuilder(header)
+
+        for (item in proAndroidDevItems) {
+            val local = item.published.atZone(zone)
+            val dateStr = local.format(dateFormatter)
+            val line = buildString {
+                append(dateStr)
+                append(" – ")
+                append("<a href=\"")
+                append(escapeHtml(item.url))
+                append("\">")
+                append(escapeHtml(item.title))
+                append("</a>\n\n")
+            }
+
+            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
+                flushChunk(sb)
+                sb = StringBuilder()
+            }
+
+            sb.append(line)
+        }
+
+        flushChunk(sb)
+    }
+
     appendYoutubeChunks()
     appendAndroidBlogChunks()
     appendKotlinBlogChunks()
     appendAndroidWeeklyChunks()
+    appendProAndroidDevChunks()
 
     return result
 }
