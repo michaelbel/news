@@ -1,5 +1,6 @@
 package news.habr
 
+import news.NewsProvider
 import news.HABR_ANDROID_URL
 import news.logInfo
 import news.logWarn
@@ -13,7 +14,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object HabrAndroidProvider {
+object HabrAndroidProvider : NewsProvider<HabrAndroidItem> {
 
     private const val FEED_URL = HABR_ANDROID_URL
 
@@ -24,7 +25,7 @@ object HabrAndroidProvider {
     private val rfc1123Formatter: DateTimeFormatter =
         DateTimeFormatter.RFC_1123_DATE_TIME
 
-    fun fetchItems(lastCheck: Instant): List<HabrAndroidItem> {
+    override fun fetchItems(lastCheck: Instant): List<HabrAndroidItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }

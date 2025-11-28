@@ -1,5 +1,6 @@
 package news.androidblog
 
+import news.NewsProvider
 import news.ANDROID_BLOG_URL
 import news.Timestamp
 import java.net.URI
@@ -9,9 +10,9 @@ import java.net.http.HttpResponse
 import java.time.Instant
 import javax.xml.parsers.DocumentBuilderFactory
 
-object AndroidBlogProvider {
+object AndroidBlogProvider : NewsProvider<AndroidBlogItem> {
 
-    fun fetchItems(lastCheck: Instant): List<AndroidBlogItem> {
+    override fun fetchItems(lastCheck: Instant): List<AndroidBlogItem> {
         val feedUrl = ANDROID_BLOG_URL
 
         val client = HttpClient.newHttpClient()

@@ -1,5 +1,6 @@
 package news.youtube
 
+import news.NewsProvider
 import news.Timestamp
 import news.YOUTUBE_CHANNELS
 import java.net.URI
@@ -9,9 +10,9 @@ import java.net.http.HttpResponse
 import java.time.Instant
 import javax.xml.parsers.DocumentBuilderFactory
 
-object YoutubeProvider {
+object YoutubeProvider : NewsProvider<YoutubeItem> {
 
-    fun fetchItems(lastCheck: Instant): List<YoutubeItem> {
+    override fun fetchItems(lastCheck: Instant): List<YoutubeItem> {
         val feeds = YOUTUBE_CHANNELS
         if (feeds.isEmpty()) return emptyList()
 

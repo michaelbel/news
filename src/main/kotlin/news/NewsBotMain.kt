@@ -39,63 +39,63 @@ fun main() {
         enabled = YOUTUBE_ENABLED,
         name = "YouTube",
         lastCheck = lastCheck,
-        fetch = YoutubeProvider::fetchItems
+        provider = YoutubeProvider
     )
 
     val androidBlogItems = collectItems(
         enabled = ANDROID_BLOG_ENABLED,
         name = "Android Developers Blog",
         lastCheck = lastCheck,
-        fetch = AndroidBlogProvider::fetchItems
+        provider = AndroidBlogProvider
     )
 
     val kotlinBlogItems = collectItems(
         enabled = KOTLIN_BLOG_ENABLED,
         name = "Kotlin Blog",
         lastCheck = lastCheck,
-        fetch = KotlinBlogProvider::fetchItems
+        provider = KotlinBlogProvider
     )
 
     val mediumGoogleItems = collectItems(
         enabled = MEDIUM_GOOGLE_ENABLED,
         name = "Medium Google",
         lastCheck = lastCheck,
-        fetch = MediumGoogleProvider::fetchItems
+        provider = MediumGoogleProvider
     )
 
     val mediumAndroidItems = collectItems(
         enabled = MEDIUM_ANDROID_ENABLED,
         name = "Medium Android",
         lastCheck = lastCheck,
-        fetch = MediumAndroidProvider::fetchItems
+        provider = MediumAndroidProvider
     )
 
     val androidWeeklyItems = collectItems(
         enabled = ANDROID_WEEKLY_ENABLED,
         name = "Android Weekly",
         lastCheck = lastCheck,
-        fetch = AndroidWeeklyProvider::fetchItems
+        provider = AndroidWeeklyProvider
     )
 
     val proAndroidDevItems = collectItems(
         enabled = PRO_ANDROID_DEV_ENABLED,
         name = "ProAndroidDev",
         lastCheck = lastCheck,
-        fetch = ProAndroidDevProvider::fetchItems
+        provider = ProAndroidDevProvider
     )
 
     val habrAndroidItems = collectItems(
         enabled = HABR_ANDROID_ENABLED,
         name = "Habr Android",
         lastCheck = lastCheck,
-        fetch = HabrAndroidProvider::fetchItems
+        provider = HabrAndroidProvider
     )
 
     val githubReleaseItems = collectItems(
         enabled = GITHUB_RELEASES_ENABLED,
         name = "GitHub releases",
         lastCheck = lastCheck,
-        fetch = GithubReleasesProvider::fetchItems
+        provider = GithubReleasesProvider
     )
 
     endSection()
@@ -295,18 +295,18 @@ private fun flushChunk(builder: StringBuilder, result: MutableList<String>) {
     }
 }
 
-private fun <T> collectItems(
+private fun <T : NewsItem> collectItems(
     enabled: Boolean,
     name: String,
     lastCheck: Instant,
-    fetch: (Instant) -> List<T>
+    provider: NewsProvider<T>
 ): List<T> {
     if (!enabled) {
         logInfo("$name parsing disabled by feature flag")
         return emptyList()
     }
 
-    val items = fetch(lastCheck)
+    val items = provider.fetchItems(lastCheck)
     logInfo("$name items collected (after filter): ${items.size}")
     return items
 }
