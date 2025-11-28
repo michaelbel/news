@@ -28,8 +28,16 @@ object ProAndroidDevProvider {
     // НЕБЕЗОПАСНО: доверяем всем сертификатам, только для этого провайдера
     private val insecureClient: HttpClient by lazy {
         val trustAllManager = object : X509TrustManager {
-            override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) = Unit
-            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) = Unit
+            override fun checkClientTrusted(
+                chain: Array<out X509Certificate>?,
+                authType: String?
+            ) = Unit
+
+            override fun checkServerTrusted(
+                chain: Array<out X509Certificate>?,
+                authType: String?
+            ) = Unit
+
             override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
         }
 
@@ -39,7 +47,6 @@ object ProAndroidDevProvider {
 
         HttpClient.newBuilder()
             .sslContext(sslContext)
-            .hostnameVerifier { _, _ -> true }
             .build()
     }
 
