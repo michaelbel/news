@@ -47,7 +47,7 @@ fun main() {
     )
 
     if (messages.isEmpty()) {
-        System.err.println("Nothing to send: all sections disabled or empty")
+        System.err.println("Новостей нет, ничего не отправляем в Telegram")
         return
     }
 
@@ -74,14 +74,9 @@ fun buildMessages(
 
     fun appendYoutubeChunks() {
         if (!youtubeEnabled) return
+        if (youtubeItems.isEmpty()) return   // источник включён, но новостей нет – секцию не добавляем
 
         val header = "<b>Новые YouTube-видео</b>\n\n"
-
-        if (youtubeItems.isEmpty()) {
-            result += header + "Новых видео нет."
-            return
-        }
-
         var sb = StringBuilder(header)
 
         for (item in youtubeItems) {
@@ -110,14 +105,9 @@ fun buildMessages(
 
     fun appendBlogChunks() {
         if (!blogEnabled) return
+        if (blogItems.isEmpty()) return   // нет новых статей – секцию не добавляем
 
         val header = "<b>Новые статьи Android Developers Blog</b>\n\n"
-
-        if (blogItems.isEmpty()) {
-            result += header + "Новых статей нет."
-            return
-        }
-
         var sb = StringBuilder(header)
 
         for (item in blogItems) {
