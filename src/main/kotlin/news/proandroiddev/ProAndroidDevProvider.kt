@@ -1,5 +1,6 @@
 package news.proandroiddev
 
+import news.NewsSources
 import news.Timestamp
 import java.net.URI
 import java.net.http.HttpClient
@@ -23,7 +24,7 @@ data class ProAndroidDevItem(
 
 object ProAndroidDevProvider {
 
-    private const val FEED_URL: String = "https://proandroiddev.com/feed"
+    private const val FEED_URL: String = NewsSources.ProAndroidDev.FEED_URL
 
     // НЕБЕЗОПАСНО: доверяем всем сертификатам, только для этого провайдера
     private val insecureClient: HttpClient by lazy {

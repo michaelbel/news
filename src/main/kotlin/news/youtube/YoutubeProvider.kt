@@ -1,8 +1,7 @@
 package news.youtube
 
+import news.NewsSources
 import news.Timestamp
-import news.logInfo
-import news.logWarn
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -16,69 +15,10 @@ data class YoutubeItem(
     val url: String
 )
 
-private data class YoutubeFeed(
-    val url: String,
-    val label: String
-)
-
-private val feeds = listOf(
-    YoutubeFeed(
-        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UCVHFbqXqoYvEWM1Ddxl0QDg",
-        label = "AndroidDevelopers"
-    ),
-    YoutubeFeed(
-        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UCKNTZMRHPLXfqlbdOI7mCkg",
-        label = "PhilippLackner"
-    ),
-    YoutubeFeed(
-        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UCKsqMPIIhev3qbMxCL8Emvw",
-        label = "AndroidBroadcast"
-    ),
-    YoutubeFeed(
-        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UCQFhFs4Ff1BP__DWMD5gC5g",
-        label = "gulyaev_it"
-    ),
-    YoutubeFeed(
-        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UC71omjio31Esx7LytaZ2ytA",
-        label = "JovMit"
-    ),
-    YoutubeFeed(
-        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UCofyDdGnCssPNwABNkxLFKg",
-        label = "randrushchenko"
-    ),
-    YoutubeFeed(
-        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UCP7uiEZIqci43m22KDl0sNw",
-        label = "Kotlin"
-    ),
-    YoutubeFeed(
-        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UCIjEgHA1vatSR2K4rfcdNRg",
-        label = "AristiDevs"
-    ),
-    YoutubeFeed(
-        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UCSmp6mEF9bml3sinNuKcZZg",
-        label = "offer_factory"
-    ),
-    YoutubeFeed(
-        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UCy9dX2OpiYIDRF-wduZSXPQ",
-        label = "ievetrov"
-    ),
-    YoutubeFeed(
-        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UCYLAirIEMMXtWOECuZAtjqQ",
-        label = "StevdzaSan"
-    ),
-    YoutubeFeed(
-        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UCFaLqiT8yyi4UYeA7NMPRIA",
-        label = "typealias"
-    ),
-    YoutubeFeed(
-        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UCTjQSpx2waqXTC37AgM8qyA",
-        label = "NativeMobileBits"
-    )
-)
-
 object YoutubeProvider {
 
     fun fetchItems(lastCheck: Instant): List<YoutubeItem> {
+        val feeds = NewsSources.Youtube.feeds
         if (feeds.isEmpty()) return emptyList()
 
         val client = HttpClient.newHttpClient()
@@ -89,7 +29,7 @@ object YoutubeProvider {
         val result = mutableListOf<YoutubeItem>()
 
         for (feed in feeds) {
-            logInfo("YouTube: fetching ${feed.label} (${feed.url})")
+            System.err.println("==== YouTube: fetching ${feed.url} [${feed.label}]")
 
             val request = HttpRequest.newBuilder()
                 .uri(URI(feed.url))
@@ -98,17 +38,17 @@ object YoutubeProvider {
 
             val xml = try {
                 val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
-                logInfo("YouTube: HTTP status for ${feed.label} = ${resp.statusCode()}")
-                if (resp.statusCode() != 200) {
-                    logWarn(
-                        "YouTube: non-200 status for ${feed.label}, " +
+                System.err.println("YouTube HTTP status=${resp.statusCode()} for ${feed.label}")
+                if (resp.statusCode() !in 200..299) {
+                    System.err.println(
+                        "YouTube: non-2xx for ${feed.label}, " +
                                 "body snippet=${resp.body().take(200)}"
                     )
                     continue
                 }
                 resp.body()
             } catch (e: Exception) {
-                logWarn("YouTube: failed to fetch ${feed.label}: ${e.message}")
+                System.err.println("YouTube: failed to fetch ${feed.url} for ${feed.label}: ${e.message}")
                 continue
             }
 
@@ -118,19 +58,20 @@ object YoutubeProvider {
                     .parse(xml.byteInputStream())
                     .apply { documentElement.normalize() }
             } catch (e: Exception) {
-                logWarn("YouTube: failed to parse XML for ${feed.label}: ${e.message}")
+                System.err.println("YouTube: failed to parse XML for ${feed.label}: ${e.message}")
                 continue
             }
 
             val entries = doc.getElementsByTagName("entry")
-            var feedEntries = 0
-            var addedEntries = 0
+
+            var total = 0
+            var parsed = 0
+            var afterFilter = 0
 
             for (i in 0 until entries.length) {
+                total += 1
                 val entry = entries.item(i)
                 val children = entry.childNodes
-
-                feedEntries++
 
                 var publishedStr: String? = null
                 var title: String? = null
@@ -156,7 +97,10 @@ object YoutubeProvider {
 
                 if (publishedStr == null) continue
                 val published = Timestamp.parseIso(publishedStr) ?: continue
+                parsed += 1
                 if (published <= lastCheck) continue
+
+                afterFilter += 1
 
                 val safeTitle = title
                     ?.trim()
@@ -174,16 +118,16 @@ object YoutubeProvider {
                     title = safeTitle,
                     url = url
                 )
-                addedEntries++
             }
 
-            logInfo(
-                "YouTube: feed=${feed.label}, totalEntries=$feedEntries, " +
-                        "newItems=$addedEntries"
+            System.err.println(
+                "YouTube feed ${feed.label}: total=$total, parsed=$parsed, " +
+                        "afterFilter=$afterFilter"
             )
         }
 
-        logInfo("YouTube: total collected items=${result.size}")
+        System.err.println("YouTube items collected total: ${result.size}")
+
         return result.sortedBy { it.published }
     }
 }

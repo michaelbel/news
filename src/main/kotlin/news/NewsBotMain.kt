@@ -8,6 +8,10 @@ import news.github.GithubReleaseItem
 import news.github.GithubReleasesProvider
 import news.kotlinblog.KotlinBlogItem
 import news.kotlinblog.KotlinBlogProvider
+import news.mediumandroid.MediumAndroidItem
+import news.mediumandroid.MediumAndroidProvider
+import news.mediumgoogle.MediumGoogleItem
+import news.mediumgoogle.MediumGoogleProvider
 import news.proandroiddev.ProAndroidDevItem
 import news.proandroiddev.ProAndroidDevProvider
 import news.youtube.YoutubeItem
@@ -30,7 +34,7 @@ fun main() {
     logSection("Collect sources")
 
     val youtubeItems: List<YoutubeItem> =
-        if (NewsFeatures.YOUTUBE_ENABLED) {
+        if (YOUTUBE_ENABLED) {
             val items = YoutubeProvider.fetchItems(lastCheck)
             logInfo("YouTube items collected (after filter): ${items.size}")
             items
@@ -40,7 +44,7 @@ fun main() {
         }
 
     val androidBlogItems: List<AndroidBlogItem> =
-        if (NewsFeatures.ANDROID_BLOG_ENABLED) {
+        if (ANDROID_BLOG_ENABLED) {
             val items = AndroidBlogProvider.fetchItems(lastCheck)
             logInfo("Android Developers Blog items collected (after filter): ${items.size}")
             items
@@ -50,7 +54,7 @@ fun main() {
         }
 
     val kotlinBlogItems: List<KotlinBlogItem> =
-        if (NewsFeatures.KOTLIN_BLOG_ENABLED) {
+        if (KOTLIN_BLOG_ENABLED) {
             val items = KotlinBlogProvider.fetchItems(lastCheck)
             logInfo("Kotlin Blog items collected (after filter): ${items.size}")
             items
@@ -59,8 +63,28 @@ fun main() {
             emptyList()
         }
 
+    val mediumGoogleItems: List<MediumGoogleItem> =
+        if (MEDIUM_GOOGLE_ENABLED) {
+            val items = MediumGoogleProvider.fetchItems(lastCheck)
+            logInfo("Medium Google items collected (after filter): ${items.size}")
+            items
+        } else {
+            logInfo("Medium Google parsing disabled by feature flag")
+            emptyList()
+        }
+
+    val mediumAndroidItems: List<MediumAndroidItem> =
+        if (MEDIUM_ANDROID_ENABLED) {
+            val items = MediumAndroidProvider.fetchItems(lastCheck)
+            logInfo("Medium Android items collected (after filter): ${items.size}")
+            items
+        } else {
+            logInfo("Medium Android parsing disabled by feature flag")
+            emptyList()
+        }
+
     val androidWeeklyItems: List<AndroidWeeklyItem> =
-        if (NewsFeatures.ANDROID_WEEKLY_ENABLED) {
+        if (ANDROID_WEEKLY_ENABLED) {
             val items = AndroidWeeklyProvider.fetchItems(lastCheck)
             logInfo("Android Weekly items collected (after filter): ${items.size}")
             items
@@ -70,7 +94,7 @@ fun main() {
         }
 
     val proAndroidDevItems: List<ProAndroidDevItem> =
-        if (NewsFeatures.PRO_ANDROID_DEV_ENABLED) {
+        if (PRO_ANDROID_DEV_ENABLED) {
             val items = ProAndroidDevProvider.fetchItems(lastCheck)
             logInfo("ProAndroidDev items collected (after filter): ${items.size}")
             items
@@ -80,12 +104,12 @@ fun main() {
         }
 
     val githubReleaseItems: List<GithubReleaseItem> =
-        if (NewsFeatures.GITHUB_RELEASES_ENABLED) {
+        if (GITHUB_RELEASES_ENABLED) {
             val items = GithubReleasesProvider.fetchItems(lastCheck)
-            logInfo("GitHub Releases items collected (after filter): ${items.size}")
+            logInfo("GitHub releases collected (after filter): ${items.size}")
             items
         } else {
-            logInfo("GitHub Releases parsing disabled by feature flag")
+            logInfo("GitHub releases parsing disabled by feature flag")
             emptyList()
         }
 
@@ -96,15 +120,19 @@ fun main() {
         youtubeItems = youtubeItems,
         androidBlogItems = androidBlogItems,
         kotlinBlogItems = kotlinBlogItems,
+        mediumGoogleItems = mediumGoogleItems,
+        mediumAndroidItems = mediumAndroidItems,
         androidWeeklyItems = androidWeeklyItems,
         proAndroidDevItems = proAndroidDevItems,
         githubReleaseItems = githubReleaseItems,
-        youtubeEnabled = NewsFeatures.YOUTUBE_ENABLED,
-        androidBlogEnabled = NewsFeatures.ANDROID_BLOG_ENABLED,
-        kotlinBlogEnabled = NewsFeatures.KOTLIN_BLOG_ENABLED,
-        androidWeeklyEnabled = NewsFeatures.ANDROID_WEEKLY_ENABLED,
-        proAndroidDevEnabled = NewsFeatures.PRO_ANDROID_DEV_ENABLED,
-        githubReleasesEnabled = NewsFeatures.GITHUB_RELEASES_ENABLED
+        youtubeEnabled = YOUTUBE_ENABLED,
+        androidBlogEnabled = ANDROID_BLOG_ENABLED,
+        kotlinBlogEnabled = KOTLIN_BLOG_ENABLED,
+        mediumGoogleEnabled = MEDIUM_GOOGLE_ENABLED,
+        mediumAndroidEnabled = MEDIUM_ANDROID_ENABLED,
+        androidWeeklyEnabled = ANDROID_WEEKLY_ENABLED,
+        proAndroidDevEnabled = PRO_ANDROID_DEV_ENABLED,
+        githubReleasesEnabled = GITHUB_RELEASES_ENABLED
     )
     logInfo("Built messages count: ${messages.size}")
     endSection()
@@ -123,12 +151,16 @@ fun buildMessages(
     youtubeItems: List<YoutubeItem>,
     androidBlogItems: List<AndroidBlogItem>,
     kotlinBlogItems: List<KotlinBlogItem>,
+    mediumGoogleItems: List<MediumGoogleItem>,
+    mediumAndroidItems: List<MediumAndroidItem>,
     androidWeeklyItems: List<AndroidWeeklyItem>,
     proAndroidDevItems: List<ProAndroidDevItem>,
     githubReleaseItems: List<GithubReleaseItem>,
     youtubeEnabled: Boolean,
     androidBlogEnabled: Boolean,
     kotlinBlogEnabled: Boolean,
+    mediumGoogleEnabled: Boolean,
+    mediumAndroidEnabled: Boolean,
     androidWeeklyEnabled: Boolean,
     proAndroidDevEnabled: Boolean,
     githubReleasesEnabled: Boolean
@@ -238,6 +270,68 @@ fun buildMessages(
         flushChunk(sb)
     }
 
+    fun appendMediumGoogleChunks() {
+        if (!mediumGoogleEnabled) return
+        if (mediumGoogleItems.isEmpty()) return
+
+        val header = "<b>Новые статьи Google Developer Experts (Medium)</b>\n\n"
+        var sb = StringBuilder(header)
+
+        for (item in mediumGoogleItems) {
+            val local = item.published.atZone(zone)
+            val dateStr = local.format(dateFormatter)
+            val line = buildString {
+                append(dateStr)
+                append(" – ")
+                append("<a href=\"")
+                append(escapeHtml(item.url))
+                append("\">")
+                append(escapeHtml(item.title))
+                append("</a>\n\n")
+            }
+
+            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
+                flushChunk(sb)
+                sb = StringBuilder()
+            }
+
+            sb.append(line)
+        }
+
+        flushChunk(sb)
+    }
+
+    fun appendMediumAndroidChunks() {
+        if (!mediumAndroidEnabled) return
+        if (mediumAndroidItems.isEmpty()) return
+
+        val header = "<b>Новые статьи Android Developers (Medium)</b>\n\n"
+        var sb = StringBuilder(header)
+
+        for (item in mediumAndroidItems) {
+            val local = item.published.atZone(zone)
+            val dateStr = local.format(dateFormatter)
+            val line = buildString {
+                append(dateStr)
+                append(" – ")
+                append("<a href=\"")
+                append(escapeHtml(item.url))
+                append("\">")
+                append(escapeHtml(item.title))
+                append("</a>\n\n")
+            }
+
+            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
+                flushChunk(sb)
+                sb = StringBuilder()
+            }
+
+            sb.append(line)
+        }
+
+        flushChunk(sb)
+    }
+
     fun appendAndroidWeeklyChunks() {
         if (!androidWeeklyEnabled) return
         if (androidWeeklyItems.isEmpty()) return
@@ -300,7 +394,7 @@ fun buildMessages(
         flushChunk(sb)
     }
 
-    fun appendGithubReleaseChunks() {
+    fun appendGithubReleasesChunks() {
         if (!githubReleasesEnabled) return
         if (githubReleaseItems.isEmpty()) return
 
@@ -313,12 +407,10 @@ fun buildMessages(
             val line = buildString {
                 append(dateStr)
                 append(" – ")
-                append(escapeHtml(item.repo))
-                append(" – ")
                 append("<a href=\"")
                 append(escapeHtml(item.url))
                 append("\">")
-                append(escapeHtml(item.title))
+                append(escapeHtml("${item.repo}: ${item.title}"))
                 append("</a>\n\n")
             }
 
@@ -336,9 +428,11 @@ fun buildMessages(
     appendYoutubeChunks()
     appendAndroidBlogChunks()
     appendKotlinBlogChunks()
+    appendMediumGoogleChunks()
+    appendMediumAndroidChunks()
     appendAndroidWeeklyChunks()
     appendProAndroidDevChunks()
-    appendGithubReleaseChunks()
+    appendGithubReleasesChunks()
 
     return result
 }

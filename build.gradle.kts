@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -9,13 +10,10 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-}
-
 application {
     mainClass.set("news.NewsBotMainKt")
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = "21"
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
 }

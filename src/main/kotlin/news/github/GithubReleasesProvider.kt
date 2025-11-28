@@ -1,5 +1,6 @@
 package news.github
 
+import news.NewsSources
 import news.Timestamp
 import java.net.URI
 import java.net.http.HttpClient
@@ -17,31 +18,10 @@ data class GithubReleaseItem(
     val url: String
 )
 
-private val repos = listOf(
-    "https://github.com/square/retrofit",
-    "https://github.com/material-components/material-components-android",
-    "https://github.com/InsertKoinIO/koin",
-    "https://github.com/coil-kt/coil",
-    "https://github.com/Kotlin/kotlinx.coroutines",
-    "https://github.com/google/dagger",
-    "https://github.com/ReactiveX/RxJava",
-    "https://github.com/airbnb/lottie-android",
-    "https://github.com/google/gson",
-    "https://github.com/androidbroadcast/ViewBindingPropertyDelegate",
-    "https://github.com/facebook/facebook-android-sdk",
-    "https://github.com/JakeWharton/timber",
-    "https://github.com/square/leakcanary",
-    "https://github.com/square/okhttp",
-    "https://github.com/Kotlin/kotlinx.serialization",
-    "https://github.com/ktorio/ktor",
-    "https://github.com/JetBrains/compose-multiplatform",
-    "https://github.com/ReactiveX/RxAndroid",
-    "https://github.com/ReactiveX/RxKotlin"
-)
-
 object GithubReleasesProvider {
 
     fun fetchItems(lastCheck: Instant): List<GithubReleaseItem> {
+        val repos = NewsSources.Github.repos
         if (repos.isEmpty()) return emptyList()
 
         val client = HttpClient.newHttpClient()
@@ -59,7 +39,6 @@ object GithubReleasesProvider {
                 .ifEmpty { trimmed }
 
             val feedUrl = "$trimmed/releases.atom"
-
             System.err.println("==== GitHub releases: fetching $feedUrl for $label")
 
             val request = HttpRequest.newBuilder()
@@ -128,7 +107,10 @@ object GithubReleasesProvider {
 
                 val dateRaw = publishedStr ?: updatedStr ?: continue
                 val published = parseDate(dateRaw) ?: continue
+                parsed += 1
                 if (published <= lastCheck) continue
+
+                afterFilter += 1
 
                 val safeTitle = title
                     ?.trim()
@@ -139,9 +121,6 @@ object GithubReleasesProvider {
                     ?.trim()
                     .takeUnless { it.isNullOrEmpty() }
                     ?: continue
-
-                parsed += 1
-                afterFilter += 1
 
                 result += GithubReleaseItem(
                     published = published,

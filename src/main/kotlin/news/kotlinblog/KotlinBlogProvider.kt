@@ -1,5 +1,6 @@
 package news.kotlinblog
 
+import news.NewsSources
 import news.logInfo
 import news.logWarn
 import java.net.URI
@@ -20,8 +21,7 @@ data class KotlinBlogItem(
 
 object KotlinBlogProvider {
 
-    // Официальный фид Kotlin Blog
-    private const val FEED_URL: String = "https://blog.jetbrains.com/kotlin/feed/"
+    private const val FEED_URL: String = NewsSources.KotlinBlog.FEED_URL
 
     private val client: HttpClient = HttpClient.newBuilder()
         .followRedirects(Redirect.NORMAL)
