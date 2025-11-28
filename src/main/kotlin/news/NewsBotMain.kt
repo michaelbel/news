@@ -2,6 +2,8 @@ package news
 
 import news.androidblog.AndroidBlogItem
 import news.androidblog.AndroidBlogProvider
+import news.kotlinblog.KotlinBlogItem
+import news.kotlinblog.KotlinBlogProvider
 import news.youtube.YoutubeItem
 import news.youtube.YoutubeProvider
 import java.net.URI
@@ -20,6 +22,7 @@ fun main() {
     endSection()
 
     logSection("Collect sources")
+
     val youtubeItems: List<YoutubeItem> =
         if (NewsFeatures.YOUTUBE_ENABLED) {
             val items = YoutubeProvider.fetchItems(lastCheck)
@@ -30,7 +33,7 @@ fun main() {
             emptyList()
         }
 
-    val blogItems: List<AndroidBlogItem> =
+    val androidBlogItems: List<AndroidBlogItem> =
         if (NewsFeatures.ANDROID_BLOG_ENABLED) {
             val items = AndroidBlogProvider.fetchItems(lastCheck)
             logInfo("Android Developers Blog items collected (after filter): ${items.size}")
@@ -39,14 +42,27 @@ fun main() {
             logInfo("Android Developers Blog parsing disabled by feature flag")
             emptyList()
         }
+
+    val kotlinBlogItems: List<KotlinBlogItem> =
+        if (NewsFeatures.KOTLIN_BLOG_ENABLED) {
+            val items = KotlinBlogProvider.fetchItems(lastCheck)
+            logInfo("Kotlin Blog items collected (after filter): ${items.size}")
+            items
+        } else {
+            logInfo("Kotlin Blog parsing disabled by feature flag")
+            emptyList()
+        }
+
     endSection()
 
     logSection("Build messages")
     val messages = buildMessages(
         youtubeItems = youtubeItems,
-        blogItems = blogItems,
+        androidBlogItems = androidBlogItems,
+        kotlinBlogItems = kotlinBlogItems,
         youtubeEnabled = NewsFeatures.YOUTUBE_ENABLED,
-        blogEnabled = NewsFeatures.ANDROID_BLOG_ENABLED
+        androidBlogEnabled = NewsFeatures.ANDROID_BLOG_ENABLED,
+        kotlinBlogEnabled = NewsFeatures.KOTLIN_BLOG_ENABLED
     )
     logInfo("Built messages count: ${messages.size}")
     endSection()
@@ -63,9 +79,11 @@ fun main() {
 
 fun buildMessages(
     youtubeItems: List<YoutubeItem>,
-    blogItems: List<AndroidBlogItem>,
+    androidBlogItems: List<AndroidBlogItem>,
+    kotlinBlogItems: List<KotlinBlogItem>,
     youtubeEnabled: Boolean,
-    blogEnabled: Boolean
+    androidBlogEnabled: Boolean,
+    kotlinBlogEnabled: Boolean
 ): List<String> {
     val zone = ZoneId.of("Europe/Berlin")
     val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
@@ -110,14 +128,14 @@ fun buildMessages(
         flushChunk(sb)
     }
 
-    fun appendBlogChunks() {
-        if (!blogEnabled) return
-        if (blogItems.isEmpty()) return
+    fun appendAndroidBlogChunks() {
+        if (!androidBlogEnabled) return
+        if (androidBlogItems.isEmpty()) return
 
         val header = "<b>Новые статьи Android Developers Blog</b>\n\n"
         var sb = StringBuilder(header)
 
-        for (item in blogItems) {
+        for (item in androidBlogItems) {
             val local = item.published.atZone(zone)
             val dateStr = local.format(dateFormatter)
             val line = buildString {
@@ -132,7 +150,38 @@ fun buildMessages(
 
             if (sb.length + line.length > TELEGRAM_MAX_LEN) {
                 flushChunk(sb)
-                sb = StringBuilder() // следующие чанки без заголовка
+                sb = StringBuilder()
+            }
+
+            sb.append(line)
+        }
+
+        flushChunk(sb)
+    }
+
+    fun appendKotlinBlogChunks() {
+        if (!kotlinBlogEnabled) return
+        if (kotlinBlogItems.isEmpty()) return
+
+        val header = "<b>Новые статьи Kotlin Blog</b>\n\n"
+        var sb = StringBuilder(header)
+
+        for (item in kotlinBlogItems) {
+            val local = item.published.atZone(zone)
+            val dateStr = local.format(dateFormatter)
+            val line = buildString {
+                append(dateStr)
+                append(" – ")
+                append("<a href=\"")
+                append(escapeHtml(item.url))
+                append("\">")
+                append(escapeHtml(item.title))
+                append("</a>\n\n")
+            }
+
+            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
+                flushChunk(sb)
+                sb = StringBuilder()
             }
 
             sb.append(line)
@@ -142,7 +191,8 @@ fun buildMessages(
     }
 
     appendYoutubeChunks()
-    appendBlogChunks()
+    appendAndroidBlogChunks()
+    appendKotlinBlogChunks()
 
     return result
 }
