@@ -1,9 +1,10 @@
 package news
 
 object NewsFeatures {
-    const val YOUTUBE_ENABLED: Boolean = false
-    const val ANDROID_BLOG_ENABLED: Boolean = false
-    const val KOTLIN_BLOG_ENABLED: Boolean = false
-    const val ANDROID_WEEKLY_ENABLED: Boolean = false
-    const val PRO_ANDROID_DEV_ENABLED: Boolean = true
+    const val YOUTUBE_ENABLED = false
+    const val ANDROID_BLOG_ENABLED = false
+    const val KOTLIN_BLOG_ENABLED = false
+    const val ANDROID_WEEKLY_ENABLED = false
+    const val PRO_ANDROID_DEV_ENABLED = false
+    const val GITHUB_RELEASES_ENABLED = true
 }

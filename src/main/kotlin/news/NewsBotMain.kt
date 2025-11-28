@@ -4,6 +4,8 @@ import news.androidblog.AndroidBlogItem
 import news.androidblog.AndroidBlogProvider
 import news.androidweekly.AndroidWeeklyItem
 import news.androidweekly.AndroidWeeklyProvider
+import news.github.GithubReleaseItem
+import news.github.GithubReleasesProvider
 import news.kotlinblog.KotlinBlogItem
 import news.kotlinblog.KotlinBlogProvider
 import news.proandroiddev.ProAndroidDevItem
@@ -17,7 +19,7 @@ import java.net.http.HttpResponse
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-private const val TELEGRAM_MAX_LEN = 3500 // запас до 4096
+private const val TELEGRAM_MAX_LEN = 3500
 
 fun main() {
     logSection("Timestamp & last check")
@@ -77,6 +79,16 @@ fun main() {
             emptyList()
         }
 
+    val githubReleaseItems: List<GithubReleaseItem> =
+        if (NewsFeatures.GITHUB_RELEASES_ENABLED) {
+            val items = GithubReleasesProvider.fetchItems(lastCheck)
+            logInfo("GitHub Releases items collected (after filter): ${items.size}")
+            items
+        } else {
+            logInfo("GitHub Releases parsing disabled by feature flag")
+            emptyList()
+        }
+
     endSection()
 
     logSection("Build messages")
@@ -86,11 +98,13 @@ fun main() {
         kotlinBlogItems = kotlinBlogItems,
         androidWeeklyItems = androidWeeklyItems,
         proAndroidDevItems = proAndroidDevItems,
+        githubReleaseItems = githubReleaseItems,
         youtubeEnabled = NewsFeatures.YOUTUBE_ENABLED,
         androidBlogEnabled = NewsFeatures.ANDROID_BLOG_ENABLED,
         kotlinBlogEnabled = NewsFeatures.KOTLIN_BLOG_ENABLED,
         androidWeeklyEnabled = NewsFeatures.ANDROID_WEEKLY_ENABLED,
-        proAndroidDevEnabled = NewsFeatures.PRO_ANDROID_DEV_ENABLED
+        proAndroidDevEnabled = NewsFeatures.PRO_ANDROID_DEV_ENABLED,
+        githubReleasesEnabled = NewsFeatures.GITHUB_RELEASES_ENABLED
     )
     logInfo("Built messages count: ${messages.size}")
     endSection()
@@ -111,11 +125,13 @@ fun buildMessages(
     kotlinBlogItems: List<KotlinBlogItem>,
     androidWeeklyItems: List<AndroidWeeklyItem>,
     proAndroidDevItems: List<ProAndroidDevItem>,
+    githubReleaseItems: List<GithubReleaseItem>,
     youtubeEnabled: Boolean,
     androidBlogEnabled: Boolean,
     kotlinBlogEnabled: Boolean,
     androidWeeklyEnabled: Boolean,
-    proAndroidDevEnabled: Boolean
+    proAndroidDevEnabled: Boolean,
+    githubReleasesEnabled: Boolean
 ): List<String> {
     val zone = ZoneId.of("Europe/Berlin")
     val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
@@ -151,7 +167,7 @@ fun buildMessages(
 
             if (sb.length + line.length > TELEGRAM_MAX_LEN) {
                 flushChunk(sb)
-                sb = StringBuilder() // следующие чанки без заголовка
+                sb = StringBuilder()
             }
 
             sb.append(line)
@@ -284,11 +300,45 @@ fun buildMessages(
         flushChunk(sb)
     }
 
+    fun appendGithubReleaseChunks() {
+        if (!githubReleasesEnabled) return
+        if (githubReleaseItems.isEmpty()) return
+
+        val header = "<b>Новые релизы на GitHub</b>\n\n"
+        var sb = StringBuilder(header)
+
+        for (item in githubReleaseItems) {
+            val local = item.published.atZone(zone)
+            val dateStr = local.format(dateFormatter)
+            val line = buildString {
+                append(dateStr)
+                append(" – ")
+                append(escapeHtml(item.repo))
+                append(" – ")
+                append("<a href=\"")
+                append(escapeHtml(item.url))
+                append("\">")
+                append(escapeHtml(item.title))
+                append("</a>\n\n")
+            }
+
+            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
+                flushChunk(sb)
+                sb = StringBuilder()
+            }
+
+            sb.append(line)
+        }
+
+        flushChunk(sb)
+    }
+
     appendYoutubeChunks()
     appendAndroidBlogChunks()
     appendKotlinBlogChunks()
     appendAndroidWeeklyChunks()
     appendProAndroidDevChunks()
+    appendGithubReleaseChunks()
 
     return result
 }
