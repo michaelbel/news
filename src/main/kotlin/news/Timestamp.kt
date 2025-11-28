@@ -26,14 +26,14 @@ object Timestamp {
         val fromEnv = System.getenv("LAST_CHECK")?.trim().orEmpty()
         if (fromEnv.isEmpty()) {
             val fallback = Instant.now().minusSeconds(ONE_DAY_SECONDS)
-            System.err.println("LAST_CHECK is empty, fallback to $fallback")
+            logWarn("LAST_CHECK is empty, fallback to $fallback")
             return fallback
         }
 
         val parsed = parseIso(fromEnv)
         if (parsed == null) {
             val fallback = Instant.now().minusSeconds(ONE_DAY_SECONDS)
-            System.err.println("Cannot parse LAST_CHECK=$fromEnv, fallback to $fallback")
+            logWarn("Cannot parse LAST_CHECK=$fromEnv, fallback to $fallback")
             return fallback
         }
 

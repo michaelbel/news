@@ -1,6 +1,8 @@
 package news.youtube
 
 import news.Timestamp
+import news.logInfo
+import news.logWarn
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -87,7 +89,7 @@ object YoutubeProvider {
         val result = mutableListOf<YoutubeItem>()
 
         for (feed in feeds) {
-            System.err.println("Fetching ${feed.url}")
+            logInfo("YouTube: fetching ${feed.label} (${feed.url})")
 
             val request = HttpRequest.newBuilder()
                 .uri(URI(feed.url))
@@ -96,9 +98,17 @@ object YoutubeProvider {
 
             val xml = try {
                 val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
+                logInfo("YouTube: HTTP status for ${feed.label} = ${resp.statusCode()}")
+                if (resp.statusCode() != 200) {
+                    logWarn(
+                        "YouTube: non-200 status for ${feed.label}, " +
+                                "body snippet=${resp.body().take(200)}"
+                    )
+                    continue
+                }
                 resp.body()
             } catch (e: Exception) {
-                System.err.println("Failed to fetch ${feed.url}: ${e.message}")
+                logWarn("YouTube: failed to fetch ${feed.label}: ${e.message}")
                 continue
             }
 
@@ -108,14 +118,19 @@ object YoutubeProvider {
                     .parse(xml.byteInputStream())
                     .apply { documentElement.normalize() }
             } catch (e: Exception) {
-                System.err.println("Failed to parse XML for ${feed.url}: ${e.message}")
+                logWarn("YouTube: failed to parse XML for ${feed.label}: ${e.message}")
                 continue
             }
 
             val entries = doc.getElementsByTagName("entry")
+            var feedEntries = 0
+            var addedEntries = 0
+
             for (i in 0 until entries.length) {
                 val entry = entries.item(i)
                 val children = entry.childNodes
+
+                feedEntries++
 
                 var publishedStr: String? = null
                 var title: String? = null
@@ -159,9 +174,16 @@ object YoutubeProvider {
                     title = safeTitle,
                     url = url
                 )
+                addedEntries++
             }
+
+            logInfo(
+                "YouTube: feed=${feed.label}, totalEntries=$feedEntries, " +
+                        "newItems=$addedEntries"
+            )
         }
 
+        logInfo("YouTube: total collected items=${result.size}")
         return result.sortedBy { it.published }
     }
 }

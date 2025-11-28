@@ -1,6 +1,8 @@
 package news.androidblog
 
 import news.Timestamp
+import news.logInfo
+import news.logWarn
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpClient.Redirect
@@ -18,11 +20,10 @@ data class AndroidBlogItem(
 object AndroidBlogProvider {
 
     // Финальный фид Android Developers Blog
-    // Blogspot редиректит сюда с android-developers.blogspot.com/atom.xml
     private const val FEED_URL_PRIMARY: String =
         "https://android-developers.googleblog.com/atom.xml"
 
-    // На всякий случай оставим http-фолбэк
+    // Фолбэк на случай странных редиректов
     private const val FEED_URL_FALLBACK: String =
         "http://android-developers.googleblog.com/atom.xml"
 
@@ -38,7 +39,7 @@ object AndroidBlogProvider {
         val result = mutableListOf<AndroidBlogItem>()
 
         fun fetchXml(url: String): String? {
-            System.err.println("AndroidBlog: fetching $url")
+            logInfo("AndroidBlog: fetching $url")
 
             val request = HttpRequest.newBuilder()
                 .uri(URI(url))
@@ -47,22 +48,22 @@ object AndroidBlogProvider {
 
             return try {
                 val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
-                System.err.println("AndroidBlog: HTTP status for $url = ${resp.statusCode()}")
+                logInfo("AndroidBlog: HTTP status for $url = ${resp.statusCode()}")
                 if (resp.statusCode() != 200) {
-                    System.err.println(
-                        "AndroidBlog: non-200 status for $url, body snippet=${resp.body().take(300)}"
+                    logWarn(
+                        "AndroidBlog: non-200 status for $url, " +
+                                "body snippet=${resp.body().take(300)}"
                     )
                     null
                 } else {
                     resp.body()
                 }
             } catch (e: Exception) {
-                System.err.println("AndroidBlog: failed to fetch $url: ${e.message}")
+                logWarn("AndroidBlog: failed to fetch $url: ${e.message}")
                 null
             }
         }
 
-        // Пытаемся сначала по https, если не вышло – пробуем http
         val xml = fetchXml(FEED_URL_PRIMARY)
             ?: fetchXml(FEED_URL_FALLBACK)
             ?: return emptyList()
@@ -73,8 +74,8 @@ object AndroidBlogProvider {
                 .parse(xml.byteInputStream())
                 .apply { documentElement.normalize() }
         } catch (e: Exception) {
-            System.err.println("AndroidBlog: failed to parse XML, error=${e.message}")
-            System.err.println("AndroidBlog raw snippet: ${xml.take(300)}")
+            logWarn("AndroidBlog: failed to parse XML, error=${e.message}")
+            logWarn("AndroidBlog raw snippet: ${xml.take(300)}")
             return emptyList()
         }
 
@@ -113,7 +114,7 @@ object AndroidBlogProvider {
 
             val published = Timestamp.parseIso(publishedStr)
             if (published == null) {
-                System.err.println("AndroidBlog: cannot parse date '$publishedStr'")
+                logWarn("AndroidBlog: cannot parse date '$publishedStr'")
                 continue
             }
 
@@ -139,7 +140,7 @@ object AndroidBlogProvider {
             )
         }
 
-        System.err.println(
+        logInfo(
             "AndroidBlog: entries total=$totalEntries, parsed=$parsedEntries, " +
                     "afterFilter=$afterFilterEntries, result=${result.size}"
         )

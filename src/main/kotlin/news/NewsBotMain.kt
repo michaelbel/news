@@ -1,7 +1,5 @@
 package news
 
-import news.Timestamp
-import news.NewsFeatures
 import news.androidblog.AndroidBlogItem
 import news.androidblog.AndroidBlogProvider
 import news.youtube.YoutubeItem
@@ -16,42 +14,51 @@ import java.time.format.DateTimeFormatter
 private const val TELEGRAM_MAX_LEN = 3500 // запас до 4096
 
 fun main() {
+    logSection("Timestamp & last check")
     val lastCheck = Timestamp.readLastCheck()
-    System.err.println("Last check instant: $lastCheck")
+    logInfo("Last check instant: $lastCheck")
+    endSection()
 
+    logSection("Collect sources")
     val youtubeItems: List<YoutubeItem> =
         if (NewsFeatures.YOUTUBE_ENABLED) {
             val items = YoutubeProvider.fetchItems(lastCheck)
-            System.err.println("YouTube items collected: ${items.size}")
+            logInfo("YouTube items collected (after filter): ${items.size}")
             items
         } else {
-            System.err.println("YouTube parsing disabled by feature flag")
+            logInfo("YouTube parsing disabled by feature flag")
             emptyList()
         }
 
     val blogItems: List<AndroidBlogItem> =
         if (NewsFeatures.ANDROID_BLOG_ENABLED) {
             val items = AndroidBlogProvider.fetchItems(lastCheck)
-            System.err.println("Android Developers Blog items collected: ${items.size}")
+            logInfo("Android Developers Blog items collected (after filter): ${items.size}")
             items
         } else {
-            System.err.println("Android Developers Blog parsing disabled by feature flag")
+            logInfo("Android Developers Blog parsing disabled by feature flag")
             emptyList()
         }
+    endSection()
 
+    logSection("Build messages")
     val messages = buildMessages(
         youtubeItems = youtubeItems,
         blogItems = blogItems,
         youtubeEnabled = NewsFeatures.YOUTUBE_ENABLED,
         blogEnabled = NewsFeatures.ANDROID_BLOG_ENABLED
     )
+    logInfo("Built messages count: ${messages.size}")
+    endSection()
 
     if (messages.isEmpty()) {
-        System.err.println("Новостей нет, ничего не отправляем в Telegram")
+        logInfo("Новостей нет, ничего не отправляем в Telegram")
         return
     }
 
+    logSection("Send to Telegram")
     sendTelegram(messages)
+    endSection()
 }
 
 fun buildMessages(
@@ -74,7 +81,7 @@ fun buildMessages(
 
     fun appendYoutubeChunks() {
         if (!youtubeEnabled) return
-        if (youtubeItems.isEmpty()) return   // источник включён, но новостей нет – секцию не добавляем
+        if (youtubeItems.isEmpty()) return
 
         val header = "<b>Новые YouTube-видео</b>\n\n"
         var sb = StringBuilder(header)
@@ -105,7 +112,7 @@ fun buildMessages(
 
     fun appendBlogChunks() {
         if (!blogEnabled) return
-        if (blogItems.isEmpty()) return   // нет новых статей – секцию не добавляем
+        if (blogItems.isEmpty()) return
 
         val header = "<b>Новые статьи Android Developers Blog</b>\n\n"
         var sb = StringBuilder(header)
@@ -154,7 +161,7 @@ fun sendTelegram(messages: List<String>) {
     val threadId = System.getenv("THREAD_ID").orEmpty()
 
     if (token.isBlank() || chatId.isBlank()) {
-        System.err.println("TELEGRAM_TOKEN or CHAT_ID not set, skip send")
+        logWarn("TELEGRAM_TOKEN or CHAT_ID not set, skip send")
         return
     }
 
@@ -162,8 +169,8 @@ fun sendTelegram(messages: List<String>) {
     val client = HttpClient.newHttpClient()
 
     messages.forEachIndexed { index, rawText ->
-        System.err.println("Preparing to send Telegram message #${index + 1}")
-        System.err.println("Text length = ${rawText.length}")
+        logInfo("Preparing to send Telegram message #${index + 1}")
+        logInfo("Text length = ${rawText.length}")
 
         val jsonText = rawText
             .replace("\\", "\\\\")
@@ -182,7 +189,7 @@ fun sendTelegram(messages: List<String>) {
             append("}")
         }
 
-        System.err.println("Payload for Telegram #${index + 1}: $payload")
+        logInfo("Payload for Telegram #${index + 1}: $payload")
 
         val request = HttpRequest.newBuilder()
             .uri(URI(url))
@@ -191,10 +198,11 @@ fun sendTelegram(messages: List<String>) {
             .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        System.err.println("Telegram response #${index + 1}: ${response.statusCode()}")
-        System.err.println("Telegram body #${index + 1}: ${response.body()}")
+        logInfo("Telegram response #${index + 1}: ${response.statusCode()}")
+        logInfo("Telegram body #${index + 1}: ${response.body()}")
 
         if (response.statusCode() != 200) {
+            logError("Telegram send failed for message #${index + 1} with status ${response.statusCode()}")
             error("Telegram send failed for message #${index + 1} with status ${response.statusCode()}")
         }
     }
