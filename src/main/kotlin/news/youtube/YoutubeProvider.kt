@@ -1,5 +1,6 @@
 package news.youtube
 
+import news.NewsItem
 import news.Timestamp
 import news.YOUTUBE_CHANNELS
 import java.net.URI
@@ -10,10 +11,10 @@ import java.time.Instant
 import javax.xml.parsers.DocumentBuilderFactory
 
 data class YoutubeItem(
-    val published: Instant,
-    val title: String,
-    val url: String
-)
+    override val published: Instant,
+    override val title: String,
+    override val url: String
+) : NewsItem
 
 object YoutubeProvider {
 

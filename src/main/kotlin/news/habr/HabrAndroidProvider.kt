@@ -1,6 +1,7 @@
 package news.habr
 
 import news.HABR_ANDROID_URL
+import news.NewsItem
 import news.logInfo
 import news.logWarn
 import java.net.URI
@@ -14,10 +15,10 @@ import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
 data class HabrAndroidItem(
-    val published: Instant,
-    val title: String,
-    val url: String
-)
+    override val published: Instant,
+    override val title: String,
+    override val url: String
+) : NewsItem
 
 object HabrAndroidProvider {
 

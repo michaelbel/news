@@ -1,6 +1,7 @@
 package news.androidblog
 
 import news.ANDROID_BLOG_URL
+import news.NewsItem
 import news.Timestamp
 import java.net.URI
 import java.net.http.HttpClient
@@ -10,10 +11,10 @@ import java.time.Instant
 import javax.xml.parsers.DocumentBuilderFactory
 
 data class AndroidBlogItem(
-    val published: Instant,
-    val title: String,
-    val url: String
-)
+    override val published: Instant,
+    override val title: String,
+    override val url: String
+) : NewsItem
 
 object AndroidBlogProvider {
 

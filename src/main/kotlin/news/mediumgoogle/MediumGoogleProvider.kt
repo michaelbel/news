@@ -1,6 +1,7 @@
 package news.mediumgoogle
 
 import news.MEDIUM_GOOGLE_DEVELOPER_EXPERTS_URL
+import news.NewsItem
 import news.Timestamp
 import java.net.URI
 import java.net.http.HttpClient
@@ -12,10 +13,10 @@ import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
 data class MediumGoogleItem(
-    val published: Instant,
-    val title: String,
-    val url: String
-)
+    override val published: Instant,
+    override val title: String,
+    override val url: String
+) : NewsItem
 
 object MediumGoogleProvider {
 

@@ -1,6 +1,7 @@
 package news.mediumandroid
 
 import news.MEDIUM_ANDROID_DEVELOPERS_URL
+import news.NewsItem
 import news.Timestamp
 import java.net.URI
 import java.net.http.HttpClient
@@ -12,10 +13,10 @@ import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
 data class MediumAndroidItem(
-    val published: Instant,
-    val title: String,
-    val url: String
-)
+    override val published: Instant,
+    override val title: String,
+    override val url: String
+) : NewsItem
 
 object MediumAndroidProvider {
 

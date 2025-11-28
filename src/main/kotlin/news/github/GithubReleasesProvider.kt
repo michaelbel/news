@@ -1,6 +1,7 @@
 package news.github
 
 import news.GITHUB_REPOS
+import news.NewsItem
 import news.Timestamp
 import java.net.URI
 import java.net.http.HttpClient
@@ -12,11 +13,11 @@ import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
 data class GithubReleaseItem(
-    val published: Instant,
+    override val published: Instant,
     val repo: String,
-    val title: String,
-    val url: String
-)
+    override val title: String,
+    override val url: String
+) : NewsItem
 
 object GithubReleasesProvider {
 

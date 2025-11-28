@@ -1,5 +1,6 @@
 package news.proandroiddev
 
+import news.NewsItem
 import news.PRO_ANDROID_DEV_URL
 import news.Timestamp
 import java.net.URI
@@ -17,10 +18,10 @@ import javax.net.ssl.X509TrustManager
 import javax.xml.parsers.DocumentBuilderFactory
 
 data class ProAndroidDevItem(
-    val published: Instant,
-    val title: String,
-    val url: String
-)
+    override val published: Instant,
+    override val title: String,
+    override val url: String
+) : NewsItem
 
 object ProAndroidDevProvider {
 
