@@ -2,6 +2,8 @@ package news
 
 import news.androidblog.AndroidBlogItem
 import news.androidblog.AndroidBlogProvider
+import news.androidweekly.AndroidWeeklyItem
+import news.androidweekly.AndroidWeeklyProvider
 import news.kotlinblog.KotlinBlogItem
 import news.kotlinblog.KotlinBlogProvider
 import news.youtube.YoutubeItem
@@ -53,6 +55,16 @@ fun main() {
             emptyList()
         }
 
+    val androidWeeklyItems: List<AndroidWeeklyItem> =
+        if (NewsFeatures.ANDROID_WEEKLY_ENABLED) {
+            val items = AndroidWeeklyProvider.fetchItems(lastCheck)
+            logInfo("Android Weekly items collected (after filter): ${items.size}")
+            items
+        } else {
+            logInfo("Android Weekly parsing disabled by feature flag")
+            emptyList()
+        }
+
     endSection()
 
     logSection("Build messages")
@@ -60,9 +72,11 @@ fun main() {
         youtubeItems = youtubeItems,
         androidBlogItems = androidBlogItems,
         kotlinBlogItems = kotlinBlogItems,
+        androidWeeklyItems = androidWeeklyItems,
         youtubeEnabled = NewsFeatures.YOUTUBE_ENABLED,
         androidBlogEnabled = NewsFeatures.ANDROID_BLOG_ENABLED,
-        kotlinBlogEnabled = NewsFeatures.KOTLIN_BLOG_ENABLED
+        kotlinBlogEnabled = NewsFeatures.KOTLIN_BLOG_ENABLED,
+        androidWeeklyEnabled = NewsFeatures.ANDROID_WEEKLY_ENABLED
     )
     logInfo("Built messages count: ${messages.size}")
     endSection()
@@ -81,9 +95,11 @@ fun buildMessages(
     youtubeItems: List<YoutubeItem>,
     androidBlogItems: List<AndroidBlogItem>,
     kotlinBlogItems: List<KotlinBlogItem>,
+    androidWeeklyItems: List<AndroidWeeklyItem>,
     youtubeEnabled: Boolean,
     androidBlogEnabled: Boolean,
-    kotlinBlogEnabled: Boolean
+    kotlinBlogEnabled: Boolean,
+    androidWeeklyEnabled: Boolean
 ): List<String> {
     val zone = ZoneId.of("Europe/Berlin")
     val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
@@ -190,9 +206,41 @@ fun buildMessages(
         flushChunk(sb)
     }
 
+    fun appendAndroidWeeklyChunks() {
+        if (!androidWeeklyEnabled) return
+        if (androidWeeklyItems.isEmpty()) return
+
+        val header = "<b>Новые выпуски Android Weekly</b>\n\n"
+        var sb = StringBuilder(header)
+
+        for (item in androidWeeklyItems) {
+            val local = item.published.atZone(zone)
+            val dateStr = local.format(dateFormatter)
+            val line = buildString {
+                append(dateStr)
+                append(" – ")
+                append("<a href=\"")
+                append(escapeHtml(item.url))
+                append("\">")
+                append(escapeHtml(item.title))
+                append("</a>\n\n")
+            }
+
+            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
+                flushChunk(sb)
+                sb = StringBuilder()
+            }
+
+            sb.append(line)
+        }
+
+        flushChunk(sb)
+    }
+
     appendYoutubeChunks()
     appendAndroidBlogChunks()
     appendKotlinBlogChunks()
+    appendAndroidWeeklyChunks()
 
     return result
 }
