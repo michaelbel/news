@@ -1,6 +1,7 @@
 package news
 
 import news.Timestamp
+import news.NewsFeatures
 import news.androidblog.AndroidBlogItem
 import news.androidblog.AndroidBlogProvider
 import news.youtube.YoutubeItem
@@ -17,20 +18,40 @@ private const val TELEGRAM_MAX_LEN = 3500 // запас до 4096
 fun main() {
     val lastCheck = Timestamp.readLastCheck()
 
-    val youtubeItems = YoutubeProvider.fetchItems(lastCheck)
-    val blogItems = AndroidBlogProvider.fetchItems(lastCheck)
+    val youtubeItems: List<YoutubeItem> =
+        if (NewsFeatures.YOUTUBE_ENABLED) {
+            YoutubeProvider.fetchItems(lastCheck)
+        } else {
+            emptyList()
+        }
+
+    val blogItems: List<AndroidBlogItem> =
+        if (NewsFeatures.ANDROID_BLOG_ENABLED) {
+            AndroidBlogProvider.fetchItems(lastCheck)
+        } else {
+            emptyList()
+        }
 
     val messages = buildMessages(
         youtubeItems = youtubeItems,
-        blogItems = blogItems
+        blogItems = blogItems,
+        youtubeEnabled = NewsFeatures.YOUTUBE_ENABLED,
+        blogEnabled = NewsFeatures.ANDROID_BLOG_ENABLED
     )
+
+    if (messages.isEmpty()) {
+        System.err.println("Nothing to send: all sections disabled or empty")
+        return
+    }
 
     sendTelegram(messages)
 }
 
 fun buildMessages(
     youtubeItems: List<YoutubeItem>,
-    blogItems: List<AndroidBlogItem>
+    blogItems: List<AndroidBlogItem>,
+    youtubeEnabled: Boolean,
+    blogEnabled: Boolean
 ): List<String> {
     val zone = ZoneId.of("Europe/Berlin")
     val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
@@ -45,9 +66,12 @@ fun buildMessages(
     }
 
     fun appendYoutubeChunks() {
+        if (!youtubeEnabled) return
+
         val header = "<b>Новые YouTube-видео</b>\n\n"
 
         if (youtubeItems.isEmpty()) {
+            // если источник включён, но новостей нет – один короткий блок
             result += header + "Новых видео нет."
             return
         }
@@ -79,6 +103,8 @@ fun buildMessages(
     }
 
     fun appendBlogChunks() {
+        if (!blogEnabled) return
+
         val header = "<b>Новые статьи Android Developers Blog</b>\n\n"
 
         if (blogItems.isEmpty()) {
