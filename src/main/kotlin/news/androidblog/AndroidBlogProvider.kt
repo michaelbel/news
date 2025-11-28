@@ -52,10 +52,16 @@ object AndroidBlogProvider {
             return emptyList()
         }
 
+        var totalEntries = 0
+        var parsedEntries = 0
+        var afterFilterEntries = 0
+
         val entries = doc.getElementsByTagName("entry")
         for (i in 0 until entries.length) {
             val entry = entries.item(i)
             val children = entry.childNodes
+
+            totalEntries++
 
             var publishedStr: String? = null
             var title: String? = null
@@ -78,8 +84,20 @@ object AndroidBlogProvider {
             }
 
             if (publishedStr == null) continue
-            val published = Timestamp.parseIso(publishedStr) ?: continue
-            if (published <= lastCheck) continue
+
+            val published = Timestamp.parseIso(publishedStr)
+            if (published == null) {
+                System.err.println("AndroidBlog: cannot parse date '$publishedStr'")
+                continue
+            }
+
+            parsedEntries++
+
+            if (published <= lastCheck) {
+                continue
+            }
+
+            afterFilterEntries++
 
             val safeTitle = title
                 ?.trim()
@@ -94,6 +112,10 @@ object AndroidBlogProvider {
                 url = url
             )
         }
+
+        System.err.println(
+            "AndroidBlog: entries total=$totalEntries, parsed=$parsedEntries, afterFilter=$afterFilterEntries, result=${result.size}"
+        )
 
         return result.sortedBy { it.published }
     }

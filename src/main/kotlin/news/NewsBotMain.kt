@@ -37,7 +37,6 @@ fun buildMessages(
 
     val result = mutableListOf<String>()
 
-    // helper для чанков
     fun flushChunk(builder: StringBuilder) {
         val text = builder.toString().trim()
         if (text.isNotEmpty()) {
@@ -45,8 +44,9 @@ fun buildMessages(
         }
     }
 
-    fun appendYoutubeChunk() {
+    fun appendYoutubeChunks() {
         val header = "<b>Новые YouTube-видео</b>\n\n"
+
         if (youtubeItems.isEmpty()) {
             result += header + "Новых видео нет."
             return
@@ -69,7 +69,7 @@ fun buildMessages(
 
             if (sb.length + line.length > TELEGRAM_MAX_LEN) {
                 flushChunk(sb)
-                sb = StringBuilder(header)
+                sb = StringBuilder() // следующие чанки без заголовка
             }
 
             sb.append(line)
@@ -78,8 +78,9 @@ fun buildMessages(
         flushChunk(sb)
     }
 
-    fun appendBlogChunk() {
+    fun appendBlogChunks() {
         val header = "<b>Новые статьи Android Developers Blog</b>\n\n"
+
         if (blogItems.isEmpty()) {
             result += header + "Новых статей нет."
             return
@@ -102,7 +103,7 @@ fun buildMessages(
 
             if (sb.length + line.length > TELEGRAM_MAX_LEN) {
                 flushChunk(sb)
-                sb = StringBuilder(header)
+                sb = StringBuilder() // следующие чанки без заголовка
             }
 
             sb.append(line)
@@ -111,8 +112,8 @@ fun buildMessages(
         flushChunk(sb)
     }
 
-    appendYoutubeChunk()
-    appendBlogChunk()
+    appendYoutubeChunks()
+    appendBlogChunks()
 
     return result
 }
