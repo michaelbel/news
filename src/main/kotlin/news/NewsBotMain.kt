@@ -17,18 +17,25 @@ private const val TELEGRAM_MAX_LEN = 3500 // запас до 4096
 
 fun main() {
     val lastCheck = Timestamp.readLastCheck()
+    System.err.println("Last check instant: $lastCheck")
 
     val youtubeItems: List<YoutubeItem> =
         if (NewsFeatures.YOUTUBE_ENABLED) {
-            YoutubeProvider.fetchItems(lastCheck)
+            val items = YoutubeProvider.fetchItems(lastCheck)
+            System.err.println("YouTube items collected: ${items.size}")
+            items
         } else {
+            System.err.println("YouTube parsing disabled by feature flag")
             emptyList()
         }
 
     val blogItems: List<AndroidBlogItem> =
         if (NewsFeatures.ANDROID_BLOG_ENABLED) {
-            AndroidBlogProvider.fetchItems(lastCheck)
+            val items = AndroidBlogProvider.fetchItems(lastCheck)
+            System.err.println("Android Developers Blog items collected: ${items.size}")
+            items
         } else {
+            System.err.println("Android Developers Blog parsing disabled by feature flag")
             emptyList()
         }
 
@@ -71,7 +78,6 @@ fun buildMessages(
         val header = "<b>Новые YouTube-видео</b>\n\n"
 
         if (youtubeItems.isEmpty()) {
-            // если источник включён, но новостей нет – один короткий блок
             result += header + "Новых видео нет."
             return
         }
