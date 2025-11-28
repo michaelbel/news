@@ -17,8 +17,14 @@ data class AndroidBlogItem(
 
 object AndroidBlogProvider {
 
-    private const val FEED_URL: String =
-        "https://android-developers.blogspot.com/atom.xml"
+    // Финальный фид Android Developers Blog
+    // Blogspot редиректит сюда с android-developers.blogspot.com/atom.xml
+    private const val FEED_URL_PRIMARY: String =
+        "https://android-developers.googleblog.com/atom.xml"
+
+    // На всякий случай оставим http-фолбэк
+    private const val FEED_URL_FALLBACK: String =
+        "http://android-developers.googleblog.com/atom.xml"
 
     private val client: HttpClient = HttpClient.newBuilder()
         .followRedirects(Redirect.NORMAL)
@@ -31,25 +37,35 @@ object AndroidBlogProvider {
 
         val result = mutableListOf<AndroidBlogItem>()
 
-        System.err.println("Fetching $FEED_URL")
+        fun fetchXml(url: String): String? {
+            System.err.println("AndroidBlog: fetching $url")
 
-        val request = HttpRequest.newBuilder()
-            .uri(URI(FEED_URL))
-            .GET()
-            .build()
+            val request = HttpRequest.newBuilder()
+                .uri(URI(url))
+                .GET()
+                .build()
 
-        val xml = try {
-            val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
-            System.err.println("AndroidBlog HTTP status=${resp.statusCode()}")
-            if (resp.statusCode() != 200) {
-                System.err.println("AndroidBlog: non-200 status, body snippet=${resp.body().take(300)}")
-                return emptyList()
+            return try {
+                val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
+                System.err.println("AndroidBlog: HTTP status for $url = ${resp.statusCode()}")
+                if (resp.statusCode() != 200) {
+                    System.err.println(
+                        "AndroidBlog: non-200 status for $url, body snippet=${resp.body().take(300)}"
+                    )
+                    null
+                } else {
+                    resp.body()
+                }
+            } catch (e: Exception) {
+                System.err.println("AndroidBlog: failed to fetch $url: ${e.message}")
+                null
             }
-            resp.body()
-        } catch (e: Exception) {
-            System.err.println("Failed to fetch $FEED_URL: ${e.message}")
-            return emptyList()
         }
+
+        // Пытаемся сначала по https, если не вышло – пробуем http
+        val xml = fetchXml(FEED_URL_PRIMARY)
+            ?: fetchXml(FEED_URL_FALLBACK)
+            ?: return emptyList()
 
         val doc = try {
             val builder = factory.newDocumentBuilder()
@@ -57,7 +73,7 @@ object AndroidBlogProvider {
                 .parse(xml.byteInputStream())
                 .apply { documentElement.normalize() }
         } catch (e: Exception) {
-            System.err.println("Failed to parse XML for $FEED_URL: ${e.message}")
+            System.err.println("AndroidBlog: failed to parse XML, error=${e.message}")
             System.err.println("AndroidBlog raw snippet: ${xml.take(300)}")
             return emptyList()
         }
@@ -124,7 +140,8 @@ object AndroidBlogProvider {
         }
 
         System.err.println(
-            "AndroidBlog: entries total=$totalEntries, parsed=$parsedEntries, afterFilter=$afterFilterEntries, result=${result.size}"
+            "AndroidBlog: entries total=$totalEntries, parsed=$parsedEntries, " +
+                    "afterFilter=$afterFilterEntries, result=${result.size}"
         )
 
         return result.sortedBy { it.published }
