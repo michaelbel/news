@@ -17,23 +17,26 @@ data class GithubReleaseItem(
     val url: String
 )
 
-private data class GithubRepo(
-    val owner: String,
-    val name: String,
-    val label: String
-)
-
 private val repos = listOf(
-    GithubRepo(
-        owner = "square",
-        name = "retrofit",
-        label = "square/retrofit"
-    ),
-    GithubRepo(
-        owner = "material-components",
-        name = "material-components-android",
-        label = "material-components/material-components-android"
-    )
+    "https://github.com/square/retrofit",
+    "https://github.com/material-components/material-components-android",
+    "https://github.com/InsertKoinIO/koin",
+    "https://github.com/coil-kt/coil",
+    "https://github.com/Kotlin/kotlinx.coroutines",
+    "https://github.com/google/dagger",
+    "https://github.com/ReactiveX/RxJava",
+    "https://github.com/airbnb/lottie-android",
+    "https://github.com/google/gson",
+    "https://github.com/androidbroadcast/ViewBindingPropertyDelegate",
+    "https://github.com/facebook/facebook-android-sdk",
+    "https://github.com/JakeWharton/timber",
+    "https://github.com/square/leakcanary",
+    "https://github.com/square/okhttp",
+    "https://github.com/Kotlin/kotlinx.serialization",
+    "https://github.com/ktorio/ktor",
+    "https://github.com/JetBrains/compose-multiplatform",
+    "https://github.com/ReactiveX/RxAndroid",
+    "https://github.com/ReactiveX/RxKotlin"
 )
 
 object GithubReleasesProvider {
@@ -48,9 +51,16 @@ object GithubReleasesProvider {
 
         val result = mutableListOf<GithubReleaseItem>()
 
-        for (repo in repos) {
-            val feedUrl = "https://github.com/${repo.owner}/${repo.name}/releases.atom"
-            System.err.println("==== GitHub releases: fetching $feedUrl for ${repo.label}")
+        for (repoUrl in repos) {
+            val trimmed = repoUrl.trim().removeSuffix("/")
+            val label = trimmed
+                .removePrefix("https://github.com/")
+                .removePrefix("http://github.com/")
+                .ifEmpty { trimmed }
+
+            val feedUrl = "$trimmed/releases.atom"
+
+            System.err.println("==== GitHub releases: fetching $feedUrl for $label")
 
             val request = HttpRequest.newBuilder()
                 .uri(URI(feedUrl))
@@ -59,14 +69,17 @@ object GithubReleasesProvider {
 
             val xml = try {
                 val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
-                System.err.println("GitHub releases HTTP status=${resp.statusCode()} for ${repo.label}")
+                System.err.println("GitHub releases HTTP status=${resp.statusCode()} for $label")
                 if (resp.statusCode() !in 200..299) {
-                    System.err.println("GitHub releases: non-2xx for ${repo.label}, body snippet=${resp.body().take(200)}")
+                    System.err.println(
+                        "GitHub releases: non-2xx for $label, " +
+                                "body snippet=${resp.body().take(200)}"
+                    )
                     continue
                 }
                 resp.body()
             } catch (e: Exception) {
-                System.err.println("GitHub releases: failed to fetch $feedUrl for ${repo.label}: ${e.message}")
+                System.err.println("GitHub releases: failed to fetch $feedUrl for $label: ${e.message}")
                 continue
             }
 
@@ -76,7 +89,7 @@ object GithubReleasesProvider {
                     .parse(xml.byteInputStream())
                     .apply { documentElement.normalize() }
             } catch (e: Exception) {
-                System.err.println("GitHub releases: failed to parse XML for ${repo.label}: ${e.message}")
+                System.err.println("GitHub releases: failed to parse XML for $label: ${e.message}")
                 continue
             }
 
@@ -132,14 +145,14 @@ object GithubReleasesProvider {
 
                 result += GithubReleaseItem(
                     published = published,
-                    repo = repo.label,
+                    repo = label,
                     title = safeTitle,
                     url = url
                 )
             }
 
             System.err.println(
-                "GitHub releases for ${repo.label}: total=$total, parsed=$parsed, " +
+                "GitHub releases for $label: total=$total, parsed=$parsed, " +
                         "afterFilter=$afterFilter"
             )
         }
