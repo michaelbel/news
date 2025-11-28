@@ -12,68 +12,109 @@ import java.net.http.HttpResponse
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
+private const val TELEGRAM_MAX_LEN = 3500 // запас до 4096
+
 fun main() {
     val lastCheck = Timestamp.readLastCheck()
 
     val youtubeItems = YoutubeProvider.fetchItems(lastCheck)
     val blogItems = AndroidBlogProvider.fetchItems(lastCheck)
 
-    val text = buildMessage(
+    val messages = buildMessages(
         youtubeItems = youtubeItems,
         blogItems = blogItems
     )
 
-    sendTelegram(text)
+    sendTelegram(messages)
 }
 
-fun buildMessage(
+fun buildMessages(
     youtubeItems: List<YoutubeItem>,
     blogItems: List<AndroidBlogItem>
-): String {
+): List<String> {
     val zone = ZoneId.of("Europe/Berlin")
     val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
 
-    val sb = StringBuilder()
+    val result = mutableListOf<String>()
 
-    // блок YouTube
-    sb.append("<b>Новые YouTube-видео</b>\n\n")
-    if (youtubeItems.isEmpty()) {
-        sb.append("Новых видео нет.\n\n")
-    } else {
+    // helper для чанков
+    fun flushChunk(builder: StringBuilder) {
+        val text = builder.toString().trim()
+        if (text.isNotEmpty()) {
+            result += text
+        }
+    }
+
+    fun appendYoutubeChunk() {
+        val header = "<b>Новые YouTube-видео</b>\n\n"
+        if (youtubeItems.isEmpty()) {
+            result += header + "Новых видео нет."
+            return
+        }
+
+        var sb = StringBuilder(header)
+
         for (item in youtubeItems) {
             val local = item.published.atZone(zone)
             val dateStr = local.format(dateFormatter)
-            sb.append(dateStr)
-                .append(" – ")
-                .append("<a href=\"")
-                .append(escapeHtml(item.url))
-                .append("\">")
-                .append(escapeHtml(item.title))
-                .append("</a>")
-                .append("\n\n")
+            val line = buildString {
+                append(dateStr)
+                append(" – ")
+                append("<a href=\"")
+                append(escapeHtml(item.url))
+                append("\">")
+                append(escapeHtml(item.title))
+                append("</a>\n\n")
+            }
+
+            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
+                flushChunk(sb)
+                sb = StringBuilder(header)
+            }
+
+            sb.append(line)
         }
+
+        flushChunk(sb)
     }
 
-    // блок Android Developers Blog
-    sb.append("\n<b>Новые статьи Android Developers Blog</b>\n\n")
-    if (blogItems.isEmpty()) {
-        sb.append("Новых статей нет.\n")
-    } else {
+    fun appendBlogChunk() {
+        val header = "<b>Новые статьи Android Developers Blog</b>\n\n"
+        if (blogItems.isEmpty()) {
+            result += header + "Новых статей нет."
+            return
+        }
+
+        var sb = StringBuilder(header)
+
         for (item in blogItems) {
             val local = item.published.atZone(zone)
             val dateStr = local.format(dateFormatter)
-            sb.append(dateStr)
-                .append(" – ")
-                .append("<a href=\"")
-                .append(escapeHtml(item.url))
-                .append("\">")
-                .append(escapeHtml(item.title))
-                .append("</a>")
-                .append("\n\n")
+            val line = buildString {
+                append(dateStr)
+                append(" – ")
+                append("<a href=\"")
+                append(escapeHtml(item.url))
+                append("\">")
+                append(escapeHtml(item.title))
+                append("</a>\n\n")
+            }
+
+            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
+                flushChunk(sb)
+                sb = StringBuilder(header)
+            }
+
+            sb.append(line)
         }
+
+        flushChunk(sb)
     }
 
-    return sb.toString().trim()
+    appendYoutubeChunk()
+    appendBlogChunk()
+
+    return result
 }
 
 fun escapeHtml(text: String): String {
@@ -84,7 +125,7 @@ fun escapeHtml(text: String): String {
         .replace("\"", "&quot;")
 }
 
-fun sendTelegram(text: String) {
+fun sendTelegram(messages: List<String>) {
     val token = System.getenv("TELEGRAM_TOKEN").orEmpty()
     val chatId = System.getenv("CHAT_ID").orEmpty()
     val threadId = System.getenv("THREAD_ID").orEmpty()
@@ -94,41 +135,44 @@ fun sendTelegram(text: String) {
         return
     }
 
-    System.err.println("Preparing to send Telegram message")
-    System.err.println("Text length = ${text.length}")
-
-    val jsonText = text
-        .replace("\\", "\\\\")
-        .replace("\"", "\\\"")
-        .replace("\n", "\\n")
-
-    val payload = buildString {
-        append("{")
-        append("\"chat_id\":\"").append(chatId).append("\",")
-        if (threadId.isNotBlank()) {
-            append("\"message_thread_id\":\"").append(threadId).append("\",")
-        }
-        append("\"text\":\"").append(jsonText).append("\",")
-        append("\"disable_web_page_preview\":true,")
-        append("\"parse_mode\":\"HTML\"")
-        append("}")
-    }
-
-    System.err.println("Payload for Telegram: $payload")
-
     val url = "https://api.telegram.org/bot$token/sendMessage"
     val client = HttpClient.newHttpClient()
-    val request = HttpRequest.newBuilder()
-        .uri(URI(url))
-        .header("Content-Type", "application/json")
-        .POST(HttpRequest.BodyPublishers.ofString(payload))
-        .build()
 
-    val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-    System.err.println("Telegram response: ${response.statusCode()}")
-    System.err.println("Telegram body: ${response.body()}")
+    messages.forEachIndexed { index, rawText ->
+        System.err.println("Preparing to send Telegram message #${index + 1}")
+        System.err.println("Text length = ${rawText.length}")
 
-    if (response.statusCode() != 200) {
-        error("Telegram send failed with status ${response.statusCode()}")
+        val jsonText = rawText
+            .replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+            .replace("\n", "\\n")
+
+        val payload = buildString {
+            append("{")
+            append("\"chat_id\":\"").append(chatId).append("\",")
+            if (threadId.isNotBlank()) {
+                append("\"message_thread_id\":\"").append(threadId).append("\",")
+            }
+            append("\"text\":\"").append(jsonText).append("\",")
+            append("\"disable_web_page_preview\":true,")
+            append("\"parse_mode\":\"HTML\"")
+            append("}")
+        }
+
+        System.err.println("Payload for Telegram #${index + 1}: $payload")
+
+        val request = HttpRequest.newBuilder()
+            .uri(URI(url))
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(payload))
+            .build()
+
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+        System.err.println("Telegram response #${index + 1}: ${response.statusCode()}")
+        System.err.println("Telegram body #${index + 1}: ${response.body()}")
+
+        if (response.statusCode() != 200) {
+            error("Telegram send failed for message #${index + 1} with status ${response.statusCode()}")
+        }
     }
 }
