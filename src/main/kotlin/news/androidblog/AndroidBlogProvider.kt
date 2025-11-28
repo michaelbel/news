@@ -3,6 +3,7 @@ package news.androidblog
 import news.Timestamp
 import java.net.URI
 import java.net.http.HttpClient
+import java.net.http.HttpClient.Redirect
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.Instant
@@ -19,8 +20,11 @@ object AndroidBlogProvider {
     private const val FEED_URL: String =
         "https://android-developers.blogspot.com/atom.xml"
 
+    private val client: HttpClient = HttpClient.newBuilder()
+        .followRedirects(Redirect.NORMAL)
+        .build()
+
     fun fetchItems(lastCheck: Instant): List<AndroidBlogItem> {
-        val client = HttpClient.newHttpClient()
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }
@@ -36,6 +40,11 @@ object AndroidBlogProvider {
 
         val xml = try {
             val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
+            System.err.println("AndroidBlog HTTP status=${resp.statusCode()}")
+            if (resp.statusCode() != 200) {
+                System.err.println("AndroidBlog: non-200 status, body snippet=${resp.body().take(300)}")
+                return emptyList()
+            }
             resp.body()
         } catch (e: Exception) {
             System.err.println("Failed to fetch $FEED_URL: ${e.message}")
@@ -49,6 +58,7 @@ object AndroidBlogProvider {
                 .apply { documentElement.normalize() }
         } catch (e: Exception) {
             System.err.println("Failed to parse XML for $FEED_URL: ${e.message}")
+            System.err.println("AndroidBlog raw snippet: ${xml.take(300)}")
             return emptyList()
         }
 
