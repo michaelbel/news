@@ -5,9 +5,14 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 import javax.xml.parsers.DocumentBuilderFactory
 
 data class ProAndroidDevItem(
@@ -20,13 +25,30 @@ object ProAndroidDevProvider {
 
     private const val FEED_URL: String = "https://proandroiddev.com/feed"
 
+    // НЕБЕЗОПАСНО: доверяем всем сертификатам, только для этого провайдера
+    private val insecureClient: HttpClient by lazy {
+        val trustAllManager = object : X509TrustManager {
+            override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) = Unit
+            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) = Unit
+            override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
+        }
+
+        val sslContext = SSLContext.getInstance("TLS").apply {
+            init(null, arrayOf<TrustManager>(trustAllManager), SecureRandom())
+        }
+
+        HttpClient.newBuilder()
+            .sslContext(sslContext)
+            .hostnameVerifier { _, _ -> true }
+            .build()
+    }
+
     fun fetchItems(lastCheck: Instant): List<ProAndroidDevItem> {
-        val client = HttpClient.newHttpClient()
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = false
         }
 
-        System.err.println("==== ProAndroidDev: fetching $FEED_URL")
+        System.err.println("==== ProAndroidDev: fetching $FEED_URL (insecure trust-all SSL)")
 
         val request = HttpRequest.newBuilder()
             .uri(URI(FEED_URL))
@@ -34,7 +56,7 @@ object ProAndroidDevProvider {
             .build()
 
         val xml = try {
-            val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
+            val resp = insecureClient.send(request, HttpResponse.BodyHandlers.ofString())
             System.err.println("ProAndroidDev HTTP status=${resp.statusCode()}")
             if (resp.statusCode() !in 200..299) {
                 System.err.println("ProAndroidDev: non-2xx, body snippet=${resp.body().take(200)}")
