@@ -1,6 +1,7 @@
 package news
 
 const val ANDROID_BLOG_ENABLED = true
+const val ANDROID_STUDIO_BLOG_ENABLED = true
 const val KOTLIN_BLOG_ENABLED = true
 const val MEDIUM_ANDROID_ENABLED = true
 const val MEDIUM_GOOGLE_ENABLED = true
