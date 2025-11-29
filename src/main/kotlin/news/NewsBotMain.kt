@@ -6,6 +6,8 @@ import news.androidstudioblog.AndroidStudioBlogItem
 import news.androidstudioblog.AndroidStudioBlogProvider
 import news.androidweekly.AndroidWeeklyItem
 import news.androidweekly.AndroidWeeklyProvider
+import news.firebaseblog.FirebaseBlogItem
+import news.firebaseblog.FirebaseBlogProvider
 import news.github.GithubReleaseItem
 import news.github.GithubReleasesProvider
 import news.habr.HabrAndroidItem
@@ -57,6 +59,13 @@ fun main() {
         name = "Android Studio Blog",
         lastCheck = lastCheck,
         provider = AndroidStudioBlogProvider
+    )
+
+    val firebaseBlogItems = collectItems(
+        enabled = FIREBASE_BLOG_ENABLED,
+        name = "Firebase Blog",
+        lastCheck = lastCheck,
+        provider = FirebaseBlogProvider
     )
 
     val kotlinBlogItems = collectItems(
@@ -115,6 +124,7 @@ fun main() {
         youtubeItems = youtubeItems,
         androidBlogItems = androidBlogItems,
         androidStudioBlogItems = androidStudioBlogItems,
+        firebaseBlogItems = firebaseBlogItems,
         kotlinBlogItems = kotlinBlogItems,
         mediumGoogleItems = mediumGoogleItems,
         mediumAndroidItems = mediumAndroidItems,
@@ -125,6 +135,7 @@ fun main() {
         youtubeEnabled = YOUTUBE_ENABLED,
         androidBlogEnabled = ANDROID_BLOG_ENABLED,
         androidStudioBlogEnabled = ANDROID_STUDIO_BLOG_ENABLED,
+        firebaseBlogEnabled = FIREBASE_BLOG_ENABLED,
         kotlinBlogEnabled = KOTLIN_BLOG_ENABLED,
         mediumGoogleEnabled = MEDIUM_GOOGLE_ENABLED,
         mediumAndroidEnabled = MEDIUM_ANDROID_ENABLED,
@@ -150,6 +161,7 @@ fun buildMessages(
     youtubeItems: List<YoutubeItem>,
     androidBlogItems: List<AndroidBlogItem>,
     androidStudioBlogItems: List<AndroidStudioBlogItem>,
+    firebaseBlogItems: List<FirebaseBlogItem>,
     kotlinBlogItems: List<KotlinBlogItem>,
     mediumGoogleItems: List<MediumGoogleItem>,
     mediumAndroidItems: List<MediumAndroidItem>,
@@ -160,6 +172,7 @@ fun buildMessages(
     youtubeEnabled: Boolean,
     androidBlogEnabled: Boolean,
     androidStudioBlogEnabled: Boolean,
+    firebaseBlogEnabled: Boolean,
     kotlinBlogEnabled: Boolean,
     mediumGoogleEnabled: Boolean,
     mediumAndroidEnabled: Boolean,
@@ -188,6 +201,12 @@ fun buildMessages(
             header = "<b>НОВЫЕ СТАТЬИ ANDROID STUDIO BLOG</b>\n\n",
             enabled = androidStudioBlogEnabled,
             items = androidStudioBlogItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = "<b>НОВЫЕ СТАТЬИ FIREBASE BLOG</b>\n\n",
+            enabled = firebaseBlogEnabled,
+            items = firebaseBlogItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
