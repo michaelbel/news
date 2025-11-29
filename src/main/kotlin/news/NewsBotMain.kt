@@ -6,6 +6,8 @@ import news.androidweekly.AndroidWeeklyItem
 import news.androidweekly.AndroidWeeklyProvider
 import news.github.GithubReleaseItem
 import news.github.GithubReleasesProvider
+import news.habr.HabrAndroidItem
+import news.habr.HabrAndroidProvider
 import news.kotlinblog.KotlinBlogItem
 import news.kotlinblog.KotlinBlogProvider
 import news.mediumandroid.MediumAndroidItem
@@ -103,6 +105,16 @@ fun main() {
             emptyList()
         }
 
+    val habrAndroidItems: List<HabrAndroidItem> =
+        if (HABR_ANDROID_ENABLED) {
+            val items = HabrAndroidProvider.fetchItems(lastCheck)
+            logInfo("Habr Android items collected (after filter): ${items.size}")
+            items
+        } else {
+            logInfo("Habr Android parsing disabled by feature flag")
+            emptyList()
+        }
+
     val githubReleaseItems: List<GithubReleaseItem> =
         if (GITHUB_RELEASES_ENABLED) {
             val items = GithubReleasesProvider.fetchItems(lastCheck)
@@ -124,6 +136,7 @@ fun main() {
         mediumAndroidItems = mediumAndroidItems,
         androidWeeklyItems = androidWeeklyItems,
         proAndroidDevItems = proAndroidDevItems,
+        habrAndroidItems = habrAndroidItems,
         githubReleaseItems = githubReleaseItems,
         youtubeEnabled = YOUTUBE_ENABLED,
         androidBlogEnabled = ANDROID_BLOG_ENABLED,
@@ -132,6 +145,7 @@ fun main() {
         mediumAndroidEnabled = MEDIUM_ANDROID_ENABLED,
         androidWeeklyEnabled = ANDROID_WEEKLY_ENABLED,
         proAndroidDevEnabled = PRO_ANDROID_DEV_ENABLED,
+        habrAndroidEnabled = HABR_ANDROID_ENABLED,
         githubReleasesEnabled = GITHUB_RELEASES_ENABLED
     )
     logInfo("Built messages count: ${messages.size}")
@@ -155,6 +169,7 @@ fun buildMessages(
     mediumAndroidItems: List<MediumAndroidItem>,
     androidWeeklyItems: List<AndroidWeeklyItem>,
     proAndroidDevItems: List<ProAndroidDevItem>,
+    habrAndroidItems: List<HabrAndroidItem>,
     githubReleaseItems: List<GithubReleaseItem>,
     youtubeEnabled: Boolean,
     androidBlogEnabled: Boolean,
@@ -163,6 +178,7 @@ fun buildMessages(
     mediumAndroidEnabled: Boolean,
     androidWeeklyEnabled: Boolean,
     proAndroidDevEnabled: Boolean,
+    habrAndroidEnabled: Boolean,
     githubReleasesEnabled: Boolean
 ): List<String> {
     val zone = ZoneId.of("Europe/Berlin")
@@ -394,6 +410,37 @@ fun buildMessages(
         flushChunk(sb)
     }
 
+    fun appendHabrAndroidChunks() {
+        if (!habrAndroidEnabled) return
+        if (habrAndroidItems.isEmpty()) return
+
+        val header = "<b>Новые статьи Habr (android_dev)</b>\n\n"
+        var sb = StringBuilder(header)
+
+        for (item in habrAndroidItems) {
+            val local = item.published.atZone(zone)
+            val dateStr = local.format(dateFormatter)
+            val line = buildString {
+                append(dateStr)
+                append(" – ")
+                append("<a href=\"")
+                append(escapeHtml(item.url))
+                append("\">")
+                append(escapeHtml(item.title))
+                append("</a>\n\n")
+            }
+
+            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
+                flushChunk(sb)
+                sb = StringBuilder()
+            }
+
+            sb.append(line)
+        }
+
+        flushChunk(sb)
+    }
+
     fun appendGithubReleasesChunks() {
         if (!githubReleasesEnabled) return
         if (githubReleaseItems.isEmpty()) return
@@ -432,6 +479,7 @@ fun buildMessages(
     appendMediumAndroidChunks()
     appendAndroidWeeklyChunks()
     appendProAndroidDevChunks()
+    appendHabrAndroidChunks()
     appendGithubReleasesChunks()
 
     return result

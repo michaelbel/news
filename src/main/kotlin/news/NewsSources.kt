@@ -6,6 +6,7 @@ const val MEDIUM_ANDROID_DEVELOPERS_URL = "https://medium.com/feed/androiddevelo
 const val MEDIUM_GOOGLE_DEVELOPER_EXPERTS_URL = "https://medium.com/feed/google-developer-experts"
 const val PRO_ANDROID_DEV_URL = "https://proandroiddev.com/feed"
 const val ANDROID_WEEKLY_URL = "https://androidweekly.net/rss"
+const val HABR_ANDROID_URL = "https://habr.com/ru/rss/hubs/android_dev/articles/all/?fl=ru"
 val GITHUB_REPOS = listOf(
     "https://github.com/square/retrofit",
     "https://github.com/material-components/material-components-android",

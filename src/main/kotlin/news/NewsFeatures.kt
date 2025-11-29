@@ -8,3 +8,4 @@ const val PRO_ANDROID_DEV_ENABLED = false
 const val ANDROID_WEEKLY_ENABLED = false
 const val GITHUB_RELEASES_ENABLED = false
 const val YOUTUBE_ENABLED = false
+const val HABR_ANDROID_ENABLED = true
