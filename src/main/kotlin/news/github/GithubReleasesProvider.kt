@@ -11,13 +11,6 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-data class GithubReleaseItem(
-    val published: Instant,
-    val repo: String,
-    val title: String,
-    val url: String
-)
-
 object GithubReleasesProvider {
 
     fun fetchItems(lastCheck: Instant): List<GithubReleaseItem> {

@@ -22,6 +22,7 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -34,96 +35,68 @@ fun main() {
     endSection()
 
     logSection("Collect sources")
+    val youtubeItems = collectItems(
+        enabled = YOUTUBE_ENABLED,
+        name = "YouTube",
+        lastCheck = lastCheck,
+        fetch = YoutubeProvider::fetchItems
+    )
 
-    val youtubeItems: List<YoutubeItem> =
-        if (YOUTUBE_ENABLED) {
-            val items = YoutubeProvider.fetchItems(lastCheck)
-            logInfo("YouTube items collected (after filter): ${items.size}")
-            items
-        } else {
-            logInfo("YouTube parsing disabled by feature flag")
-            emptyList()
-        }
+    val androidBlogItems = collectItems(
+        enabled = ANDROID_BLOG_ENABLED,
+        name = "Android Developers Blog",
+        lastCheck = lastCheck,
+        fetch = AndroidBlogProvider::fetchItems
+    )
 
-    val androidBlogItems: List<AndroidBlogItem> =
-        if (ANDROID_BLOG_ENABLED) {
-            val items = AndroidBlogProvider.fetchItems(lastCheck)
-            logInfo("Android Developers Blog items collected (after filter): ${items.size}")
-            items
-        } else {
-            logInfo("Android Developers Blog parsing disabled by feature flag")
-            emptyList()
-        }
+    val kotlinBlogItems = collectItems(
+        enabled = KOTLIN_BLOG_ENABLED,
+        name = "Kotlin Blog",
+        lastCheck = lastCheck,
+        fetch = KotlinBlogProvider::fetchItems
+    )
 
-    val kotlinBlogItems: List<KotlinBlogItem> =
-        if (KOTLIN_BLOG_ENABLED) {
-            val items = KotlinBlogProvider.fetchItems(lastCheck)
-            logInfo("Kotlin Blog items collected (after filter): ${items.size}")
-            items
-        } else {
-            logInfo("Kotlin Blog parsing disabled by feature flag")
-            emptyList()
-        }
+    val mediumGoogleItems = collectItems(
+        enabled = MEDIUM_GOOGLE_ENABLED,
+        name = "Medium Google",
+        lastCheck = lastCheck,
+        fetch = MediumGoogleProvider::fetchItems
+    )
 
-    val mediumGoogleItems: List<MediumGoogleItem> =
-        if (MEDIUM_GOOGLE_ENABLED) {
-            val items = MediumGoogleProvider.fetchItems(lastCheck)
-            logInfo("Medium Google items collected (after filter): ${items.size}")
-            items
-        } else {
-            logInfo("Medium Google parsing disabled by feature flag")
-            emptyList()
-        }
+    val mediumAndroidItems = collectItems(
+        enabled = MEDIUM_ANDROID_ENABLED,
+        name = "Medium Android",
+        lastCheck = lastCheck,
+        fetch = MediumAndroidProvider::fetchItems
+    )
 
-    val mediumAndroidItems: List<MediumAndroidItem> =
-        if (MEDIUM_ANDROID_ENABLED) {
-            val items = MediumAndroidProvider.fetchItems(lastCheck)
-            logInfo("Medium Android items collected (after filter): ${items.size}")
-            items
-        } else {
-            logInfo("Medium Android parsing disabled by feature flag")
-            emptyList()
-        }
+    val androidWeeklyItems = collectItems(
+        enabled = ANDROID_WEEKLY_ENABLED,
+        name = "Android Weekly",
+        lastCheck = lastCheck,
+        fetch = AndroidWeeklyProvider::fetchItems
+    )
 
-    val androidWeeklyItems: List<AndroidWeeklyItem> =
-        if (ANDROID_WEEKLY_ENABLED) {
-            val items = AndroidWeeklyProvider.fetchItems(lastCheck)
-            logInfo("Android Weekly items collected (after filter): ${items.size}")
-            items
-        } else {
-            logInfo("Android Weekly parsing disabled by feature flag")
-            emptyList()
-        }
+    val proAndroidDevItems = collectItems(
+        enabled = PRO_ANDROID_DEV_ENABLED,
+        name = "ProAndroidDev",
+        lastCheck = lastCheck,
+        fetch = ProAndroidDevProvider::fetchItems
+    )
 
-    val proAndroidDevItems: List<ProAndroidDevItem> =
-        if (PRO_ANDROID_DEV_ENABLED) {
-            val items = ProAndroidDevProvider.fetchItems(lastCheck)
-            logInfo("ProAndroidDev items collected (after filter): ${items.size}")
-            items
-        } else {
-            logInfo("ProAndroidDev parsing disabled by feature flag")
-            emptyList()
-        }
+    val habrAndroidItems = collectItems(
+        enabled = HABR_ANDROID_ENABLED,
+        name = "Habr Android",
+        lastCheck = lastCheck,
+        fetch = HabrAndroidProvider::fetchItems
+    )
 
-    val habrAndroidItems: List<HabrAndroidItem> =
-        if (HABR_ANDROID_ENABLED) {
-            val items = HabrAndroidProvider.fetchItems(lastCheck)
-            logInfo("Habr Android items collected (after filter): ${items.size}")
-            items
-        } else {
-            logInfo("Habr Android parsing disabled by feature flag")
-            emptyList()
-        }
-
-    val githubReleaseItems: List<GithubReleaseItem> =
-        if (GITHUB_RELEASES_ENABLED) {
-            val items = GithubReleasesProvider.fetchItems(lastCheck)
-            logInfo("GitHub releases collected (after filter): ${items.size}")
-            items
-        } else {
-            logInfo("GitHub releases parsing disabled by feature flag")
-            emptyList()
-        }
+    val githubReleaseItems = collectItems(
+        enabled = GITHUB_RELEASES_ENABLED,
+        name = "GitHub releases",
+        lastCheck = lastCheck,
+        fetch = GithubReleasesProvider::fetchItems
+    )
 
     endSection()
 
@@ -184,305 +157,158 @@ fun buildMessages(
     val zone = ZoneId.of("Europe/Berlin")
     val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
 
+    val sections = listOf(
+        MessageSection(
+            header = "<b>Новые YouTube-видео</b>\n\n",
+            enabled = youtubeEnabled,
+            items = youtubeItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = "<b>Новые статьи Android Developers Blog</b>\n\n",
+            enabled = androidBlogEnabled,
+            items = androidBlogItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = "<b>Новые статьи Kotlin Blog</b>\n\n",
+            enabled = kotlinBlogEnabled,
+            items = kotlinBlogItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = "<b>Новые статьи Google Developer Experts (Medium)</b>\n\n",
+            enabled = mediumGoogleEnabled,
+            items = mediumGoogleItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = "<b>Новые статьи Android Developers (Medium)</b>\n\n",
+            enabled = mediumAndroidEnabled,
+            items = mediumAndroidItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = "<b>Новые выпуски Android Weekly</b>\n\n",
+            enabled = androidWeeklyEnabled,
+            items = androidWeeklyItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = "<b>Новые статьи ProAndroidDev</b>\n\n",
+            enabled = proAndroidDevEnabled,
+            items = proAndroidDevItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = "<b>Новые статьи Habr (android_dev)</b>\n\n",
+            enabled = habrAndroidEnabled,
+            items = habrAndroidItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = "<b>Новые релизы на GitHub</b>\n\n",
+            enabled = githubReleasesEnabled,
+            items = githubReleaseItems,
+            formatLine = ::formatGithubLine
+        )
+    )
+
     val result = mutableListOf<String>()
-
-    fun flushChunk(builder: StringBuilder) {
-        val text = builder.toString().trim()
-        if (text.isNotEmpty()) {
-            result += text
-        }
+    sections.forEach { section ->
+        appendSection(section, zone, dateFormatter, result)
     }
-
-    fun appendYoutubeChunks() {
-        if (!youtubeEnabled) return
-        if (youtubeItems.isEmpty()) return
-
-        val header = "<b>Новые YouTube-видео</b>\n\n"
-        var sb = StringBuilder(header)
-
-        for (item in youtubeItems) {
-            val local = item.published.atZone(zone)
-            val dateStr = local.format(dateFormatter)
-            val line = buildString {
-                append(dateStr)
-                append(" – ")
-                append("<a href=\"")
-                append(escapeHtml(item.url))
-                append("\">")
-                append(escapeHtml(item.title))
-                append("</a>\n\n")
-            }
-
-            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
-                flushChunk(sb)
-                sb = StringBuilder()
-            }
-
-            sb.append(line)
-        }
-
-        flushChunk(sb)
-    }
-
-    fun appendAndroidBlogChunks() {
-        if (!androidBlogEnabled) return
-        if (androidBlogItems.isEmpty()) return
-
-        val header = "<b>Новые статьи Android Developers Blog</b>\n\n"
-        var sb = StringBuilder(header)
-
-        for (item in androidBlogItems) {
-            val local = item.published.atZone(zone)
-            val dateStr = local.format(dateFormatter)
-            val line = buildString {
-                append(dateStr)
-                append(" – ")
-                append("<a href=\"")
-                append(escapeHtml(item.url))
-                append("\">")
-                append(escapeHtml(item.title))
-                append("</a>\n\n")
-            }
-
-            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
-                flushChunk(sb)
-                sb = StringBuilder()
-            }
-
-            sb.append(line)
-        }
-
-        flushChunk(sb)
-    }
-
-    fun appendKotlinBlogChunks() {
-        if (!kotlinBlogEnabled) return
-        if (kotlinBlogItems.isEmpty()) return
-
-        val header = "<b>Новые статьи Kotlin Blog</b>\n\n"
-        var sb = StringBuilder(header)
-
-        for (item in kotlinBlogItems) {
-            val local = item.published.atZone(zone)
-            val dateStr = local.format(dateFormatter)
-            val line = buildString {
-                append(dateStr)
-                append(" – ")
-                append("<a href=\"")
-                append(escapeHtml(item.url))
-                append("\">")
-                append(escapeHtml(item.title))
-                append("</a>\n\n")
-            }
-
-            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
-                flushChunk(sb)
-                sb = StringBuilder()
-            }
-
-            sb.append(line)
-        }
-
-        flushChunk(sb)
-    }
-
-    fun appendMediumGoogleChunks() {
-        if (!mediumGoogleEnabled) return
-        if (mediumGoogleItems.isEmpty()) return
-
-        val header = "<b>Новые статьи Google Developer Experts (Medium)</b>\n\n"
-        var sb = StringBuilder(header)
-
-        for (item in mediumGoogleItems) {
-            val local = item.published.atZone(zone)
-            val dateStr = local.format(dateFormatter)
-            val line = buildString {
-                append(dateStr)
-                append(" – ")
-                append("<a href=\"")
-                append(escapeHtml(item.url))
-                append("\">")
-                append(escapeHtml(item.title))
-                append("</a>\n\n")
-            }
-
-            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
-                flushChunk(sb)
-                sb = StringBuilder()
-            }
-
-            sb.append(line)
-        }
-
-        flushChunk(sb)
-    }
-
-    fun appendMediumAndroidChunks() {
-        if (!mediumAndroidEnabled) return
-        if (mediumAndroidItems.isEmpty()) return
-
-        val header = "<b>Новые статьи Android Developers (Medium)</b>\n\n"
-        var sb = StringBuilder(header)
-
-        for (item in mediumAndroidItems) {
-            val local = item.published.atZone(zone)
-            val dateStr = local.format(dateFormatter)
-            val line = buildString {
-                append(dateStr)
-                append(" – ")
-                append("<a href=\"")
-                append(escapeHtml(item.url))
-                append("\">")
-                append(escapeHtml(item.title))
-                append("</a>\n\n")
-            }
-
-            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
-                flushChunk(sb)
-                sb = StringBuilder()
-            }
-
-            sb.append(line)
-        }
-
-        flushChunk(sb)
-    }
-
-    fun appendAndroidWeeklyChunks() {
-        if (!androidWeeklyEnabled) return
-        if (androidWeeklyItems.isEmpty()) return
-
-        val header = "<b>Новые выпуски Android Weekly</b>\n\n"
-        var sb = StringBuilder(header)
-
-        for (item in androidWeeklyItems) {
-            val local = item.published.atZone(zone)
-            val dateStr = local.format(dateFormatter)
-            val line = buildString {
-                append(dateStr)
-                append(" – ")
-                append("<a href=\"")
-                append(escapeHtml(item.url))
-                append("\">")
-                append(escapeHtml(item.title))
-                append("</a>\n\n")
-            }
-
-            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
-                flushChunk(sb)
-                sb = StringBuilder()
-            }
-
-            sb.append(line)
-        }
-
-        flushChunk(sb)
-    }
-
-    fun appendProAndroidDevChunks() {
-        if (!proAndroidDevEnabled) return
-        if (proAndroidDevItems.isEmpty()) return
-
-        val header = "<b>Новые статьи ProAndroidDev</b>\n\n"
-        var sb = StringBuilder(header)
-
-        for (item in proAndroidDevItems) {
-            val local = item.published.atZone(zone)
-            val dateStr = local.format(dateFormatter)
-            val line = buildString {
-                append(dateStr)
-                append(" – ")
-                append("<a href=\"")
-                append(escapeHtml(item.url))
-                append("\">")
-                append(escapeHtml(item.title))
-                append("</a>\n\n")
-            }
-
-            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
-                flushChunk(sb)
-                sb = StringBuilder()
-            }
-
-            sb.append(line)
-        }
-
-        flushChunk(sb)
-    }
-
-    fun appendHabrAndroidChunks() {
-        if (!habrAndroidEnabled) return
-        if (habrAndroidItems.isEmpty()) return
-
-        val header = "<b>Новые статьи Habr (android_dev)</b>\n\n"
-        var sb = StringBuilder(header)
-
-        for (item in habrAndroidItems) {
-            val local = item.published.atZone(zone)
-            val dateStr = local.format(dateFormatter)
-            val line = buildString {
-                append(dateStr)
-                append(" – ")
-                append("<a href=\"")
-                append(escapeHtml(item.url))
-                append("\">")
-                append(escapeHtml(item.title))
-                append("</a>\n\n")
-            }
-
-            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
-                flushChunk(sb)
-                sb = StringBuilder()
-            }
-
-            sb.append(line)
-        }
-
-        flushChunk(sb)
-    }
-
-    fun appendGithubReleasesChunks() {
-        if (!githubReleasesEnabled) return
-        if (githubReleaseItems.isEmpty()) return
-
-        val header = "<b>Новые релизы на GitHub</b>\n\n"
-        var sb = StringBuilder(header)
-
-        for (item in githubReleaseItems) {
-            val local = item.published.atZone(zone)
-            val dateStr = local.format(dateFormatter)
-            val line = buildString {
-                append(dateStr)
-                append(" – ")
-                append("<a href=\"")
-                append(escapeHtml(item.url))
-                append("\">")
-                append(escapeHtml("${item.repo}: ${item.title}"))
-                append("</a>\n\n")
-            }
-
-            if (sb.length + line.length > TELEGRAM_MAX_LEN) {
-                flushChunk(sb)
-                sb = StringBuilder()
-            }
-
-            sb.append(line)
-        }
-
-        flushChunk(sb)
-    }
-
-    appendYoutubeChunks()
-    appendAndroidBlogChunks()
-    appendKotlinBlogChunks()
-    appendMediumGoogleChunks()
-    appendMediumAndroidChunks()
-    appendAndroidWeeklyChunks()
-    appendProAndroidDevChunks()
-    appendHabrAndroidChunks()
-    appendGithubReleasesChunks()
 
     return result
+}
+
+private data class MessageSection<T : NewsItem>(
+    val header: String,
+    val enabled: Boolean,
+    val items: List<T>,
+    val formatLine: (T, ZoneId, DateTimeFormatter) -> String
+)
+
+private fun defaultLine(
+    item: NewsItem,
+    zone: ZoneId,
+    dateFormatter: DateTimeFormatter
+): String {
+    val local = item.published.atZone(zone)
+    val dateStr = local.format(dateFormatter)
+    return buildString {
+        append(dateStr)
+        append(" – ")
+        append("<a href=\"")
+        append(escapeHtml(item.url))
+        append("\">")
+        append(escapeHtml(item.title))
+        append("</a>\n\n")
+    }
+}
+
+private fun formatGithubLine(
+    item: GithubReleaseItem,
+    zone: ZoneId,
+    dateFormatter: DateTimeFormatter
+): String {
+    val local = item.published.atZone(zone)
+    val dateStr = local.format(dateFormatter)
+    return buildString {
+        append(dateStr)
+        append(" – ")
+        append("<a href=\"")
+        append(escapeHtml(item.url))
+        append("\">")
+        append(escapeHtml("${item.repo}: ${item.title}"))
+        append("</a>\n\n")
+    }
+}
+
+private fun <T : NewsItem> appendSection(
+    section: MessageSection<T>,
+    zone: ZoneId,
+    dateFormatter: DateTimeFormatter,
+    result: MutableList<String>
+) {
+    if (!section.enabled) return
+    if (section.items.isEmpty()) return
+
+    var sb = StringBuilder(section.header)
+    for (item in section.items) {
+        val line = section.formatLine(item, zone, dateFormatter)
+        if (sb.length + line.length > TELEGRAM_MAX_LEN) {
+            flushChunk(sb, result)
+            sb = StringBuilder()
+        }
+
+        sb.append(line)
+    }
+
+    flushChunk(sb, result)
+}
+
+private fun flushChunk(builder: StringBuilder, result: MutableList<String>) {
+    val text = builder.toString().trim()
+    if (text.isNotEmpty()) {
+        result += text
+    }
+}
+
+private fun <T> collectItems(
+    enabled: Boolean,
+    name: String,
+    lastCheck: Instant,
+    fetch: (Instant) -> List<T>
+): List<T> {
+    if (!enabled) {
+        logInfo("$name parsing disabled by feature flag")
+        return emptyList()
+    }
+
+    val items = fetch(lastCheck)
+    logInfo("$name items collected (after filter): ${items.size}")
+    return items
 }
 
 fun escapeHtml(text: String): String {

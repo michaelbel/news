@@ -9,12 +9,6 @@ import java.net.http.HttpResponse
 import java.time.Instant
 import javax.xml.parsers.DocumentBuilderFactory
 
-data class AndroidBlogItem(
-    val published: Instant,
-    val title: String,
-    val url: String
-)
-
 object AndroidBlogProvider {
 
     fun fetchItems(lastCheck: Instant): List<AndroidBlogItem> {

@@ -9,12 +9,6 @@ import java.net.http.HttpResponse
 import java.time.Instant
 import javax.xml.parsers.DocumentBuilderFactory
 
-data class YoutubeItem(
-    val published: Instant,
-    val title: String,
-    val url: String
-)
-
 object YoutubeProvider {
 
     fun fetchItems(lastCheck: Instant): List<YoutubeItem> {

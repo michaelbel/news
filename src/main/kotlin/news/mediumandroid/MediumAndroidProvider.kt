@@ -11,12 +11,6 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-data class MediumAndroidItem(
-    val published: Instant,
-    val title: String,
-    val url: String
-)
-
 object MediumAndroidProvider {
 
     private const val FEED_URL = MEDIUM_ANDROID_DEVELOPERS_URL

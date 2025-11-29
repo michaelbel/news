@@ -13,12 +13,6 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-data class HabrAndroidItem(
-    val published: Instant,
-    val title: String,
-    val url: String
-)
-
 object HabrAndroidProvider {
 
     private const val FEED_URL = HABR_ANDROID_URL

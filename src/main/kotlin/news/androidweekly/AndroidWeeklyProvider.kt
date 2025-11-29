@@ -13,12 +13,6 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-data class AndroidWeeklyItem(
-    val published: Instant,
-    val title: String,
-    val url: String
-)
-
 object AndroidWeeklyProvider {
 
     private const val FEED_URL = ANDROID_WEEKLY_URL

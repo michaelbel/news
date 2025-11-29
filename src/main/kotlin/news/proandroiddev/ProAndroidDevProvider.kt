@@ -16,12 +16,6 @@ import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 import javax.xml.parsers.DocumentBuilderFactory
 
-data class ProAndroidDevItem(
-    val published: Instant,
-    val title: String,
-    val url: String
-)
-
 object ProAndroidDevProvider {
 
     private const val FEED_URL: String = PRO_ANDROID_DEV_URL

@@ -13,12 +13,6 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-data class KotlinBlogItem(
-    val published: Instant,
-    val title: String,
-    val url: String
-)
-
 object KotlinBlogProvider {
 
     private const val FEED_URL = KOTLIN_BLOG_URL

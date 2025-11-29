@@ -11,12 +11,6 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-data class MediumGoogleItem(
-    val published: Instant,
-    val title: String,
-    val url: String
-)
-
 object MediumGoogleProvider {
 
     private const val FEED_URL = MEDIUM_GOOGLE_DEVELOPER_EXPERTS_URL
