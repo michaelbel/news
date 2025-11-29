@@ -25,6 +25,7 @@ import java.net.http.HttpResponse
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 private const val TELEGRAM_MAX_LEN = 3500
 
@@ -155,7 +156,7 @@ fun buildMessages(
     githubReleasesEnabled: Boolean
 ): List<String> {
     val zone = ZoneId.of("Europe/Berlin")
-    val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+    val dateFormatter = DateTimeFormatter.ofPattern("d LLL", Locale.of("ru"))
 
     val sections = listOf(
         MessageSection(
@@ -201,7 +202,7 @@ fun buildMessages(
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>Новые статьи c хабра</b>\n\n",
+            header = "<b>Новые статьи c Хабра</b>\n\n",
             enabled = habrAndroidEnabled,
             items = habrAndroidItems,
             formatLine = ::defaultLine
@@ -215,9 +216,13 @@ fun buildMessages(
     )
 
     val result = mutableListOf<String>()
+    val builder = StringBuilder()
+
     sections.forEach { section ->
-        appendSection(section, zone, dateFormatter, result)
+        appendSection(section, zone, dateFormatter, builder, result)
     }
+
+    flushChunk(builder, result)
 
     return result
 }
@@ -237,13 +242,14 @@ private fun defaultLine(
     val local = item.published.atZone(zone)
     val dateStr = local.format(dateFormatter)
     return buildString {
-        append(dateStr)
-        append(" – ")
         append("<a href=\"")
         append(escapeHtml(item.url))
         append("\">")
         append(escapeHtml(item.title))
-        append("</a>\n\n")
+        append("</a>, ")
+        append("<i>")
+        append(dateStr)
+        append("</i>\n\n")
     }
 }
 
@@ -255,13 +261,14 @@ private fun formatGithubLine(
     val local = item.published.atZone(zone)
     val dateStr = local.format(dateFormatter)
     return buildString {
-        append(dateStr)
-        append(" – ")
         append("<a href=\"")
         append(escapeHtml(item.url))
         append("\">")
         append(escapeHtml("${item.repo}: ${item.title}"))
-        append("</a>\n\n")
+        append("</a>, ")
+        append("<i>")
+        append(dateStr)
+        append("</i>\n\n")
     }
 }
 
@@ -269,23 +276,24 @@ private fun <T: NewsItem> appendSection(
     section: MessageSection<T>,
     zone: ZoneId,
     dateFormatter: DateTimeFormatter,
+    builder: StringBuilder,
     result: MutableList<String>
 ) {
     if (!section.enabled) return
     if (section.items.isEmpty()) return
 
-    var sb = StringBuilder(section.header)
+    if (builder.length + section.header.length > TELEGRAM_MAX_LEN) {
+        flushChunk(builder, result)
+    }
+    builder.append(section.header)
+
     for (item in section.items) {
         val line = section.formatLine(item, zone, dateFormatter)
-        if (sb.length + line.length > TELEGRAM_MAX_LEN) {
-            flushChunk(sb, result)
-            sb = StringBuilder()
+        if (builder.length + line.length > TELEGRAM_MAX_LEN) {
+            flushChunk(builder, result)
         }
-
-        sb.append(line)
+        builder.append(line)
     }
-
-    flushChunk(sb, result)
 }
 
 private fun flushChunk(builder: StringBuilder, result: MutableList<String>) {
@@ -293,6 +301,7 @@ private fun flushChunk(builder: StringBuilder, result: MutableList<String>) {
     if (text.isNotEmpty()) {
         result += text
     }
+    builder.setLength(0)
 }
 
 private fun <T: NewsItem> collectItems(
