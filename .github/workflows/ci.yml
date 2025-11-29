@@ -65,7 +65,7 @@ jobs:
           date -u +%Y-%m-%dT%H:%M:%SZ > timestamp.txt
 
       - name: commit timestamp
-        if: false
+        if: true
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
