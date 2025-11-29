@@ -2,6 +2,7 @@ package news
 
 const val ANDROID_BLOG_URL = "http://android-developers.googleblog.com/atom.xml"
 const val ANDROID_STUDIO_BLOG_URL = "https://androidstudio.googleblog.com/feeds/posts/default"
+const val FIREBASE_BLOG_URL = "https://firebase.blog/rss.xml"
 const val KOTLIN_BLOG_URL = "https://blog.jetbrains.com/kotlin/feed/"
 const val MEDIUM_ANDROID_DEVELOPERS_URL = "https://medium.com/feed/androiddevelopers"
 const val MEDIUM_GOOGLE_DEVELOPER_EXPERTS_URL = "https://medium.com/feed/google-developer-experts"
