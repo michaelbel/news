@@ -160,55 +160,55 @@ fun buildMessages(
 
     val sections = listOf(
         MessageSection(
-            header = "<b>Новые YouTube-видео</b>\n\n",
+            header = "<b>НОВЫЕ YOUTUBE-ВИДЕО</b>\n\n",
             enabled = youtubeEnabled,
             items = youtubeItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>Новые статьи Android Developers Blog</b>\n\n",
+            header = "<b>НОВЫЕ СТАТЬИ ANDROID DEVELOPERS BLOG</b>\n\n",
             enabled = androidBlogEnabled,
             items = androidBlogItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>Новые статьи Kotlin Blog</b>\n\n",
+            header = "<b>НОВЫЕ СТАТЬИ KOTLIN BLOG</b>\n\n",
             enabled = kotlinBlogEnabled,
             items = kotlinBlogItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>Новые статьи Google Developer Experts</b>\n\n",
+            header = "<b>НОВЫЕ СТАТЬИ GOOGLE DEVELOPER EXPERTS</b>\n\n",
             enabled = mediumGoogleEnabled,
             items = mediumGoogleItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>Новые статьи Android Developers</b>\n\n",
+            header = "<b>НОВЫЕ СТАТЬИ ANDROID DEVELOPERS</b>\n\n",
             enabled = mediumAndroidEnabled,
             items = mediumAndroidItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>Новые выпуски Android Weekly</b>\n\n",
+            header = "<b>НОВЫЕ ВЫПУСКИ ANDROID WEEKLY</b>\n\n",
             enabled = androidWeeklyEnabled,
             items = androidWeeklyItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>Новые статьи ProAndroidDev</b>\n\n",
+            header = "<b>НОВЫЕ СТАТЬИ PROANDROIDDEV</b>\n\n",
             enabled = proAndroidDevEnabled,
             items = proAndroidDevItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>Новые статьи c Хабра</b>\n\n",
+            header = "<b>НОВЫЕ СТАТЬИ C ХАБРА</b>\n\n",
             enabled = habrAndroidEnabled,
             items = habrAndroidItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>Новые релизы на GitHub</b>\n\n",
+            header = "<b>НОВЫЕ РЕЛИЗЫ НА GITHUB</b>\n\n",
             enabled = githubReleasesEnabled,
             items = githubReleaseItems,
             formatLine = ::formatGithubLine
@@ -227,7 +227,7 @@ fun buildMessages(
     return result
 }
 
-private data class MessageSection<T : NewsItem>(
+private data class MessageSection<T: NewsItem>(
     val header: String,
     val enabled: Boolean,
     val items: List<T>,
@@ -282,18 +282,10 @@ private fun <T: NewsItem> appendSection(
     if (!section.enabled) return
     if (section.items.isEmpty()) return
 
-    val isFirstHeaderInMessage = builder.isEmpty()
-    val headerCore = section.header
-    val headerPrefix = if (isFirstHeaderInMessage) "" else "\n\n"
-    val headerWithPrefix = headerPrefix + headerCore
-
-    if (builder.length + headerWithPrefix.length > TELEGRAM_MAX_LEN) {
+    if (builder.length + section.header.length > TELEGRAM_MAX_LEN) {
         flushChunk(builder, result)
-        // после сброса этот заголовок станет первым в новом сообщении – без пустых строк
-        builder.append(headerCore)
-    } else {
-        builder.append(headerWithPrefix)
     }
+    builder.append(section.header)
 
     for (item in section.items) {
         val line = section.formatLine(item, zone, dateFormatter)
