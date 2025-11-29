@@ -25,6 +25,7 @@ import java.net.http.HttpResponse
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 private const val TELEGRAM_MAX_LEN = 3500
 
@@ -155,7 +156,7 @@ fun buildMessages(
     githubReleasesEnabled: Boolean
 ): List<String> {
     val zone = ZoneId.of("Europe/Berlin")
-    val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+    val dateFormatter = DateTimeFormatter.ofPattern("d LLL", Locale("ru"))
 
     val sections = listOf(
         MessageSection(
@@ -237,13 +238,14 @@ private fun defaultLine(
     val local = item.published.atZone(zone)
     val dateStr = local.format(dateFormatter)
     return buildString {
-        append(dateStr)
-        append(" – ")
         append("<a href=\"")
         append(escapeHtml(item.url))
         append("\">")
         append(escapeHtml(item.title))
-        append("</a>\n\n")
+        append("</a>, ")
+        append("<i>")
+        append(dateStr)
+        append("</i>\n\n")
     }
 }
 
@@ -255,13 +257,14 @@ private fun formatGithubLine(
     val local = item.published.atZone(zone)
     val dateStr = local.format(dateFormatter)
     return buildString {
-        append(dateStr)
-        append(" – ")
         append("<a href=\"")
         append(escapeHtml(item.url))
         append("\">")
         append(escapeHtml("${item.repo}: ${item.title}"))
-        append("</a>\n\n")
+        append("</a>, ")
+        append("<i>")
+        append(dateStr)
+        append("</i>\n\n")
     }
 }
 
