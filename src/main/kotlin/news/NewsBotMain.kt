@@ -282,10 +282,18 @@ private fun <T: NewsItem> appendSection(
     if (!section.enabled) return
     if (section.items.isEmpty()) return
 
-    if (builder.length + section.header.length > TELEGRAM_MAX_LEN) {
+    val isFirstHeaderInMessage = builder.isEmpty()
+    val headerCore = section.header
+    val headerPrefix = if (isFirstHeaderInMessage) "" else "\n\n"
+    val headerWithPrefix = headerPrefix + headerCore
+
+    if (builder.length + headerWithPrefix.length > TELEGRAM_MAX_LEN) {
         flushChunk(builder, result)
+        // после сброса этот заголовок станет первым в новом сообщении – без пустых строк
+        builder.append(headerCore)
+    } else {
+        builder.append(headerWithPrefix)
     }
-    builder.append(section.header)
 
     for (item in section.items) {
         val line = section.formatLine(item, zone, dateFormatter)
