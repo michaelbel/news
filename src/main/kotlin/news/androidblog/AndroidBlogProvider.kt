@@ -1,5 +1,6 @@
 package news.androidblog
 
+import news.ANDROID_BLOG_URL
 import news.NewsSources
 import news.Timestamp
 import java.net.URI
@@ -18,7 +19,7 @@ data class AndroidBlogItem(
 object AndroidBlogProvider {
 
     fun fetchItems(lastCheck: Instant): List<AndroidBlogItem> {
-        val feedUrl = NewsSources.AndroidBlog.FEED_URL
+        val feedUrl = ANDROID_BLOG_URL
 
         val client = HttpClient.newHttpClient()
         val factory = DocumentBuilderFactory.newInstance().apply {

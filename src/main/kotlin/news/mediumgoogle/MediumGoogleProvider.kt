@@ -1,5 +1,6 @@
 package news.mediumgoogle
 
+import news.MEDIUM_GOOGLE_DEVELOPER_EXPERTS_URL
 import news.Timestamp
 import java.net.URI
 import java.net.http.HttpClient
@@ -18,8 +19,7 @@ data class MediumGoogleItem(
 
 object MediumGoogleProvider {
 
-    private const val FEED_URL: String =
-        "https://medium.com/feed/google-developer-experts"
+    private const val FEED_URL = MEDIUM_GOOGLE_DEVELOPER_EXPERTS_URL
 
     fun fetchItems(lastCheck: Instant): List<MediumGoogleItem> {
         val client = HttpClient.newHttpClient()

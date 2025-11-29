@@ -1,5 +1,6 @@
 package news.mediumandroid
 
+import news.MEDIUM_ANDROID_DEVELOPERS_URL
 import news.Timestamp
 import java.net.URI
 import java.net.http.HttpClient
@@ -18,8 +19,7 @@ data class MediumAndroidItem(
 
 object MediumAndroidProvider {
 
-    private const val FEED_URL: String =
-        "https://medium.com/feed/androiddevelopers"
+    private const val FEED_URL = MEDIUM_ANDROID_DEVELOPERS_URL
 
     fun fetchItems(lastCheck: Instant): List<MediumAndroidItem> {
         val client = HttpClient.newHttpClient()

@@ -1,6 +1,6 @@
 package news.github
 
-import news.NewsSources
+import news.GITHUB_REPOS
 import news.Timestamp
 import java.net.URI
 import java.net.http.HttpClient
@@ -21,7 +21,7 @@ data class GithubReleaseItem(
 object GithubReleasesProvider {
 
     fun fetchItems(lastCheck: Instant): List<GithubReleaseItem> {
-        val repos = NewsSources.Github.repos
+        val repos = GITHUB_REPOS
         if (repos.isEmpty()) return emptyList()
 
         val client = HttpClient.newHttpClient()

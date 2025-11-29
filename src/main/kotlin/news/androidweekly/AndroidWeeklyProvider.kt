@@ -1,5 +1,6 @@
 package news.androidweekly
 
+import news.ANDROID_WEEKLY_URL
 import news.NewsSources
 import news.Timestamp
 import news.logInfo
@@ -22,7 +23,7 @@ data class AndroidWeeklyItem(
 
 object AndroidWeeklyProvider {
 
-    private const val FEED_URL: String = NewsSources.AndroidWeekly.FEED_URL
+    private const val FEED_URL = ANDROID_WEEKLY_URL
 
     private val client: HttpClient = HttpClient.newBuilder()
         .followRedirects(Redirect.NORMAL)

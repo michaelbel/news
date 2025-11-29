@@ -1,5 +1,6 @@
 package news.kotlinblog
 
+import news.KOTLIN_BLOG_URL
 import news.NewsSources
 import news.logInfo
 import news.logWarn
@@ -21,7 +22,7 @@ data class KotlinBlogItem(
 
 object KotlinBlogProvider {
 
-    private const val FEED_URL: String = NewsSources.KotlinBlog.FEED_URL
+    private const val FEED_URL = KOTLIN_BLOG_URL
 
     private val client: HttpClient = HttpClient.newBuilder()
         .followRedirects(Redirect.NORMAL)

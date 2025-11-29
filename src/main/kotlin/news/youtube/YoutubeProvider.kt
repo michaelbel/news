@@ -1,7 +1,7 @@
 package news.youtube
 
-import news.NewsSources
 import news.Timestamp
+import news.YOUTUBE_CHANNELS
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -18,7 +18,7 @@ data class YoutubeItem(
 object YoutubeProvider {
 
     fun fetchItems(lastCheck: Instant): List<YoutubeItem> {
-        val feeds = NewsSources.Youtube.feeds
+        val feeds = YOUTUBE_CHANNELS
         if (feeds.isEmpty()) return emptyList()
 
         val client = HttpClient.newHttpClient()
@@ -29,26 +29,26 @@ object YoutubeProvider {
         val result = mutableListOf<YoutubeItem>()
 
         for (feed in feeds) {
-            System.err.println("==== YouTube: fetching ${feed.url} [${feed.label}]")
+            System.err.println("==== YouTube: fetching $feed")
 
             val request = HttpRequest.newBuilder()
-                .uri(URI(feed.url))
+                .uri(URI(feed))
                 .GET()
                 .build()
 
             val xml = try {
                 val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
-                System.err.println("YouTube HTTP status=${resp.statusCode()} for ${feed.label}")
+                System.err.println("YouTube HTTP status=${resp.statusCode()}")
                 if (resp.statusCode() !in 200..299) {
                     System.err.println(
-                        "YouTube: non-2xx for ${feed.label}, " +
+                        "YouTube: non-2xx " +
                                 "body snippet=${resp.body().take(200)}"
                     )
                     continue
                 }
                 resp.body()
             } catch (e: Exception) {
-                System.err.println("YouTube: failed to fetch ${feed.url} for ${feed.label}: ${e.message}")
+                System.err.println("YouTube: failed to fetch $feed: ${e.message}")
                 continue
             }
 
@@ -58,7 +58,7 @@ object YoutubeProvider {
                     .parse(xml.byteInputStream())
                     .apply { documentElement.normalize() }
             } catch (e: Exception) {
-                System.err.println("YouTube: failed to parse XML for ${feed.label}: ${e.message}")
+                System.err.println("YouTube: failed to parse XML: ${e.message}")
                 continue
             }
 
@@ -109,7 +109,7 @@ object YoutubeProvider {
 
                 val url = when {
                     !videoId.isNullOrBlank() -> "https://www.youtube.com/watch?v=$videoId"
-                    !linkHref.isNullOrBlank() -> linkHref!!
+                    !linkHref.isNullOrBlank() -> linkHref
                     else -> ""
                 }
 
@@ -121,7 +121,7 @@ object YoutubeProvider {
             }
 
             System.err.println(
-                "YouTube feed ${feed.label}: total=$total, parsed=$parsed, " +
+                "YouTube feed: total=$total, parsed=$parsed, " +
                         "afterFilter=$afterFilter"
             )
         }
