@@ -1,7 +1,6 @@
 package news.kotlinblog
 
 import news.KOTLIN_BLOG_URL
-import news.NewsSources
 import news.logInfo
 import news.logWarn
 import java.net.URI

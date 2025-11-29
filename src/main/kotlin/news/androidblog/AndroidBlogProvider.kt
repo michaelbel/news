@@ -1,7 +1,6 @@
 package news.androidblog
 
 import news.ANDROID_BLOG_URL
-import news.NewsSources
 import news.Timestamp
 import java.net.URI
 import java.net.http.HttpClient

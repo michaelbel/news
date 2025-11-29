@@ -1,6 +1,5 @@
 package news.proandroiddev
 
-import news.NewsSources
 import news.PRO_ANDROID_DEV_URL
 import news.Timestamp
 import java.net.URI

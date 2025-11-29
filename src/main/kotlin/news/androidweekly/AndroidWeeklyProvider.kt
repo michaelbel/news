@@ -1,8 +1,6 @@
 package news.androidweekly
 
 import news.ANDROID_WEEKLY_URL
-import news.NewsSources
-import news.Timestamp
 import news.logInfo
 import news.logWarn
 import java.net.URI
