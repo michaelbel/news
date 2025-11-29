@@ -1,5 +1,6 @@
 package news.proandroiddev
 
+import news.NewsProvider
 import news.PRO_ANDROID_DEV_URL
 import news.Timestamp
 import java.net.URI
@@ -16,7 +17,7 @@ import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 import javax.xml.parsers.DocumentBuilderFactory
 
-object ProAndroidDevProvider {
+object ProAndroidDevProvider: NewsProvider<ProAndroidDevItem> {
 
     private const val FEED_URL: String = PRO_ANDROID_DEV_URL
 
@@ -45,7 +46,7 @@ object ProAndroidDevProvider {
             .build()
     }
 
-    fun fetchItems(lastCheck: Instant): List<ProAndroidDevItem> {
+    override fun fetchItems(lastCheck: Instant): List<ProAndroidDevItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = false
         }

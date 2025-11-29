@@ -1,6 +1,7 @@
 package news.mediumgoogle
 
 import news.MEDIUM_GOOGLE_DEVELOPER_EXPERTS_URL
+import news.NewsProvider
 import news.Timestamp
 import java.net.URI
 import java.net.http.HttpClient
@@ -11,11 +12,11 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object MediumGoogleProvider {
+object MediumGoogleProvider: NewsProvider<MediumGoogleItem> {
 
     private const val FEED_URL = MEDIUM_GOOGLE_DEVELOPER_EXPERTS_URL
 
-    fun fetchItems(lastCheck: Instant): List<MediumGoogleItem> {
+    override fun fetchItems(lastCheck: Instant): List<MediumGoogleItem> {
         val client = HttpClient.newHttpClient()
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = false

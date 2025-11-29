@@ -1,6 +1,7 @@
 package news.androidweekly
 
 import news.ANDROID_WEEKLY_URL
+import news.NewsProvider
 import news.logInfo
 import news.logWarn
 import java.net.URI
@@ -13,7 +14,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object AndroidWeeklyProvider {
+object AndroidWeeklyProvider: NewsProvider<AndroidWeeklyItem> {
 
     private const val FEED_URL = ANDROID_WEEKLY_URL
 
@@ -24,7 +25,7 @@ object AndroidWeeklyProvider {
     private val rfc1123Formatter: DateTimeFormatter =
         DateTimeFormatter.RFC_1123_DATE_TIME
 
-    fun fetchItems(lastCheck: Instant): List<AndroidWeeklyItem> {
+    override fun fetchItems(lastCheck: Instant): List<AndroidWeeklyItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }

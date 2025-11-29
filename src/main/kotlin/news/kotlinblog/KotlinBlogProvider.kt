@@ -1,6 +1,7 @@
 package news.kotlinblog
 
 import news.KOTLIN_BLOG_URL
+import news.NewsProvider
 import news.logInfo
 import news.logWarn
 import java.net.URI
@@ -13,7 +14,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object KotlinBlogProvider {
+object KotlinBlogProvider: NewsProvider<KotlinBlogItem> {
 
     private const val FEED_URL = KOTLIN_BLOG_URL
 
@@ -24,7 +25,7 @@ object KotlinBlogProvider {
     private val rfc1123Formatter: DateTimeFormatter =
         DateTimeFormatter.RFC_1123_DATE_TIME
 
-    fun fetchItems(lastCheck: Instant): List<KotlinBlogItem> {
+    override fun fetchItems(lastCheck: Instant): List<KotlinBlogItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }

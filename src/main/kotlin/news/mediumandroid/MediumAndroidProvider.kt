@@ -1,6 +1,7 @@
 package news.mediumandroid
 
 import news.MEDIUM_ANDROID_DEVELOPERS_URL
+import news.NewsProvider
 import news.Timestamp
 import java.net.URI
 import java.net.http.HttpClient
@@ -11,11 +12,11 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object MediumAndroidProvider {
+object MediumAndroidProvider: NewsProvider<MediumAndroidItem> {
 
     private const val FEED_URL = MEDIUM_ANDROID_DEVELOPERS_URL
 
-    fun fetchItems(lastCheck: Instant): List<MediumAndroidItem> {
+    override fun fetchItems(lastCheck: Instant): List<MediumAndroidItem> {
         val client = HttpClient.newHttpClient()
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = false

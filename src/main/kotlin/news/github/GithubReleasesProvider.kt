@@ -1,6 +1,7 @@
 package news.github
 
 import news.GITHUB_REPOS
+import news.NewsProvider
 import news.Timestamp
 import java.net.URI
 import java.net.http.HttpClient
@@ -11,9 +12,9 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object GithubReleasesProvider {
+object GithubReleasesProvider: NewsProvider<GithubReleaseItem> {
 
-    fun fetchItems(lastCheck: Instant): List<GithubReleaseItem> {
+    override fun fetchItems(lastCheck: Instant): List<GithubReleaseItem> {
         val repos = GITHUB_REPOS
         if (repos.isEmpty()) return emptyList()
 
