@@ -194,8 +194,8 @@ fun buildMessages(
     githubReleasesEnabled: Boolean,
     githubTrendingKotlinEnabled: Boolean
 ): List<String> {
-    val zone = ZoneId.of("Europe/Berlin")
-    val dateFormatter = DateTimeFormatter.ofPattern("d LLL", Locale.of("ru"))
+    val zone = ZoneId.of("Europe/Moscow")
+    val dateFormatter = DateTimeFormatter.ofPattern("d LLL HH:mm 'МСК'", Locale.of("ru"))
 
     val sections = listOf(
         MessageSection(
@@ -303,10 +303,9 @@ private fun defaultLine(
         append(escapeHtml(item.url))
         append("\">")
         append(escapeHtml(item.title))
-        append("</a>, ")
-        append("<i>")
+        append("</a>")
+        append("\n")
         append(dateStr)
-        append("</i>")
         item.author?.let { author ->
             append("\nАвтор: ")
             append(escapeHtml(author))
@@ -335,10 +334,10 @@ private fun formatGithubLine(
         append(escapeHtml(item.url))
         append("\">")
         append(escapeHtml("${item.repo}: ${item.title}"))
-        append("</a>, ")
-        append("<i>")
+        append("</a>")
+        append("\n")
         append(dateStr)
-        append("</i>\n\n")
+        append("\n\n")
     }
 }
 

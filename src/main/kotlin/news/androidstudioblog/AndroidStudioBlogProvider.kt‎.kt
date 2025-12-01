@@ -70,7 +70,6 @@ object AndroidStudioBlogProvider: NewsProvider<AndroidStudioBlogItem> {
             var publishedStr: String? = null
             var title: String? = null
             var linkHref: String? = null
-            var author: String? = null
             var summary: String? = null
             val categories = mutableListOf<String>()
 
@@ -87,15 +86,6 @@ object AndroidStudioBlogProvider: NewsProvider<AndroidStudioBlogItem> {
                                 ?.getNamedItem("href")
                                 ?.nodeValue
                         }
-                    }
-                    "author" -> {
-                        val nameNode = node.childNodes
-                            .let { children ->
-                                (0 until children.length)
-                                    .map(children::item)
-                                    .firstOrNull { it.nodeName == "name" }
-                            }
-                        author = nameNode?.textContent ?: node.textContent
                     }
                     "category" -> {
                         val term = node.attributes?.getNamedItem("term")?.nodeValue
@@ -123,7 +113,6 @@ object AndroidStudioBlogProvider: NewsProvider<AndroidStudioBlogItem> {
                 published = published,
                 title = safeTitle,
                 url = url,
-                author = cleanText(author),
                 summary = cleanAndTruncate(summary),
                 categories = categories
             )

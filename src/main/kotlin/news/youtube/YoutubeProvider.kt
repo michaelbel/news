@@ -3,7 +3,6 @@ package news.youtube
 import news.NewsProvider
 import news.Timestamp
 import news.YOUTUBE_CHANNELS
-import news.cleanAndTruncate
 import news.cleanText
 import java.net.URI
 import java.net.http.HttpClient
@@ -75,7 +74,6 @@ object YoutubeProvider: NewsProvider<YoutubeItem> {
             var videoId: String? = null
             var linkHref: String? = null
             var author: String? = null
-            var description: String? = null
 
             for (j in 0 until children.length) {
                 val node = children.item(j)
@@ -100,16 +98,6 @@ object YoutubeProvider: NewsProvider<YoutubeItem> {
                                 ?.nodeValue
                         }
                     }
-                    "media:group" -> {
-                        val groupChildren = node.childNodes
-                        for (k in 0 until groupChildren.length) {
-                            val mediaNode = groupChildren.item(k)
-                            if (mediaNode.nodeName == "media:description") {
-                                description = mediaNode.textContent
-                            }
-                        }
-                    }
-                    "media:description" -> description = node.textContent
                 }
             }
 
@@ -135,8 +123,7 @@ object YoutubeProvider: NewsProvider<YoutubeItem> {
                     published = published,
                     title = safeTitle,
                     url = url,
-                    author = cleanText(author),
-                    summary = cleanAndTruncate(description)
+                    author = cleanText(author)
                 )
             }
 
