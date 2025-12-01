@@ -38,6 +38,8 @@ object AndroidWeeklyProvider: NewsProvider<AndroidWeeklyItem> {
 
         val request = HttpRequest.newBuilder()
             .uri(URI(FEED_URL))
+            .header("User-Agent", "news-bot (+https://github.com/andmiles/news)")
+            .header("Accept", "application/rss+xml, application/xml;q=0.9, */*;q=0.8")
             .GET()
             .build()
 
@@ -45,10 +47,7 @@ object AndroidWeeklyProvider: NewsProvider<AndroidWeeklyItem> {
             val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
             logInfo("AndroidWeekly: HTTP status for $FEED_URL = ${resp.statusCode()}")
             if (resp.statusCode() != 200) {
-                logWarn(
-                    "AndroidWeekly: non-200 status for $FEED_URL, " +
-                            "body snippet=${resp.body().take(300)}"
-                )
+                logWarn("AndroidWeekly: non-200 status for $FEED_URL, " + "body snippet=${resp.body().take(300)}")
                 return emptyList()
             }
             resp.body()
@@ -133,11 +132,7 @@ object AndroidWeeklyProvider: NewsProvider<AndroidWeeklyItem> {
             )
         }
 
-        logInfo(
-            "AndroidWeekly: items total=$totalItems, parsed=$parsedItems, " +
-                    "afterFilter=$afterFilterItems, result=${result.size}"
-        )
-
+        logInfo("AndroidWeekly: items total=$totalItems, parsed=$parsedItems, " + "afterFilter=$afterFilterItems, result=${result.size}")
         return result.sortedBy { it.published }
     }
 }
