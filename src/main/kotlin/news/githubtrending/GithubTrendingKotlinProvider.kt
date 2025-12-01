@@ -25,8 +25,9 @@ object GithubTrendingKotlinProvider: NewsProvider<GithubTrendingKotlinItem> {
         options = setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
     )
 
+    // Поддерживаем и старую разметку с /network/members, и новую с /forks
     private val forksRegex = Regex(
-        pattern = """<a[^>]+href="[^"]+/network/members[^"]*"[^>]*>.*?([\d,.]+)\s*</a>""",
+        pattern = """<a[^>]+href="[^"]+/(?:network/members|forks)[^"]*"[^>]*>.*?([\d,.]+)\s*</a>""",
         options = setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
     )
 
@@ -107,11 +108,19 @@ object GithubTrendingKotlinProvider: NewsProvider<GithubTrendingKotlinItem> {
     }
 
     private fun cleanupHtml(raw: String): String {
-        return raw
+        val withoutTags = raw
             .replace(Regex("<[^>]+>"), " ")
             .replace("&amp;", "&")
             .replace("&lt;", "<")
             .replace("&gt;", ">")
+
+        // Убираем "Star android / nowinandroid" и подобные CTA
+        val withoutCta = withoutTags.replace(
+            Regex("""Star\s+\S+\s*/\s*\S+""", RegexOption.IGNORE_CASE),
+            " "
+        )
+
+        return withoutCta
             .replace(Regex("\\s+"), " ")
             .trim()
     }
