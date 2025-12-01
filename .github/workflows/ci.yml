@@ -67,7 +67,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git stash push -u -m "before-pull" || true
           git pull --rebase origin main
+          git stash pop || true
+
           git add timestamp_debug.txt
           if git diff --cached --quiet; then
             echo "No changes to commit"
