@@ -347,8 +347,8 @@ private fun formatGithubTrendingLine(
         }
         append("⭐️ ")
         append(item.stars)
-        append(" · ")
-        append("🍴 ")
+        append(" • ")
+        append("👤 ")
         append(item.forks)
         append("\n\n")
     }
