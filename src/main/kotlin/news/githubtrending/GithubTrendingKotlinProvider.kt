@@ -11,7 +11,7 @@ import java.time.Instant
 object GithubTrendingKotlinProvider: NewsProvider<GithubTrendingKotlinItem> {
 
     private val nameRegex = Regex(
-        pattern = """<h2[^>]*>\s*<a[^>]*href="([^"]+)"[^>]*>\s*([^<]+)\s*</a>""",
+        pattern = """<h2[^>]*>.*?<a[^>]*href="([^"]+)"[^>]*>(.*?)</a>""",
         options = setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
     )
 
@@ -21,12 +21,12 @@ object GithubTrendingKotlinProvider: NewsProvider<GithubTrendingKotlinItem> {
     )
 
     private val starsRegex = Regex(
-        pattern = """<a[^>]+href="[^"]+/stargazers"[^>]*>\s*([\d,.]+)\s*</a>""",
+        pattern = """<a[^>]+href="[^"]+/stargazers"[^>]*>.*?([\d,.]+)\s*</a>""",
         options = setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
     )
 
     private val forksRegex = Regex(
-        pattern = """<a[^>]+href="[^"]+/network/members[^"]*"[^>]*>\s*([\d,.]+)\s*</a>""",
+        pattern = """<a[^>]+href="[^"]+/network/members[^"]*"[^>]*>.*?([\d,.]+)\s*</a>""",
         options = setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
     )
 
