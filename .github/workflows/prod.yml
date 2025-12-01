@@ -1,23 +1,25 @@
-name: news-bot-debug
+name: news-bot
 
 on:
   push:
+  schedule:
+    - cron: '0 13 * * *'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: news-debug-${{ github.ref }}
+  group: news-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   send-news:
     runs-on: ubuntu-24.04
     env:
-      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN_DEBUG }}
-      CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID_DEBUG }}
-      THREAD_ID: ${{ secrets.TELEGRAM_THREAD_ID_DEBUG }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      THREAD_ID: ${{ secrets.TELEGRAM_THREAD_ID }}
 
     steps:
       - name: checkout
@@ -34,43 +36,43 @@ jobs:
       - name: read timestamp
         id: timestamp
         run: |
-          if [ -f timestamp_debug.txt ]; then
-            VALUE="$(tr -d '\n' < timestamp_debug.txt)"
+          if [ -f timestamp.txt ]; then
+            VALUE="$(tr -d '\n' < timestamp.txt)"
             echo "Using existing timestamp: $VALUE"
             if [ -z "$VALUE" ]; then
               VALUE="$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ)"
-              echo "timestamp_debug.txt was empty, using: $VALUE"
-              echo "$VALUE" > timestamp_debug.txt
+              echo "timestamp.txt was empty, using: $VALUE"
+              echo "$VALUE" > timestamp.txt
             fi
           else
             VALUE="$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ)"
-            echo "timestamp_debug.txt not found, using: $VALUE"
-            echo "$VALUE" > timestamp_debug.txt
+            echo "timestamp.txt not found, using: $VALUE"
+            echo "$VALUE" > timestamp.txt
           fi
           echo "value=$VALUE" >> "$GITHUB_OUTPUT"
 
       - name: run news bot (Kotlin)
         env:
           LAST_CHECK: ${{ steps.timestamp.outputs.value }}
-          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN_DEBUG }}
-          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID_DEBUG }}
-          THREAD_ID: ${{ secrets.TELEGRAM_THREAD_ID_DEBUG }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          THREAD_ID: ${{ secrets.TELEGRAM_THREAD_ID }}
         run: |
           ./gradlew run
 
       - name: update timestamp
         run: |
-          date -u +%Y-%m-%dT%H:%M:%SZ > timestamp_debug.txt
+          date -u +%Y-%m-%dT%H:%M:%SZ > timestamp.txt
 
       - name: commit timestamp
         if: true
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add timestamp_debug.txt
+          git add timestamp.txt
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Update debug timestamp"
+            git commit -m "Update timestamp"
             git push
           fi
