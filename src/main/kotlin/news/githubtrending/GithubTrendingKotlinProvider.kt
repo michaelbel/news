@@ -8,15 +8,25 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.Instant
 
-object GithubTrendingKotlinProvider : NewsProvider<GithubTrendingKotlinItem> {
+object GithubTrendingKotlinProvider: NewsProvider<GithubTrendingKotlinItem> {
 
     private val nameRegex = Regex(
-        pattern = "<h2[^>]*>\\s*<a[^>]*href=\\\"([^\\\"]+)\\\"[^>]*>\\s*([^<]+)\\s*</a>",
+        pattern = """<h2[^>]*>\s*<a[^>]*href="([^"]+)"[^>]*>\s*([^<]+)\s*</a>""",
         options = setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
     )
 
     private val descriptionRegex = Regex(
-        pattern = "<p[^>]*>(.*?)</p>",
+        pattern = """<p[^>]*>(.*?)</p>""",
+        options = setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
+    )
+
+    private val starsRegex = Regex(
+        pattern = """<a[^>]+href="[^"]+/stargazers"[^>]*>\s*([\d,.]+)\s*</a>""",
+        options = setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
+    )
+
+    private val forksRegex = Regex(
+        pattern = """<a[^>]+href="[^"]+/network/members[^"]*"[^>]*>\s*([\d,.]+)\s*</a>""",
         options = setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
     )
 
@@ -30,16 +40,16 @@ object GithubTrendingKotlinProvider : NewsProvider<GithubTrendingKotlinItem> {
 
         val html = try {
             val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
-            System.err.println("GitHub trending Kotlin HTTP status=${'$'}{resp.statusCode()}")
+            System.err.println("GitHub trending Kotlin HTTP status=${resp.statusCode()}")
             if (resp.statusCode() !in 200..299) {
                 System.err.println(
-                    "GitHub trending Kotlin: non-2xx, body snippet=${'$'}{resp.body().take(200)}"
+                    "GitHub trending Kotlin: non-2xx, body snippet=${resp.body().take(200)}"
                 )
                 return emptyList()
             }
             resp.body()
         } catch (e: Exception) {
-            System.err.println("GitHub trending Kotlin: failed to fetch: ${'$'}{e.message}")
+            System.err.println("GitHub trending Kotlin: failed to fetch: ${e.message}")
             return emptyList()
         }
 
@@ -59,23 +69,39 @@ object GithubTrendingKotlinProvider : NewsProvider<GithubTrendingKotlinItem> {
                 ?.let(::cleanupHtml)
                 ?.ifBlank { null }
 
+            val stars = starsRegex
+                .find(article)
+                ?.groupValues
+                ?.getOrNull(1)
+                ?.let(::parseNumber)
+                ?: 0
+
+            val forks = forksRegex
+                .find(article)
+                ?.groupValues
+                ?.getOrNull(1)
+                ?.let(::parseNumber)
+                ?: 0
+
             val url = if (href.startsWith("http")) {
                 href
             } else {
-                "https://github.com${'$'}href"
+                "https://github.com$href"
             }
 
             result += GithubTrendingKotlinItem(
                 published = Instant.now(),
                 title = cleanupHtml(repoName),
                 url = url,
-                description = description
+                description = description,
+                stars = stars,
+                forks = forks
             )
 
-            if (result.size >= 5) break
+            if (result.size >= 10) break
         }
 
-        System.err.println("GitHub trending Kotlin items collected: ${'$'}{result.size}")
+        System.err.println("GitHub trending Kotlin items collected: ${result.size}")
 
         return result
     }
@@ -88,5 +114,10 @@ object GithubTrendingKotlinProvider : NewsProvider<GithubTrendingKotlinItem> {
             .replace("&gt;", ">")
             .replace(Regex("\\s+"), " ")
             .trim()
+    }
+
+    private fun parseNumber(raw: String): Int {
+        val digitsOnly = raw.replace(Regex("[^0-9]"), "")
+        return digitsOnly.toIntOrNull() ?: 0
     }
 }
