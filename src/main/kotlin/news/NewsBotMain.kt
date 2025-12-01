@@ -194,8 +194,8 @@ fun buildMessages(
     githubReleasesEnabled: Boolean,
     githubTrendingKotlinEnabled: Boolean
 ): List<String> {
-    val zone = ZoneId.of("Europe/Berlin")
-    val dateFormatter = DateTimeFormatter.ofPattern("d LLL", Locale.of("ru"))
+    val zone = ZoneId.of("Europe/Moscow")
+    val dateFormatter = DateTimeFormatter.ofPattern("d LLL HH:mm 'МСК'", Locale.of("ru"))
 
     val sections = listOf(
         MessageSection(
@@ -303,10 +303,9 @@ private fun defaultLine(
         append(escapeHtml(item.url))
         append("\">")
         append(escapeHtml(item.title))
-        append("</a>, ")
-        append("<i>")
+        append("</a>")
+        append("\n")
         append(dateStr)
-        append("</i>")
         item.author?.let { author ->
             append("\nАвтор: ")
             append(escapeHtml(author))
@@ -335,10 +334,10 @@ private fun formatGithubLine(
         append(escapeHtml(item.url))
         append("\">")
         append(escapeHtml("${item.repo}: ${item.title}"))
-        append("</a>, ")
-        append("<i>")
+        append("</a>")
+        append("\n")
         append(dateStr)
-        append("</i>\n\n")
+        append("\n\n")
     }
 }
 
@@ -423,6 +422,12 @@ fun escapeHtml(text: String): String {
         .replace("\"", "&quot;")
 }
 
+private fun extractRetryAfterSeconds(body: String): Long? {
+    val match = Regex("\"retry_after\"\\s*:\\s*(\\d+)").find(body) ?: return null
+    val value = match.groupValues.getOrNull(1) ?: return null
+    return value.toLongOrNull()
+}
+
 fun sendTelegram(messages: List<String>) {
     val token = System.getenv("TELEGRAM_TOKEN").orEmpty()
     val chatId = System.getenv("CHAT_ID").orEmpty()
@@ -459,19 +464,38 @@ fun sendTelegram(messages: List<String>) {
 
         logInfo("Payload for Telegram #${index + 1}: $payload")
 
-        val request = HttpRequest.newBuilder()
-            .uri(URI(url))
-            .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(payload))
-            .build()
+        var attempt = 0
+        val maxRetries = 3
 
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        logInfo("Telegram response #${index + 1}: ${response.statusCode()}")
-        logInfo("Telegram body #${index + 1}: ${response.body()}")
+        while (true) {
+            attempt++
 
-        if (response.statusCode() != 200) {
-            logError("Telegram send failed for message #${index + 1} with status ${response.statusCode()}")
-            error("Telegram send failed for message #${index + 1} with status ${response.statusCode()}")
+            val request = HttpRequest.newBuilder()
+                .uri(URI(url))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(payload))
+                .build()
+
+            val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+            val status = response.statusCode()
+            val body = response.body()
+
+            logInfo("Telegram response #${index + 1}: $status")
+            logInfo("Telegram body #${index + 1}: $body")
+
+            if (status == 200) {
+                break
+            }
+
+            if (status == 429 && attempt <= maxRetries) {
+                val retryAfter = extractRetryAfterSeconds(body) ?: 1L
+                logWarn("Telegram 429 for message #${index + 1}, retry after $retryAfter seconds (attempt $attempt of $maxRetries)")
+                Thread.sleep(retryAfter * 1000L)
+                continue
+            }
+
+            logError("Telegram send failed for message #${index + 1} with status $status")
+            error("Telegram send failed for message #${index + 1} with status $status")
         }
     }
 }

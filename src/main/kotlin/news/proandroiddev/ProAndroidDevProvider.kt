@@ -3,7 +3,6 @@ package news.proandroiddev
 import news.NewsProvider
 import news.PRO_ANDROID_DEV_URL
 import news.Timestamp
-import news.cleanAndTruncate
 import news.cleanText
 import java.net.URI
 import java.net.http.HttpClient
@@ -99,7 +98,6 @@ object ProAndroidDevProvider: NewsProvider<ProAndroidDevItem> {
             var title: String? = null
             var linkHref: String? = null
             var author: String? = null
-            var description: String? = null
             val categories = mutableListOf<String>()
 
             for (j in 0 until children.length) {
@@ -109,7 +107,7 @@ object ProAndroidDevProvider: NewsProvider<ProAndroidDevItem> {
                     "title" -> title = node.textContent
                     "link" -> linkHref = node.textContent
                     "dc:creator", "author" -> author = node.textContent
-                    "description", "content:encoded" -> description = node.textContent
+                    "description", "content:encoded" -> { /* description ignored */ }
                     "category" -> cleanText(node.textContent)?.let { categories += it }
                 }
             }
@@ -136,7 +134,6 @@ object ProAndroidDevProvider: NewsProvider<ProAndroidDevItem> {
                 title = safeTitle,
                 url = url,
                 author = cleanText(author),
-                summary = cleanAndTruncate(description),
                 categories = categories
             )
         }

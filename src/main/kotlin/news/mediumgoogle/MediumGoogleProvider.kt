@@ -3,7 +3,6 @@ package news.mediumgoogle
 import news.MEDIUM_GOOGLE_DEVELOPER_EXPERTS_URL
 import news.NewsProvider
 import news.Timestamp
-import news.cleanAndTruncate
 import news.cleanText
 import java.net.URI
 import java.net.http.HttpClient
@@ -80,7 +79,6 @@ object MediumGoogleProvider: NewsProvider<MediumGoogleItem> {
             var title: String? = null
             var linkHref: String? = null
             var author: String? = null
-            var description: String? = null
             val categories = mutableListOf<String>()
 
             for (j in 0 until children.length) {
@@ -91,7 +89,7 @@ object MediumGoogleProvider: NewsProvider<MediumGoogleItem> {
                     "title" -> title = node.textContent
                     "link" -> linkHref = node.textContent
                     "dc:creator", "author" -> author = node.textContent
-                    "description", "content:encoded" -> description = node.textContent
+                    "description", "content:encoded" -> { /* description ignored */ }
                     "category" -> cleanText(node.textContent)?.let { categories += it }
                 }
             }
@@ -118,7 +116,6 @@ object MediumGoogleProvider: NewsProvider<MediumGoogleItem> {
                 title = safeTitle,
                 url = url,
                 author = cleanText(author),
-                summary = cleanAndTruncate(description),
                 categories = categories
             )
         }

@@ -2,7 +2,6 @@ package news.habr
 
 import news.HABR_ANDROID_URL
 import news.NewsProvider
-import news.cleanAndTruncate
 import news.cleanText
 import news.logInfo
 import news.logWarn
@@ -83,7 +82,6 @@ object HabrAndroidProvider: NewsProvider<HabrAndroidItem> {
             var linkHref: String? = null
             var pubDateStr: String? = null
             var author: String? = null
-            var description: String? = null
             val categories = mutableListOf<String>()
 
             for (j in 0 until children.length) {
@@ -93,7 +91,7 @@ object HabrAndroidProvider: NewsProvider<HabrAndroidItem> {
                     "link" -> linkHref = node.textContent
                     "pubdate" -> pubDateStr = node.textContent
                     "author" -> author = node.textContent
-                    "description" -> description = node.textContent
+                    "description" -> { /* description ignored */ }
                     "category" -> cleanText(node.textContent)?.let { categories += it }
                 }
             }
@@ -130,7 +128,6 @@ object HabrAndroidProvider: NewsProvider<HabrAndroidItem> {
                 title = safeTitle,
                 url = url,
                 author = cleanText(author),
-                summary = cleanAndTruncate(description),
                 categories = categories
             )
         }
