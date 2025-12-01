@@ -195,7 +195,7 @@ fun buildMessages(
     githubTrendingKotlinEnabled: Boolean
 ): List<String> {
     val zone = ZoneId.of("Europe/Moscow")
-    val dateFormatter = DateTimeFormatter.ofPattern("d LLL HH:mm 'МСК'", Locale.of("ru"))
+    val dateFormatter = DateTimeFormatter.ofPattern("d LLL 'в' HH:mm", Locale.of("ru"))
 
     val sections = listOf(
         MessageSection(
