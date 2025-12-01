@@ -20,6 +20,16 @@ object GithubTrendingKotlinProvider : NewsProvider<GithubTrendingKotlinItem> {
         options = setOf(RegexOption.IGNORE_CASE, RegexOption.DOTALL)
     )
 
+    private val starsRegex = Regex(
+        pattern = "<a[^>]+href=\\\"[^\\"]+/stargazers\\\"[^>]*>\\s*([\\d,.]+)\\s*</a>",
+        options = setOf(RegexOption.IGNORE_CASE, RegexOption.DOTALL)
+    )
+
+    private val forksRegex = Regex(
+        pattern = "<a[^>]+href=\\\"[^\\"]+/network/members[^\\"]*\\\"[^>]*>\\s*([\\d,.]+)\\s*</a>",
+        options = setOf(RegexOption.IGNORE_CASE, RegexOption.DOTALL)
+    )
+
     override fun fetchItems(lastCheck: Instant): List<GithubTrendingKotlinItem> {
         val client = HttpClient.newHttpClient()
 
@@ -59,6 +69,20 @@ object GithubTrendingKotlinProvider : NewsProvider<GithubTrendingKotlinItem> {
                 ?.let(::cleanupHtml)
                 ?.ifBlank { null }
 
+            val stars = starsRegex
+                .find(article)
+                ?.groupValues
+                ?.getOrNull(1)
+                ?.let(::parseNumber)
+                ?: 0
+
+            val forks = forksRegex
+                .find(article)
+                ?.groupValues
+                ?.getOrNull(1)
+                ?.let(::parseNumber)
+                ?: 0
+
             val url = if (href.startsWith("http")) {
                 href
             } else {
@@ -69,10 +93,12 @@ object GithubTrendingKotlinProvider : NewsProvider<GithubTrendingKotlinItem> {
                 published = Instant.now(),
                 title = cleanupHtml(repoName),
                 url = url,
-                description = description
+                description = description,
+                stars = stars,
+                forks = forks
             )
 
-            if (result.size >= 5) break
+            if (result.size >= 10) break
         }
 
         System.err.println("GitHub trending Kotlin items collected: ${'$'}{result.size}")
@@ -88,5 +114,10 @@ object GithubTrendingKotlinProvider : NewsProvider<GithubTrendingKotlinItem> {
             .replace("&gt;", ">")
             .replace(Regex("\\s+"), " ")
             .trim()
+    }
+
+    private fun parseNumber(raw: String): Int {
+        val digitsOnly = raw.replace(Regex("[^0-9]"), "")
+        return digitsOnly.toIntOrNull() ?: 0
     }
 }

@@ -340,10 +340,16 @@ private fun formatGithubTrendingLine(
         append("\">")
         append(escapeHtml(item.title))
         append("</a>")
+        append("\n")
         if (!item.description.isNullOrBlank()) {
-            append("\n")
             append(escapeHtml(item.description))
+            append("\n")
         }
+        append("⭐️ ")
+        append(item.stars)
+        append(" · ")
+        append("🍴 ")
+        append(item.forks)
         append("\n\n")
     }
 }
