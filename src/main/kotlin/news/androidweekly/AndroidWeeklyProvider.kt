@@ -38,6 +38,14 @@ object AndroidWeeklyProvider: NewsProvider<AndroidWeeklyItem> {
 
         val request = HttpRequest.newBuilder()
             .uri(URI(FEED_URL))
+            .header(
+                "User-Agent",
+                "news-bot (+https://github.com/andmiles/news)"
+            )
+            .header(
+                "Accept",
+                "application/rss+xml, application/xml;q=0.9, */*;q=0.8"
+            )
             .GET()
             .build()
 
