@@ -9,5 +9,8 @@ data class GithubTrendingKotlinItem(
     override val url: String,
     val description: String?,
     val stars: Int,
-    val forks: Int
+    val forks: Int,
+    override val author: String? = null,
+    override val summary: String? = null,
+    override val categories: List<String> = emptyList()
 ): NewsItem

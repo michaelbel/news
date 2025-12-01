@@ -3,6 +3,8 @@ package news.youtube
 import news.NewsProvider
 import news.Timestamp
 import news.YOUTUBE_CHANNELS
+import news.cleanAndTruncate
+import news.cleanText
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -68,27 +70,48 @@ object YoutubeProvider: NewsProvider<YoutubeItem> {
                 val entry = entries.item(i)
                 val children = entry.childNodes
 
-                var publishedStr: String? = null
-                var title: String? = null
-                var videoId: String? = null
-                var linkHref: String? = null
+            var publishedStr: String? = null
+            var title: String? = null
+            var videoId: String? = null
+            var linkHref: String? = null
+            var author: String? = null
+            var description: String? = null
 
-                for (j in 0 until children.length) {
-                    val node = children.item(j)
-                    when (node.nodeName) {
-                        "published" -> publishedStr = node.textContent
-                        "title" -> title = node.textContent
-                        "yt:videoId" -> videoId = node.textContent
-                        "link" -> {
-                            val rel = node.attributes?.getNamedItem("rel")?.nodeValue
-                            if (rel == "alternate") {
-                                linkHref = node.attributes
-                                    ?.getNamedItem("href")
-                                    ?.nodeValue
+            for (j in 0 until children.length) {
+                val node = children.item(j)
+                when (node.nodeName) {
+                    "published" -> publishedStr = node.textContent
+                    "title" -> title = node.textContent
+                    "yt:videoId" -> videoId = node.textContent
+                    "author" -> {
+                        val nameNode = node.childNodes
+                            .let { nodes ->
+                                (0 until nodes.length)
+                                    .map(nodes::item)
+                                    .firstOrNull { it.nodeName == "name" }
+                            }
+                        author = nameNode?.textContent ?: node.textContent
+                    }
+                    "link" -> {
+                        val rel = node.attributes?.getNamedItem("rel")?.nodeValue
+                        if (rel == "alternate") {
+                            linkHref = node.attributes
+                                ?.getNamedItem("href")
+                                ?.nodeValue
+                        }
+                    }
+                    "media:group" -> {
+                        val groupChildren = node.childNodes
+                        for (k in 0 until groupChildren.length) {
+                            val mediaNode = groupChildren.item(k)
+                            if (mediaNode.nodeName == "media:description") {
+                                description = mediaNode.textContent
                             }
                         }
                     }
+                    "media:description" -> description = node.textContent
                 }
+            }
 
                 if (publishedStr == null) continue
                 val published = Timestamp.parseIso(publishedStr) ?: continue
@@ -111,7 +134,9 @@ object YoutubeProvider: NewsProvider<YoutubeItem> {
                 result += YoutubeItem(
                     published = published,
                     title = safeTitle,
-                    url = url
+                    url = url,
+                    author = cleanText(author),
+                    summary = cleanAndTruncate(description)
                 )
             }
 
