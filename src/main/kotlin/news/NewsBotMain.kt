@@ -306,7 +306,20 @@ private fun defaultLine(
         append("</a>, ")
         append("<i>")
         append(dateStr)
-        append("</i>\n\n")
+        append("</i>")
+        item.author?.let { author ->
+            append("\nАвтор: ")
+            append(escapeHtml(author))
+        }
+        item.summary?.let { summary ->
+            append("\n")
+            append(escapeHtml(summary))
+        }
+        if (item.categories.isNotEmpty()) {
+            append("\nТеги: ")
+            append(escapeHtml(item.categories.joinToString(", ")))
+        }
+        append("\n\n")
     }
 }
 

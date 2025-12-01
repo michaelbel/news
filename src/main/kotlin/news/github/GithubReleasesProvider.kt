@@ -3,6 +3,8 @@ package news.github
 import news.GITHUB_REPOS
 import news.NewsProvider
 import news.Timestamp
+import news.cleanAndTruncate
+import news.cleanText
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -81,6 +83,9 @@ object GithubReleasesProvider: NewsProvider<GithubReleaseItem> {
                 var updatedStr: String? = null
                 var title: String? = null
                 var linkHref: String? = null
+                var author: String? = null
+                var content: String? = null
+                val categories = mutableListOf(label)
 
                 for (j in 0 until children.length) {
                     val node = children.item(j)
@@ -88,6 +93,15 @@ object GithubReleasesProvider: NewsProvider<GithubReleaseItem> {
                         "published" -> publishedStr = node.textContent
                         "updated" -> updatedStr = node.textContent
                         "title" -> title = node.textContent
+                        "author" -> {
+                            val nameNode = node.childNodes
+                                .let { nodes ->
+                                    (0 until nodes.length)
+                                        .map(nodes::item)
+                                        .firstOrNull { it.nodeName.equals("name", ignoreCase = true) }
+                                }
+                            author = nameNode?.textContent ?: node.textContent
+                        }
                         "link" -> {
                             val rel = node.attributes?.getNamedItem("rel")?.nodeValue
                             if (rel == "alternate") {
@@ -96,6 +110,7 @@ object GithubReleasesProvider: NewsProvider<GithubReleaseItem> {
                                     ?.nodeValue
                             }
                         }
+                        "content" -> content = node.textContent
                     }
                 }
 
@@ -120,7 +135,10 @@ object GithubReleasesProvider: NewsProvider<GithubReleaseItem> {
                     published = published,
                     repo = label,
                     title = safeTitle,
-                    url = url
+                    url = url,
+                    author = cleanText(author),
+                    summary = cleanAndTruncate(content),
+                    categories = categories
                 )
             }
 

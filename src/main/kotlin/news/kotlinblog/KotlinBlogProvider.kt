@@ -2,6 +2,8 @@ package news.kotlinblog
 
 import news.KOTLIN_BLOG_URL
 import news.NewsProvider
+import news.cleanAndTruncate
+import news.cleanText
 import news.logInfo
 import news.logWarn
 import java.net.URI
@@ -81,6 +83,9 @@ object KotlinBlogProvider: NewsProvider<KotlinBlogItem> {
             var title: String? = null
             var linkHref: String? = null
             var pubDateStr: String? = null
+            var author: String? = null
+            var description: String? = null
+            val categories = mutableListOf<String>()
 
             for (j in 0 until children.length) {
                 val node = children.item(j)
@@ -88,6 +93,9 @@ object KotlinBlogProvider: NewsProvider<KotlinBlogItem> {
                     "title" -> title = node.textContent
                     "link" -> linkHref = node.textContent
                     "pubdate" -> pubDateStr = node.textContent
+                    "dc:creator", "author" -> author = node.textContent
+                    "description", "content:encoded" -> description = node.textContent
+                    "category" -> cleanText(node.textContent)?.let { categories += it }
                 }
             }
 
@@ -121,7 +129,10 @@ object KotlinBlogProvider: NewsProvider<KotlinBlogItem> {
             result += KotlinBlogItem(
                 published = published,
                 title = safeTitle,
-                url = url
+                url = url,
+                author = cleanText(author),
+                summary = cleanAndTruncate(description),
+                categories = categories
             )
         }
 

@@ -3,6 +3,8 @@ package news.androidblog
 import news.ANDROID_BLOG_URL
 import news.NewsProvider
 import news.Timestamp
+import news.cleanAndTruncate
+import news.cleanText
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -68,12 +70,16 @@ object AndroidBlogProvider: NewsProvider<AndroidBlogItem> {
             var publishedStr: String? = null
             var title: String? = null
             var linkHref: String? = null
+            var author: String? = null
+            var summary: String? = null
+            val categories = mutableListOf<String>()
 
             for (j in 0 until children.length) {
                 val node = children.item(j)
                 when (node.nodeName) {
                     "published" -> publishedStr = node.textContent
                     "title" -> title = node.textContent
+                    "summary" -> summary = node.textContent
                     "link" -> {
                         val rel = node.attributes?.getNamedItem("rel")?.nodeValue
                         if (rel == "alternate") {
@@ -81,6 +87,20 @@ object AndroidBlogProvider: NewsProvider<AndroidBlogItem> {
                                 ?.getNamedItem("href")
                                 ?.nodeValue
                         }
+                    }
+                    "author" -> {
+                        val nameNode = node.childNodes
+                            .let { children ->
+                                (0 until children.length)
+                                    .map(children::item)
+                                    .firstOrNull { it.nodeName == "name" }
+                            }
+                        author = nameNode?.textContent ?: node.textContent
+                    }
+                    "category" -> {
+                        val term = node.attributes?.getNamedItem("term")?.nodeValue
+                        val label = term ?: node.textContent
+                        cleanText(label)?.let { categories += it }
                     }
                 }
             }
@@ -102,7 +122,10 @@ object AndroidBlogProvider: NewsProvider<AndroidBlogItem> {
             result += AndroidBlogItem(
                 published = published,
                 title = safeTitle,
-                url = url
+                url = url,
+                author = cleanText(author),
+                summary = cleanAndTruncate(summary),
+                categories = categories
             )
         }
 

@@ -3,6 +3,8 @@ package news.firebaseblog
 import news.FIREBASE_BLOG_URL
 import news.NewsProvider
 import news.Timestamp
+import news.cleanAndTruncate
+import news.cleanText
 import news.logInfo
 import news.logWarn
 import java.net.URI
@@ -77,6 +79,9 @@ object FirebaseBlogProvider: NewsProvider<FirebaseBlogItem> {
             var title: String? = null
             var linkHref: String? = null
             var publishedRaw: String? = null
+            var author: String? = null
+            var description: String? = null
+            val categories = mutableListOf<String>()
 
             for (j in 0 until children.length) {
                 val node = children.item(j)
@@ -84,6 +89,9 @@ object FirebaseBlogProvider: NewsProvider<FirebaseBlogItem> {
                     "title" -> title = node.textContent
                     "link" -> linkHref = node.textContent
                     "pubdate", "published", "updated" -> publishedRaw = node.textContent
+                    "author", "dc:creator" -> author = node.textContent
+                    "description" -> description = node.textContent
+                    "category" -> cleanText(node.textContent)?.let { categories += it }
                 }
             }
 
@@ -109,7 +117,10 @@ object FirebaseBlogProvider: NewsProvider<FirebaseBlogItem> {
             result += FirebaseBlogItem(
                 published = published,
                 title = safeTitle,
-                url = url
+                url = url,
+                author = cleanText(author),
+                summary = cleanAndTruncate(description),
+                categories = categories
             )
         }
 

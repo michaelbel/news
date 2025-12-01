@@ -3,6 +3,8 @@ package news.mediumandroid
 import news.MEDIUM_ANDROID_DEVELOPERS_URL
 import news.NewsProvider
 import news.Timestamp
+import news.cleanAndTruncate
+import news.cleanText
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -77,6 +79,9 @@ object MediumAndroidProvider: NewsProvider<MediumAndroidItem> {
             var updatedStr: String? = null
             var title: String? = null
             var linkHref: String? = null
+            var author: String? = null
+            var description: String? = null
+            val categories = mutableListOf<String>()
 
             for (j in 0 until children.length) {
                 val node = children.item(j)
@@ -85,6 +90,9 @@ object MediumAndroidProvider: NewsProvider<MediumAndroidItem> {
                     "updated" -> updatedStr = node.textContent
                     "title" -> title = node.textContent
                     "link" -> linkHref = node.textContent
+                    "dc:creator", "author" -> author = node.textContent
+                    "description", "content:encoded" -> description = node.textContent
+                    "category" -> cleanText(node.textContent)?.let { categories += it }
                 }
             }
 
@@ -108,7 +116,10 @@ object MediumAndroidProvider: NewsProvider<MediumAndroidItem> {
             result += MediumAndroidItem(
                 published = published,
                 title = safeTitle,
-                url = url
+                url = url,
+                author = cleanText(author),
+                summary = cleanAndTruncate(description),
+                categories = categories
             )
         }
 
