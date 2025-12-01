@@ -11,3 +11,4 @@ const val ANDROID_WEEKLY_ENABLED = true
 const val GITHUB_RELEASES_ENABLED = true
 const val YOUTUBE_ENABLED = true
 const val HABR_ANDROID_ENABLED = true
+const val GITHUB_TRENDING_KOTLIN_ENABLED = true

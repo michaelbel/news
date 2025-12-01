@@ -10,6 +10,8 @@ import news.firebaseblog.FirebaseBlogItem
 import news.firebaseblog.FirebaseBlogProvider
 import news.github.GithubReleaseItem
 import news.github.GithubReleasesProvider
+import news.githubtrending.GithubTrendingKotlinItem
+import news.githubtrending.GithubTrendingKotlinProvider
 import news.habr.HabrAndroidItem
 import news.habr.HabrAndroidProvider
 import news.kotlinblog.KotlinBlogItem
@@ -117,6 +119,13 @@ fun main() {
         provider = GithubReleasesProvider
     )
 
+    val githubTrendingKotlinItems = collectItems(
+        enabled = GITHUB_TRENDING_KOTLIN_ENABLED,
+        name = "GitHub trending Kotlin",
+        lastCheck = lastCheck,
+        provider = GithubTrendingKotlinProvider
+    )
+
     endSection()
 
     logSection("Build messages")
@@ -132,6 +141,7 @@ fun main() {
         proAndroidDevItems = proAndroidDevItems,
         habrAndroidItems = habrAndroidItems,
         githubReleaseItems = githubReleaseItems,
+        githubTrendingKotlinItems = githubTrendingKotlinItems,
         youtubeEnabled = YOUTUBE_ENABLED,
         androidBlogEnabled = ANDROID_BLOG_ENABLED,
         androidStudioBlogEnabled = ANDROID_STUDIO_BLOG_ENABLED,
@@ -142,7 +152,8 @@ fun main() {
         androidWeeklyEnabled = ANDROID_WEEKLY_ENABLED,
         proAndroidDevEnabled = PRO_ANDROID_DEV_ENABLED,
         habrAndroidEnabled = HABR_ANDROID_ENABLED,
-        githubReleasesEnabled = GITHUB_RELEASES_ENABLED
+        githubReleasesEnabled = GITHUB_RELEASES_ENABLED,
+        githubTrendingKotlinEnabled = GITHUB_TRENDING_KOTLIN_ENABLED
     )
     logInfo("Built messages count: ${messages.size}")
     endSection()
@@ -169,6 +180,7 @@ fun buildMessages(
     proAndroidDevItems: List<ProAndroidDevItem>,
     habrAndroidItems: List<HabrAndroidItem>,
     githubReleaseItems: List<GithubReleaseItem>,
+    githubTrendingKotlinItems: List<GithubTrendingKotlinItem>,
     youtubeEnabled: Boolean,
     androidBlogEnabled: Boolean,
     androidStudioBlogEnabled: Boolean,
@@ -179,7 +191,8 @@ fun buildMessages(
     androidWeeklyEnabled: Boolean,
     proAndroidDevEnabled: Boolean,
     habrAndroidEnabled: Boolean,
-    githubReleasesEnabled: Boolean
+    githubReleasesEnabled: Boolean,
+    githubTrendingKotlinEnabled: Boolean
 ): List<String> {
     val zone = ZoneId.of("Europe/Berlin")
     val dateFormatter = DateTimeFormatter.ofPattern("d LLL", Locale.of("ru"))
@@ -250,6 +263,12 @@ fun buildMessages(
             enabled = githubReleasesEnabled,
             items = githubReleaseItems,
             formatLine = ::formatGithubLine
+        ),
+        MessageSection(
+            header = "<b>GITHUB TRENDING: KOTLIN</b>\n\n",
+            enabled = githubTrendingKotlinEnabled,
+            items = githubTrendingKotlinItems,
+            formatLine = ::formatGithubTrendingLine
         )
     )
 
@@ -307,6 +326,25 @@ private fun formatGithubLine(
         append("<i>")
         append(dateStr)
         append("</i>\n\n")
+    }
+}
+
+private fun formatGithubTrendingLine(
+    item: GithubTrendingKotlinItem,
+    zone: ZoneId,
+    dateFormatter: DateTimeFormatter
+): String {
+    return buildString {
+        append("<a href=\"")
+        append(escapeHtml(item.url))
+        append("\">")
+        append(escapeHtml(item.title))
+        append("</a>")
+        if (!item.description.isNullOrBlank()) {
+            append("\n")
+            append(escapeHtml(item.description))
+        }
+        append("\n\n")
     }
 }
 
