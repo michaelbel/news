@@ -265,7 +265,14 @@ fun buildMessages(
             formatLine = ::formatGithubLine
         ),
         MessageSection(
-            header = "<b>GITHUB TRENDING: KOTLIN</b>\n\n",
+            header = buildString {
+                append("<b>GITHUB TRENDING: KOTLIN</b>\n")
+                append(
+                    "Текущий список топовых Kotlin-репозиториев из GitHub Trending " +
+                        "за ${Instant.now().atZone(zone).format(DateTimeFormatter.ofPattern("d MMMM", Locale.of("ru")))}."
+                )
+                append("\n\n")
+            },
             enabled = githubTrendingKotlinEnabled,
             items = githubTrendingKotlinItems,
             formatLine = ::formatGithubTrendingLine
