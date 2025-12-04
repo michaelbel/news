@@ -374,8 +374,7 @@ private fun <T: NewsItem> buildSectionMessages(
 
     val builder = StringBuilder()
     val result = mutableListOf<String>()
-
-    builder.append(section.header)
+    var isFirstChunk = true
 
     fun flushChunk() {
         val text = builder.toString().trim()
@@ -387,8 +386,11 @@ private fun <T: NewsItem> buildSectionMessages(
 
     for (item in section.items) {
         val line = section.formatLine(item, zone, dateFormatter)
-        if (builder.length + line.length > TELEGRAM_MAX_LEN) {
+        if (builder.isNotEmpty() && builder.length + line.length > TELEGRAM_MAX_LEN) {
             flushChunk()
+            isFirstChunk = false
+        }
+        if (builder.isEmpty() && isFirstChunk) {
             builder.append(section.header)
         }
         builder.append(line)
