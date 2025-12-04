@@ -8,6 +8,8 @@ import news.androidweekly.AndroidWeeklyItem
 import news.androidweekly.AndroidWeeklyProvider
 import news.firebaseblog.FirebaseBlogItem
 import news.firebaseblog.FirebaseBlogProvider
+import news.devto.DevToItem
+import news.devto.DevToProvider
 import news.github.GithubReleaseItem
 import news.github.GithubReleasesProvider
 import news.githubtrending.GithubTrendingKotlinItem
@@ -91,6 +93,13 @@ fun main() {
         provider = MediumAndroidProvider
     )
 
+    val devToAndroidItems = collectItems(
+        enabled = DEV_TO_ANDROID_ENABLED,
+        name = "Dev.to Android",
+        lastCheck = lastCheck,
+        provider = DevToProvider
+    )
+
     val androidWeeklyItems = collectItems(
         enabled = ANDROID_WEEKLY_ENABLED,
         name = "Android Weekly",
@@ -137,6 +146,7 @@ fun main() {
         kotlinBlogItems = kotlinBlogItems,
         mediumGoogleItems = mediumGoogleItems,
         mediumAndroidItems = mediumAndroidItems,
+        devToAndroidItems = devToAndroidItems,
         androidWeeklyItems = androidWeeklyItems,
         proAndroidDevItems = proAndroidDevItems,
         habrAndroidItems = habrAndroidItems,
@@ -149,6 +159,7 @@ fun main() {
         kotlinBlogEnabled = KOTLIN_BLOG_ENABLED,
         mediumGoogleEnabled = MEDIUM_GOOGLE_ENABLED,
         mediumAndroidEnabled = MEDIUM_ANDROID_ENABLED,
+        devToAndroidEnabled = DEV_TO_ANDROID_ENABLED,
         androidWeeklyEnabled = ANDROID_WEEKLY_ENABLED,
         proAndroidDevEnabled = PRO_ANDROID_DEV_ENABLED,
         habrAndroidEnabled = HABR_ANDROID_ENABLED,
@@ -176,6 +187,7 @@ private fun buildMessages(
     kotlinBlogItems: List<KotlinBlogItem>,
     mediumGoogleItems: List<MediumGoogleItem>,
     mediumAndroidItems: List<MediumAndroidItem>,
+    devToAndroidItems: List<DevToItem>,
     androidWeeklyItems: List<AndroidWeeklyItem>,
     proAndroidDevItems: List<ProAndroidDevItem>,
     habrAndroidItems: List<HabrAndroidItem>,
@@ -188,6 +200,7 @@ private fun buildMessages(
     kotlinBlogEnabled: Boolean,
     mediumGoogleEnabled: Boolean,
     mediumAndroidEnabled: Boolean,
+    devToAndroidEnabled: Boolean,
     androidWeeklyEnabled: Boolean,
     proAndroidDevEnabled: Boolean,
     habrAndroidEnabled: Boolean,
@@ -273,6 +286,17 @@ private fun buildMessages(
             },
             enabled = mediumAndroidEnabled,
             items = mediumAndroidItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ DEV.TO (ANDROID)</b>")
+                append("\n\n")
+                append("Публикации с тегом Android на dev.to от сообщества разработчиков.")
+                append("\n\n")
+            },
+            enabled = devToAndroidEnabled,
+            items = devToAndroidItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
