@@ -199,67 +199,122 @@ private fun buildMessages(
 
     val sections = listOf(
         MessageSection(
-            header = "<b>НОВЫЕ YOUTUBE-ВИДЕО</b>\n\n",
+            header = buildString {
+                append("<b>НОВЫЕ YOUTUBE-ВИДЕО</b>")
+                append("\n\n")
+                append("Свежие ролики с ${YOUTUBE_CHANNELS.size} отслеживаемых каналов про Android.")
+                append("\n\n")
+            },
             enabled = youtubeEnabled,
             items = youtubeItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ ПОСТЫ ANDROID DEVELOPERS BLOG</b>\n\n",
+            header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ ANDROID DEVELOPERS BLOG</b>")
+                append("\n\n")
+                append("Последние материалы с официального блога Android команды Google.")
+                append("\n\n")
+            },
             enabled = androidBlogEnabled,
             items = androidBlogItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ ПОСТЫ ANDROID STUDIO BLOG</b>\n\n",
+            header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ ANDROID STUDIO BLOG</b>")
+                append("\n\n")
+                append("Новости и советы по Android Studio и инструментам разработки.")
+                append("\n\n")
+            },
             enabled = androidStudioBlogEnabled,
             items = androidStudioBlogItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ ПОСТЫ FIREBASE BLOG</b>\n\n",
+            header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ FIREBASE BLOG</b>")
+                append("\n\n")
+                append("Обновления и гайды по сервисам Firebase для мобильной разработки.")
+                append("\n\n")
+            },
             enabled = firebaseBlogEnabled,
             items = firebaseBlogItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ ПОСТЫ KOTLIN BLOG</b>\n\n",
+            header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ KOTLIN BLOG</b>")
+                append("\n\n")
+                append("Свежие записи о языке Kotlin и экосистеме от JetBrains/Google.")
+                append("\n\n")
+            },
             enabled = kotlinBlogEnabled,
             items = kotlinBlogItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ ПОСТЫ GOOGLE DEVELOPER EXPERTS</b>\n\n",
+            header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ GOOGLE DEVELOPER EXPERTS</b>")
+                append("\n\n")
+                append("Подборка публикаций от экспертов GDE по Android/Kotlin.")
+                append("\n\n")
+            },
             enabled = mediumGoogleEnabled,
             items = mediumGoogleItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ ПОСТЫ ANDROID DEVELOPERS</b>\n\n",
+            header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ ANDROID DEVELOPERS</b>")
+                append("\n\n")
+                append("Материалы команды Android в Medium о практиках и новинках платформы.")
+                append("\n\n")
+            },
             enabled = mediumAndroidEnabled,
             items = mediumAndroidItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ ВЫПУСКИ ANDROID WEEKLY</b>\n\n",
+            header = buildString {
+                append("<b>НОВЫЕ ВЫПУСКИ ANDROID WEEKLY</b>")
+                append("\n\n")
+                append("Последний номер рассылки Android Weekly с подборкой статей и инструментов.")
+                append("\n\n")
+            },
             enabled = androidWeeklyEnabled,
             items = androidWeeklyItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ ПОСТЫ PROANDROIDDEV</b>\n\n",
+            header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ PROANDROIDDEV</b>")
+                append("\n\n")
+                append("Заметки и разборы от авторов ProAndroidDev про Android-разработку.")
+                append("\n\n")
+            },
             enabled = proAndroidDevEnabled,
             items = proAndroidDevItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ ПОСТЫ C ХАБРА</b>\n\n",
+            header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ C ХАБРА</b>")
+                append("\n\n")
+                append("Новые публикации с Хабра по Android/Kotlin из отслеживаемых блогов.")
+                append("\n\n")
+            },
             enabled = habrAndroidEnabled,
             items = habrAndroidItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ РЕЛИЗЫ НА GITHUB</b>\n\n",
+            header = buildString {
+                append("<b>НОВЫЕ РЕЛИЗЫ НА GITHUB</b>")
+                append("\n\n")
+                append("Свежие релизные версии ${GITHUB_REPOS.size} отслеживаемых open-source проектов Android/Kotlin.")
+                append("\n\n")
+            },
             enabled = githubReleasesEnabled,
             items = githubReleaseItems,
             formatLine = ::formatGithubLine
