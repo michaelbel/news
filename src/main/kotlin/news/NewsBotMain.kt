@@ -168,7 +168,7 @@ fun main() {
     endSection()
 }
 
-fun buildMessages(
+private fun buildMessages(
     youtubeItems: List<YoutubeItem>,
     androidBlogItems: List<AndroidBlogItem>,
     androidStudioBlogItems: List<AndroidStudioBlogItem>,
@@ -205,37 +205,37 @@ fun buildMessages(
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ СТАТЬИ ANDROID DEVELOPERS BLOG</b>\n\n",
+            header = "<b>НОВЫЕ ПОСТЫ ANDROID DEVELOPERS BLOG</b>\n\n",
             enabled = androidBlogEnabled,
             items = androidBlogItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ СТАТЬИ ANDROID STUDIO BLOG</b>\n\n",
+            header = "<b>НОВЫЕ ПОСТЫ ANDROID STUDIO BLOG</b>\n\n",
             enabled = androidStudioBlogEnabled,
             items = androidStudioBlogItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ СТАТЬИ FIREBASE BLOG</b>\n\n",
+            header = "<b>НОВЫЕ ПОСТЫ FIREBASE BLOG</b>\n\n",
             enabled = firebaseBlogEnabled,
             items = firebaseBlogItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ СТАТЬИ KOTLIN BLOG</b>\n\n",
+            header = "<b>НОВЫЕ ПОСТЫ KOTLIN BLOG</b>\n\n",
             enabled = kotlinBlogEnabled,
             items = kotlinBlogItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ СТАТЬИ GOOGLE DEVELOPER EXPERTS</b>\n\n",
+            header = "<b>НОВЫЕ ПОСТЫ GOOGLE DEVELOPER EXPERTS</b>\n\n",
             enabled = mediumGoogleEnabled,
             items = mediumGoogleItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ СТАТЬИ ANDROID DEVELOPERS</b>\n\n",
+            header = "<b>НОВЫЕ ПОСТЫ ANDROID DEVELOPERS</b>\n\n",
             enabled = mediumAndroidEnabled,
             items = mediumAndroidItems,
             formatLine = ::defaultLine
@@ -247,13 +247,13 @@ fun buildMessages(
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ СТАТЬИ PROANDROIDDEV</b>\n\n",
+            header = "<b>НОВЫЕ ПОСТЫ PROANDROIDDEV</b>\n\n",
             enabled = proAndroidDevEnabled,
             items = proAndroidDevItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = "<b>НОВЫЕ СТАТЬИ C ХАБРА</b>\n\n",
+            header = "<b>НОВЫЕ ПОСТЫ C ХАБРА</b>\n\n",
             enabled = habrAndroidEnabled,
             items = habrAndroidItems,
             formatLine = ::defaultLine
@@ -266,8 +266,9 @@ fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>GITHUB TRENDING: KOTLIN</b>\n")
-                append("Текущий список топовых Kotlin-репозиториев из GitHub Trending за ${Instant.now().atZone(zone).format(DateTimeFormatter.ofPattern("d MMMM", Locale.of("ru")))}.")
+                append("<b>GITHUB TRENDING</b>")
+                append("\n\n")
+                append("Cписок топовых Kotlin-репозиториев из GitHub Trending за ${Instant.now().atZone(zone).format(DateTimeFormatter.ofPattern("d MMMM", Locale.of("ru")))}.")
                 append("\n\n")
             },
             enabled = githubTrendingKotlinEnabled,
@@ -276,10 +277,7 @@ fun buildMessages(
         )
     )
 
-    return sections
-        .flatMap { section ->
-            buildSectionMessages(section, zone, dateFormatter)
-        }
+    return sections.flatMap { section -> buildSectionMessages(section, zone, dateFormatter) }
 }
 
 private data class MessageSection<T: NewsItem>(
@@ -374,8 +372,7 @@ private fun <T: NewsItem> buildSectionMessages(
 
     val builder = StringBuilder()
     val result = mutableListOf<String>()
-
-    builder.append(section.header)
+    var isFirstChunk = true
 
     fun flushChunk() {
         val text = builder.toString().trim()
@@ -387,8 +384,11 @@ private fun <T: NewsItem> buildSectionMessages(
 
     for (item in section.items) {
         val line = section.formatLine(item, zone, dateFormatter)
-        if (builder.length + line.length > TELEGRAM_MAX_LEN) {
+        if (builder.isNotEmpty() && builder.length + line.length > TELEGRAM_MAX_LEN) {
             flushChunk()
+            isFirstChunk = false
+        }
+        if (builder.isEmpty() && isFirstChunk) {
             builder.append(section.header)
         }
         builder.append(line)
@@ -415,7 +415,7 @@ private fun <T: NewsItem> collectItems(
     return items
 }
 
-fun escapeHtml(text: String): String {
+private fun escapeHtml(text: String): String {
     return text
         .replace("&", "&amp;")
         .replace("<", "&lt;")
@@ -429,7 +429,7 @@ private fun extractRetryAfterSeconds(body: String): Long? {
     return value.toLongOrNull()
 }
 
-fun sendTelegram(messages: List<String>) {
+private fun sendTelegram(messages: List<String>) {
     val token = System.getenv("TELEGRAM_TOKEN").orEmpty()
     val chatId = System.getenv("CHAT_ID").orEmpty()
     val threadId = System.getenv("THREAD_ID").orEmpty()
@@ -484,9 +484,7 @@ fun sendTelegram(messages: List<String>) {
             logInfo("Telegram response #${index + 1}: $status")
             logInfo("Telegram body #${index + 1}: $body")
 
-            if (status == 200) {
-                break
-            }
+            if (status == 200) break
 
             if (status == 429 && attempt <= maxRetries) {
                 val retryAfter = extractRetryAfterSeconds(body) ?: 1L
