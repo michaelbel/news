@@ -6,6 +6,8 @@ import news.androidstudioblog.AndroidStudioBlogItem
 import news.androidstudioblog.AndroidStudioBlogProvider
 import news.androidweekly.AndroidWeeklyItem
 import news.androidweekly.AndroidWeeklyProvider
+import news.androidauthority.AndroidAuthorityItem
+import news.androidauthority.AndroidAuthorityProvider
 import news.devto.DevToItem
 import news.devto.DevToProvider
 import news.firebaseblog.FirebaseBlogItem
@@ -67,6 +69,13 @@ fun main() {
         name = "Android Studio Blog",
         lastCheck = lastCheck,
         provider = AndroidStudioBlogProvider
+    )
+
+    val androidAuthorityItems = collectItems(
+        enabled = ANDROID_AUTHORITY_ENABLED,
+        name = "Android Authority",
+        lastCheck = lastCheck,
+        provider = AndroidAuthorityProvider
     )
 
     val firebaseBlogItems = collectItems(
@@ -160,6 +169,7 @@ fun main() {
         youtubeItems = youtubeItems,
         androidBlogItems = androidBlogItems,
         androidStudioBlogItems = androidStudioBlogItems,
+        androidAuthorityItems = androidAuthorityItems,
         firebaseBlogItems = firebaseBlogItems,
         kotlinBlogItems = kotlinBlogItems,
         githubBlogItems = githubBlogItems,
@@ -175,6 +185,7 @@ fun main() {
         youtubeEnabled = YOUTUBE_ENABLED,
         androidBlogEnabled = ANDROID_BLOG_ENABLED,
         androidStudioBlogEnabled = ANDROID_STUDIO_BLOG_ENABLED,
+        androidAuthorityEnabled = ANDROID_AUTHORITY_ENABLED,
         firebaseBlogEnabled = FIREBASE_BLOG_ENABLED,
         kotlinBlogEnabled = KOTLIN_BLOG_ENABLED,
         githubBlogEnabled = GITHUB_BLOG_ENABLED,
@@ -205,6 +216,7 @@ private fun buildMessages(
     youtubeItems: List<YoutubeItem>,
     androidBlogItems: List<AndroidBlogItem>,
     androidStudioBlogItems: List<AndroidStudioBlogItem>,
+    androidAuthorityItems: List<AndroidAuthorityItem>,
     firebaseBlogItems: List<FirebaseBlogItem>,
     kotlinBlogItems: List<KotlinBlogItem>,
     githubBlogItems: List<GithubBlogItem>,
@@ -220,6 +232,7 @@ private fun buildMessages(
     youtubeEnabled: Boolean,
     androidBlogEnabled: Boolean,
     androidStudioBlogEnabled: Boolean,
+    androidAuthorityEnabled: Boolean,
     firebaseBlogEnabled: Boolean,
     kotlinBlogEnabled: Boolean,
     githubBlogEnabled: Boolean,
@@ -268,6 +281,17 @@ private fun buildMessages(
             },
             enabled = androidStudioBlogEnabled,
             items = androidStudioBlogItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ ANDROID AUTHORITY</b>")
+                append("\n\n")
+                append("Свежие материалы Android Authority о платформе и индустрии.")
+                append("\n\n")
+            },
+            enabled = androidAuthorityEnabled,
+            items = androidAuthorityItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
