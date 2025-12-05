@@ -3,6 +3,7 @@ package news
 const val ANDROID_BLOG_URL = "http://android-developers.googleblog.com/atom.xml"
 const val ANDROID_STUDIO_BLOG_URL = "https://androidstudio.googleblog.com/feeds/posts/default"
 const val FIREBASE_BLOG_URL = "https://firebase.blog/rss.xml"
+const val GITHUB_BLOG_URL = "https://github.blog/feed/"
 const val JETBRAINS_BLOG_URL = "https://blog.jetbrains.com/feed/"
 const val KOTLIN_BLOG_URL = "https://blog.jetbrains.com/kotlin/feed/"
 const val DEV_TO_ANDROID_URL = "https://dev.to/feed/tag/android"

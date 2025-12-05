@@ -10,6 +10,8 @@ import news.devto.DevToItem
 import news.devto.DevToProvider
 import news.firebaseblog.FirebaseBlogItem
 import news.firebaseblog.FirebaseBlogProvider
+import news.githubblog.GithubBlogItem
+import news.githubblog.GithubBlogProvider
 import news.github.GithubReleaseItem
 import news.github.GithubReleasesProvider
 import news.githubtrending.GithubTrendingKotlinItem
@@ -79,6 +81,13 @@ fun main() {
         name = "Kotlin Blog",
         lastCheck = lastCheck,
         provider = KotlinBlogProvider
+    )
+
+    val githubBlogItems = collectItems(
+        enabled = GITHUB_BLOG_ENABLED,
+        name = "GitHub Blog",
+        lastCheck = lastCheck,
+        provider = GithubBlogProvider
     )
 
     val jetBrainsBlogItems = collectItems(
@@ -153,6 +162,7 @@ fun main() {
         androidStudioBlogItems = androidStudioBlogItems,
         firebaseBlogItems = firebaseBlogItems,
         kotlinBlogItems = kotlinBlogItems,
+        githubBlogItems = githubBlogItems,
         jetBrainsBlogItems = jetBrainsBlogItems,
         mediumGoogleItems = mediumGoogleItems,
         mediumAndroidItems = mediumAndroidItems,
@@ -167,6 +177,7 @@ fun main() {
         androidStudioBlogEnabled = ANDROID_STUDIO_BLOG_ENABLED,
         firebaseBlogEnabled = FIREBASE_BLOG_ENABLED,
         kotlinBlogEnabled = KOTLIN_BLOG_ENABLED,
+        githubBlogEnabled = GITHUB_BLOG_ENABLED,
         jetBrainsBlogEnabled = JETBRAINS_BLOG_ENABLED,
         mediumGoogleEnabled = MEDIUM_GOOGLE_ENABLED,
         mediumAndroidEnabled = MEDIUM_ANDROID_ENABLED,
@@ -196,6 +207,7 @@ private fun buildMessages(
     androidStudioBlogItems: List<AndroidStudioBlogItem>,
     firebaseBlogItems: List<FirebaseBlogItem>,
     kotlinBlogItems: List<KotlinBlogItem>,
+    githubBlogItems: List<GithubBlogItem>,
     jetBrainsBlogItems: List<JetBrainsBlogItem>,
     mediumGoogleItems: List<MediumGoogleItem>,
     mediumAndroidItems: List<MediumAndroidItem>,
@@ -210,6 +222,7 @@ private fun buildMessages(
     androidStudioBlogEnabled: Boolean,
     firebaseBlogEnabled: Boolean,
     kotlinBlogEnabled: Boolean,
+    githubBlogEnabled: Boolean,
     jetBrainsBlogEnabled: Boolean,
     mediumGoogleEnabled: Boolean,
     mediumAndroidEnabled: Boolean,
@@ -277,6 +290,17 @@ private fun buildMessages(
             },
             enabled = kotlinBlogEnabled,
             items = kotlinBlogItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ GITHUB BLOG</b>")
+                append("\n\n")
+                append("Новости и анонсы платформы GitHub из официального блога.")
+                append("\n\n")
+            },
+            enabled = githubBlogEnabled,
+            items = githubBlogItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
