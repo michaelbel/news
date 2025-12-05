@@ -26,6 +26,8 @@ import news.mediumgoogle.MediumGoogleItem
 import news.mediumgoogle.MediumGoogleProvider
 import news.proandroiddev.ProAndroidDevItem
 import news.proandroiddev.ProAndroidDevProvider
+import news.techradar.TechRadarItem
+import news.techradar.TechRadarProvider
 import news.youtube.YoutubeItem
 import news.youtube.YoutubeProvider
 import java.net.URI
@@ -123,6 +125,13 @@ fun main() {
         provider = ProAndroidDevProvider
     )
 
+    val techRadarItems = collectItems(
+        enabled = TECHRADAR_ANDROID_ENABLED,
+        name = "TechRadar Android",
+        lastCheck = lastCheck,
+        provider = TechRadarProvider
+    )
+
     val habrAndroidItems = collectItems(
         enabled = HABR_ANDROID_ENABLED,
         name = "Habr Android",
@@ -159,6 +168,7 @@ fun main() {
         devToAndroidItems = devToAndroidItems,
         androidWeeklyItems = androidWeeklyItems,
         proAndroidDevItems = proAndroidDevItems,
+        techRadarItems = techRadarItems,
         habrAndroidItems = habrAndroidItems,
         githubReleaseItems = githubReleaseItems,
         githubTrendingKotlinItems = githubTrendingKotlinItems,
@@ -173,6 +183,7 @@ fun main() {
         devToAndroidEnabled = DEV_TO_ANDROID_ENABLED,
         androidWeeklyEnabled = ANDROID_WEEKLY_ENABLED,
         proAndroidDevEnabled = PRO_ANDROID_DEV_ENABLED,
+        techRadarEnabled = TECHRADAR_ANDROID_ENABLED,
         habrAndroidEnabled = HABR_ANDROID_ENABLED,
         githubReleasesEnabled = GITHUB_RELEASES_ENABLED,
         githubTrendingKotlinEnabled = GITHUB_TRENDING_KOTLIN_ENABLED
@@ -202,6 +213,7 @@ private fun buildMessages(
     devToAndroidItems: List<DevToItem>,
     androidWeeklyItems: List<AndroidWeeklyItem>,
     proAndroidDevItems: List<ProAndroidDevItem>,
+    techRadarItems: List<TechRadarItem>,
     habrAndroidItems: List<HabrAndroidItem>,
     githubReleaseItems: List<GithubReleaseItem>,
     githubTrendingKotlinItems: List<GithubTrendingKotlinItem>,
@@ -216,6 +228,7 @@ private fun buildMessages(
     devToAndroidEnabled: Boolean,
     androidWeeklyEnabled: Boolean,
     proAndroidDevEnabled: Boolean,
+    techRadarEnabled: Boolean,
     habrAndroidEnabled: Boolean,
     githubReleasesEnabled: Boolean,
     githubTrendingKotlinEnabled: Boolean
@@ -343,6 +356,17 @@ private fun buildMessages(
             },
             enabled = proAndroidDevEnabled,
             items = proAndroidDevItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<b>ANDROID НА TECHRADAR</b>")
+                append("\n\n")
+                append("Подборка свежих материалов раздела Android на TechRadar.")
+                append("\n\n")
+            },
+            enabled = techRadarEnabled,
+            items = techRadarItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
