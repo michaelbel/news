@@ -28,6 +28,8 @@ import news.mediumandroid.MediumAndroidItem
 import news.mediumandroid.MediumAndroidProvider
 import news.mediumgoogle.MediumGoogleItem
 import news.mediumgoogle.MediumGoogleProvider
+import news.ninetofivegoogle.NineToFiveGoogleItem
+import news.ninetofivegoogle.NineToFiveGoogleProvider
 import news.proandroiddev.ProAndroidDevItem
 import news.proandroiddev.ProAndroidDevProvider
 import news.youtube.YoutubeItem
@@ -134,6 +136,13 @@ fun main() {
         provider = AndroidWeeklyProvider
     )
 
+    val nineToFiveGoogleItems = collectItems(
+        enabled = NINE_TO_FIVE_GOOGLE_ENABLED,
+        name = "9to5Google",
+        lastCheck = lastCheck,
+        provider = NineToFiveGoogleProvider
+    )
+
     val proAndroidDevItems = collectItems(
         enabled = PRO_ANDROID_DEV_ENABLED,
         name = "ProAndroidDev",
@@ -178,6 +187,7 @@ fun main() {
         mediumAndroidItems = mediumAndroidItems,
         devToAndroidItems = devToAndroidItems,
         androidWeeklyItems = androidWeeklyItems,
+        nineToFiveGoogleItems = nineToFiveGoogleItems,
         proAndroidDevItems = proAndroidDevItems,
         habrAndroidItems = habrAndroidItems,
         githubReleaseItems = githubReleaseItems,
@@ -194,6 +204,7 @@ fun main() {
         mediumAndroidEnabled = MEDIUM_ANDROID_ENABLED,
         devToAndroidEnabled = DEV_TO_ANDROID_ENABLED,
         androidWeeklyEnabled = ANDROID_WEEKLY_ENABLED,
+        nineToFiveGoogleEnabled = NINE_TO_FIVE_GOOGLE_ENABLED,
         proAndroidDevEnabled = PRO_ANDROID_DEV_ENABLED,
         habrAndroidEnabled = HABR_ANDROID_ENABLED,
         githubReleasesEnabled = GITHUB_RELEASES_ENABLED,
@@ -225,6 +236,7 @@ private fun buildMessages(
     mediumAndroidItems: List<MediumAndroidItem>,
     devToAndroidItems: List<DevToItem>,
     androidWeeklyItems: List<AndroidWeeklyItem>,
+    nineToFiveGoogleItems: List<NineToFiveGoogleItem>,
     proAndroidDevItems: List<ProAndroidDevItem>,
     habrAndroidItems: List<HabrAndroidItem>,
     githubReleaseItems: List<GithubReleaseItem>,
@@ -241,6 +253,7 @@ private fun buildMessages(
     mediumAndroidEnabled: Boolean,
     devToAndroidEnabled: Boolean,
     androidWeeklyEnabled: Boolean,
+    nineToFiveGoogleEnabled: Boolean,
     proAndroidDevEnabled: Boolean,
     habrAndroidEnabled: Boolean,
     githubReleasesEnabled: Boolean,
@@ -373,6 +386,17 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ 9TO5GOOGLE</b>")
+                append("\n\n")
+                append("Последние статьи и обзоры с сайта 9to5Google.")
+                append("\n\n")
+            },
+            enabled = nineToFiveGoogleEnabled,
+            items = nineToFiveGoogleItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
                 append("<b>НОВЫЕ ВЫПУСКИ ANDROID WEEKLY</b>")
                 append("\n\n")
                 append("Последний номер рассылки Android Weekly с подборкой статей и инструментов.")
@@ -456,10 +480,6 @@ private fun defaultLine(
         item.author?.let { author ->
             append("\nАвтор: ")
             append(escapeHtml(author))
-        }
-        item.summary?.let { summary ->
-            append("\n")
-            append(escapeHtml(summary))
         }
         if (item.categories.isNotEmpty()) {
             append("\nТеги: ")
