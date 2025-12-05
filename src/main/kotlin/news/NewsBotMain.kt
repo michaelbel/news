@@ -16,6 +16,8 @@ import news.githubtrending.GithubTrendingKotlinItem
 import news.githubtrending.GithubTrendingKotlinProvider
 import news.habr.HabrAndroidItem
 import news.habr.HabrAndroidProvider
+import news.jetbrainsblog.JetBrainsBlogItem
+import news.jetbrainsblog.JetBrainsBlogProvider
 import news.kotlinblog.KotlinBlogItem
 import news.kotlinblog.KotlinBlogProvider
 import news.mediumandroid.MediumAndroidItem
@@ -77,6 +79,13 @@ fun main() {
         name = "Kotlin Blog",
         lastCheck = lastCheck,
         provider = KotlinBlogProvider
+    )
+
+    val jetBrainsBlogItems = collectItems(
+        enabled = JETBRAINS_BLOG_ENABLED,
+        name = "JetBrains Blog",
+        lastCheck = lastCheck,
+        provider = JetBrainsBlogProvider
     )
 
     val mediumGoogleItems = collectItems(
@@ -144,6 +153,7 @@ fun main() {
         androidStudioBlogItems = androidStudioBlogItems,
         firebaseBlogItems = firebaseBlogItems,
         kotlinBlogItems = kotlinBlogItems,
+        jetBrainsBlogItems = jetBrainsBlogItems,
         mediumGoogleItems = mediumGoogleItems,
         mediumAndroidItems = mediumAndroidItems,
         devToAndroidItems = devToAndroidItems,
@@ -157,6 +167,7 @@ fun main() {
         androidStudioBlogEnabled = ANDROID_STUDIO_BLOG_ENABLED,
         firebaseBlogEnabled = FIREBASE_BLOG_ENABLED,
         kotlinBlogEnabled = KOTLIN_BLOG_ENABLED,
+        jetBrainsBlogEnabled = JETBRAINS_BLOG_ENABLED,
         mediumGoogleEnabled = MEDIUM_GOOGLE_ENABLED,
         mediumAndroidEnabled = MEDIUM_ANDROID_ENABLED,
         devToAndroidEnabled = DEV_TO_ANDROID_ENABLED,
@@ -185,6 +196,7 @@ private fun buildMessages(
     androidStudioBlogItems: List<AndroidStudioBlogItem>,
     firebaseBlogItems: List<FirebaseBlogItem>,
     kotlinBlogItems: List<KotlinBlogItem>,
+    jetBrainsBlogItems: List<JetBrainsBlogItem>,
     mediumGoogleItems: List<MediumGoogleItem>,
     mediumAndroidItems: List<MediumAndroidItem>,
     devToAndroidItems: List<DevToItem>,
@@ -198,6 +210,7 @@ private fun buildMessages(
     androidStudioBlogEnabled: Boolean,
     firebaseBlogEnabled: Boolean,
     kotlinBlogEnabled: Boolean,
+    jetBrainsBlogEnabled: Boolean,
     mediumGoogleEnabled: Boolean,
     mediumAndroidEnabled: Boolean,
     devToAndroidEnabled: Boolean,
@@ -264,6 +277,17 @@ private fun buildMessages(
             },
             enabled = kotlinBlogEnabled,
             items = kotlinBlogItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ JETBRAINS BLOG</b>")
+                append("\n\n")
+                append("Анонсы продуктов, статьи и новости из основного блога JetBrains.")
+                append("\n\n")
+            },
+            enabled = jetBrainsBlogEnabled,
+            items = jetBrainsBlogItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
