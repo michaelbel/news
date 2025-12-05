@@ -2,7 +2,9 @@ package news
 
 const val ANDROID_BLOG_URL = "http://android-developers.googleblog.com/atom.xml"
 const val ANDROID_STUDIO_BLOG_URL = "https://androidstudio.googleblog.com/feeds/posts/default"
+const val ANDROID_AUTHORITY_URL = "https://www.androidauthority.com/feed/"
 const val FIREBASE_BLOG_URL = "https://firebase.blog/rss.xml"
+const val GITHUB_BLOG_URL = "https://github.blog/feed/"
 const val JETBRAINS_BLOG_URL = "https://blog.jetbrains.com/feed/"
 const val KOTLIN_BLOG_URL = "https://blog.jetbrains.com/kotlin/feed/"
 const val DEV_TO_ANDROID_URL = "https://dev.to/feed/tag/android"
@@ -30,7 +32,7 @@ val GITHUB_REPOS = listOf(
     "https://github.com/Kotlin/kotlinx.coroutines",
     "https://github.com/Kotlin/kotlinx.serialization",
     "https://github.com/Kotlin/kotlinx.collections.immutable",
-    "https://github.com/Kotlin/kotlinx-kover",
+    "https://github.com/Kotlin/kotlinx.kover",
     "https://github.com/Kotlin/kotlinx-benchmark",
     "https://github.com/Kotlin/kotlinx.html",
     "https://github.com/Kotlin/kotlinx-datetime",

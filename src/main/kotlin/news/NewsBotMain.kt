@@ -6,10 +6,14 @@ import news.androidstudioblog.AndroidStudioBlogItem
 import news.androidstudioblog.AndroidStudioBlogProvider
 import news.androidweekly.AndroidWeeklyItem
 import news.androidweekly.AndroidWeeklyProvider
+import news.androidauthority.AndroidAuthorityItem
+import news.androidauthority.AndroidAuthorityProvider
 import news.devto.DevToItem
 import news.devto.DevToProvider
 import news.firebaseblog.FirebaseBlogItem
 import news.firebaseblog.FirebaseBlogProvider
+import news.githubblog.GithubBlogItem
+import news.githubblog.GithubBlogProvider
 import news.github.GithubReleaseItem
 import news.github.GithubReleasesProvider
 import news.githubtrending.GithubTrendingKotlinItem
@@ -69,6 +73,13 @@ fun main() {
         provider = AndroidStudioBlogProvider
     )
 
+    val androidAuthorityItems = collectItems(
+        enabled = ANDROID_AUTHORITY_ENABLED,
+        name = "Android Authority",
+        lastCheck = lastCheck,
+        provider = AndroidAuthorityProvider
+    )
+
     val firebaseBlogItems = collectItems(
         enabled = FIREBASE_BLOG_ENABLED,
         name = "Firebase Blog",
@@ -81,6 +92,13 @@ fun main() {
         name = "Kotlin Blog",
         lastCheck = lastCheck,
         provider = KotlinBlogProvider
+    )
+
+    val githubBlogItems = collectItems(
+        enabled = GITHUB_BLOG_ENABLED,
+        name = "GitHub Blog",
+        lastCheck = lastCheck,
+        provider = GithubBlogProvider
     )
 
     val jetBrainsBlogItems = collectItems(
@@ -160,8 +178,10 @@ fun main() {
         youtubeItems = youtubeItems,
         androidBlogItems = androidBlogItems,
         androidStudioBlogItems = androidStudioBlogItems,
+        androidAuthorityItems = androidAuthorityItems,
         firebaseBlogItems = firebaseBlogItems,
         kotlinBlogItems = kotlinBlogItems,
+        githubBlogItems = githubBlogItems,
         jetBrainsBlogItems = jetBrainsBlogItems,
         mediumGoogleItems = mediumGoogleItems,
         mediumAndroidItems = mediumAndroidItems,
@@ -175,8 +195,10 @@ fun main() {
         youtubeEnabled = YOUTUBE_ENABLED,
         androidBlogEnabled = ANDROID_BLOG_ENABLED,
         androidStudioBlogEnabled = ANDROID_STUDIO_BLOG_ENABLED,
+        androidAuthorityEnabled = ANDROID_AUTHORITY_ENABLED,
         firebaseBlogEnabled = FIREBASE_BLOG_ENABLED,
         kotlinBlogEnabled = KOTLIN_BLOG_ENABLED,
+        githubBlogEnabled = GITHUB_BLOG_ENABLED,
         jetBrainsBlogEnabled = JETBRAINS_BLOG_ENABLED,
         mediumGoogleEnabled = MEDIUM_GOOGLE_ENABLED,
         mediumAndroidEnabled = MEDIUM_ANDROID_ENABLED,
@@ -205,8 +227,10 @@ private fun buildMessages(
     youtubeItems: List<YoutubeItem>,
     androidBlogItems: List<AndroidBlogItem>,
     androidStudioBlogItems: List<AndroidStudioBlogItem>,
+    androidAuthorityItems: List<AndroidAuthorityItem>,
     firebaseBlogItems: List<FirebaseBlogItem>,
     kotlinBlogItems: List<KotlinBlogItem>,
+    githubBlogItems: List<GithubBlogItem>,
     jetBrainsBlogItems: List<JetBrainsBlogItem>,
     mediumGoogleItems: List<MediumGoogleItem>,
     mediumAndroidItems: List<MediumAndroidItem>,
@@ -220,8 +244,10 @@ private fun buildMessages(
     youtubeEnabled: Boolean,
     androidBlogEnabled: Boolean,
     androidStudioBlogEnabled: Boolean,
+    androidAuthorityEnabled: Boolean,
     firebaseBlogEnabled: Boolean,
     kotlinBlogEnabled: Boolean,
+    githubBlogEnabled: Boolean,
     jetBrainsBlogEnabled: Boolean,
     mediumGoogleEnabled: Boolean,
     mediumAndroidEnabled: Boolean,
@@ -272,6 +298,17 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ ANDROID AUTHORITY</b>")
+                append("\n\n")
+                append("Свежие материалы Android Authority о платформе и индустрии.")
+                append("\n\n")
+            },
+            enabled = androidAuthorityEnabled,
+            items = androidAuthorityItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
                 append("<b>НОВЫЕ ПОСТЫ FIREBASE BLOG</b>")
                 append("\n\n")
                 append("Обновления и гайды по сервисам Firebase для мобильной разработки.")
@@ -290,6 +327,17 @@ private fun buildMessages(
             },
             enabled = kotlinBlogEnabled,
             items = kotlinBlogItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ GITHUB BLOG</b>")
+                append("\n\n")
+                append("Новости и анонсы платформы GitHub из официального блога.")
+                append("\n\n")
+            },
+            enabled = githubBlogEnabled,
+            items = githubBlogItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
