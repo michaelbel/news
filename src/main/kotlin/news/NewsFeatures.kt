@@ -13,4 +13,5 @@ const val DEV_TO_ANDROID_ENABLED = false
 const val MEDIUM_ANDROID_ENABLED = true
 const val MEDIUM_GOOGLE_ENABLED = false
 const val PRO_ANDROID_DEV_ENABLED = false
+const val NINE_TO_FIVE_GOOGLE_ENABLED = true
 const val YOUTUBE_ENABLED = false
