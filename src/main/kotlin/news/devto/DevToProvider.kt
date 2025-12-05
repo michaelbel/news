@@ -3,7 +3,6 @@ package news.devto
 import news.DEV_TO_ANDROID_URL
 import news.NewsProvider
 import news.Timestamp
-import news.cleanAndTruncate
 import news.cleanText
 import news.logInfo
 import news.logWarn
@@ -34,6 +33,17 @@ object DevToProvider: NewsProvider<DevToItem> {
 
         val request = HttpRequest.newBuilder()
             .uri(URI(FEED_URL))
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+                        "AppleWebKit/537.36 (KHTML, like Gecko) " +
+                        "Chrome/124.0.0.0 Safari/537.36"
+            )
+            .header(
+                "Accept",
+                "application/rss+xml,application/xml;q=0.9,text/xml;q=0.8,*/*;q=0.7"
+            )
+            .header("Accept-Language", "en-US,en;q=0.9")
             .GET()
             .build()
 
@@ -79,7 +89,6 @@ object DevToProvider: NewsProvider<DevToItem> {
             var linkHref: String? = null
             var publishedRaw: String? = null
             var author: String? = null
-            var description: String? = null
             val categories = mutableListOf<String>()
 
             for (j in 0 until children.length) {
@@ -89,7 +98,6 @@ object DevToProvider: NewsProvider<DevToItem> {
                     "link" -> linkHref = node.textContent
                     "pubdate", "published", "updated" -> publishedRaw = node.textContent
                     "author", "dc:creator" -> author = node.textContent
-                    "description", "content:encoded" -> description = node.textContent
                     "category" -> cleanText(node.textContent)?.let { categories += it }
                 }
             }
@@ -118,7 +126,7 @@ object DevToProvider: NewsProvider<DevToItem> {
                 title = safeTitle,
                 url = url,
                 author = cleanText(author),
-                summary = cleanAndTruncate(description),
+                summary = null,
                 categories = categories
             )
         }

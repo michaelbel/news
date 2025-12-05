@@ -1,5 +1,6 @@
 package news.androidweekly
 
+import news.ANDROID_WEEKLY_FALLBACK_URL
 import news.ANDROID_WEEKLY_URL
 import news.NewsProvider
 import news.cleanAndTruncate
@@ -18,7 +19,10 @@ import javax.xml.parsers.DocumentBuilderFactory
 
 object AndroidWeeklyProvider: NewsProvider<AndroidWeeklyItem> {
 
-    private const val FEED_URL = ANDROID_WEEKLY_URL
+    private val feedUrls = listOf(
+        ANDROID_WEEKLY_URL,
+        ANDROID_WEEKLY_FALLBACK_URL
+    )
 
     private val client: HttpClient = HttpClient.newBuilder()
         .followRedirects(Redirect.NORMAL)
@@ -34,46 +38,68 @@ object AndroidWeeklyProvider: NewsProvider<AndroidWeeklyItem> {
 
         val result = mutableListOf<AndroidWeeklyItem>()
 
-        logInfo("AndroidWeekly: fetching $FEED_URL")
+        var chosenFeed: String? = null
+        var xml: String? = null
 
-        val request = HttpRequest.newBuilder()
-            .uri(URI(FEED_URL))
-            .header(
-                "User-Agent",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
-                        "AppleWebKit/537.36 (KHTML, like Gecko) " +
-                        "Chrome/124.0.0.0 Safari/537.36"
-            )
-            .header(
-                "Accept",
-                "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif," +
-                        "image/webp,*/*;q=0.8"
-            )
-            .header("Accept-Language", "en-US,en;q=0.9")
-            .GET()
-            .build()
+        for (feedUrl in feedUrls) {
+            logInfo("AndroidWeekly: fetching $feedUrl")
 
-        val xml = try {
-            val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
-            logInfo("AndroidWeekly: HTTP status for $FEED_URL = ${resp.statusCode()}")
-            if (resp.statusCode() != 200) {
-                logWarn("AndroidWeekly: non-200 status for $FEED_URL, " + "body snippet=${resp.body().take(300)}")
-                return emptyList()
+            val request = HttpRequest.newBuilder()
+                .uri(URI(feedUrl))
+                .header(
+                    "User-Agent",
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+                            "AppleWebKit/537.36 (KHTML, like Gecko) " +
+                            "Chrome/124.0.0.0 Safari/537.36"
+                )
+                .header(
+                    "Accept",
+                    "application/rss+xml,application/xml;q=0.9,text/xml;q=0.8,*/*;q=0.7"
+                )
+                .header("Accept-Language", "en-US,en;q=0.9")
+                .GET()
+                .build()
+
+            val body = try {
+                val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
+                logInfo("AndroidWeekly: HTTP status for $feedUrl = ${resp.statusCode()}")
+                if (resp.statusCode() != 200) {
+                    logWarn(
+                        "AndroidWeekly: non-200 status for $feedUrl, " +
+                                "body snippet=${resp.body().take(300)}"
+                    )
+                    null
+                } else {
+                    resp.body()
+                }
+            } catch (e: Exception) {
+                logWarn("AndroidWeekly: failed to fetch $feedUrl: ${e.message}")
+                null
             }
-            resp.body()
-        } catch (e: Exception) {
-            logWarn("AndroidWeekly: failed to fetch $FEED_URL: ${e.message}")
+
+            if (body != null) {
+                xml = body
+                chosenFeed = feedUrl
+                break
+            }
+        }
+
+        if (xml == null || chosenFeed == null) {
             return emptyList()
         }
+
+        logInfo("AndroidWeekly: using feed $chosenFeed")
+
+        val feedXml = xml ?: return emptyList()
 
         val doc = try {
             val builder = factory.newDocumentBuilder()
             builder
-                .parse(xml.byteInputStream())
+                .parse(feedXml.byteInputStream())
                 .apply { documentElement.normalize() }
         } catch (e: Exception) {
             logWarn("AndroidWeekly: failed to parse XML, error=${e.message}")
-            logWarn("AndroidWeekly raw snippet: ${xml.take(300)}")
+            logWarn("AndroidWeekly raw snippet: ${feedXml.take(300)}")
             return emptyList()
         }
 
