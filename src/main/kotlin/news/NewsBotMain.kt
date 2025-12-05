@@ -265,23 +265,21 @@ fun buildMessages(
             formatLine = ::formatGithubLine
         ),
         MessageSection(
-            header = "<b>GITHUB TRENDING: KOTLIN</b>\n\n",
+            header = buildString {
+                append("<b>GITHUB TRENDING: KOTLIN</b>\n")
+                append("Текущий список топовых Kotlin-репозиториев из GitHub Trending за ${Instant.now().atZone(zone).format(DateTimeFormatter.ofPattern("d MMMM", Locale.of("ru")))}.")
+                append("\n\n")
+            },
             enabled = githubTrendingKotlinEnabled,
             items = githubTrendingKotlinItems,
             formatLine = ::formatGithubTrendingLine
         )
     )
 
-    val result = mutableListOf<String>()
-    val builder = StringBuilder()
-
-    sections.forEach { section ->
-        appendSection(section, zone, dateFormatter, builder, result)
-    }
-
-    flushChunk(builder, result)
-
-    return result
+    return sections
+        .flatMap { section ->
+            buildSectionMessages(section, zone, dateFormatter)
+        }
 }
 
 private data class MessageSection<T: NewsItem>(
@@ -366,36 +364,39 @@ private fun formatGithubTrendingLine(
     }
 }
 
-private fun <T: NewsItem> appendSection(
+private fun <T: NewsItem> buildSectionMessages(
     section: MessageSection<T>,
     zone: ZoneId,
-    dateFormatter: DateTimeFormatter,
-    builder: StringBuilder,
-    result: MutableList<String>
-) {
-    if (!section.enabled) return
-    if (section.items.isEmpty()) return
+    dateFormatter: DateTimeFormatter
+): List<String> {
+    if (!section.enabled) return emptyList()
+    if (section.items.isEmpty()) return emptyList()
 
-    if (builder.length + section.header.length > TELEGRAM_MAX_LEN) {
-        flushChunk(builder, result)
-    }
+    val builder = StringBuilder()
+    val result = mutableListOf<String>()
+
     builder.append(section.header)
+
+    fun flushChunk() {
+        val text = builder.toString().trim()
+        if (text.isNotEmpty()) {
+            result += text
+        }
+        builder.setLength(0)
+    }
 
     for (item in section.items) {
         val line = section.formatLine(item, zone, dateFormatter)
         if (builder.length + line.length > TELEGRAM_MAX_LEN) {
-            flushChunk(builder, result)
+            flushChunk()
+            builder.append(section.header)
         }
         builder.append(line)
     }
-}
 
-private fun flushChunk(builder: StringBuilder, result: MutableList<String>) {
-    val text = builder.toString().trim()
-    if (text.isNotEmpty()) {
-        result += text
-    }
-    builder.setLength(0)
+    flushChunk()
+
+    return result
 }
 
 private fun <T: NewsItem> collectItems(
