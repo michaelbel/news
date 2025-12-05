@@ -8,6 +8,7 @@ const val GITHUB_RELEASES_ENABLED = true
 const val GITHUB_TRENDING_KOTLIN_ENABLED = true
 const val HABR_ANDROID_ENABLED = true
 const val KOTLIN_BLOG_ENABLED = true
+const val JETBRAINS_BLOG_ENABLED = true
 const val DEV_TO_ANDROID_ENABLED = true
 const val MEDIUM_ANDROID_ENABLED = true
 const val MEDIUM_GOOGLE_ENABLED = true
