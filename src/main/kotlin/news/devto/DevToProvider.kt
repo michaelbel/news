@@ -34,6 +34,17 @@ object DevToProvider: NewsProvider<DevToItem> {
 
         val request = HttpRequest.newBuilder()
             .uri(URI(FEED_URL))
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+                        "AppleWebKit/537.36 (KHTML, like Gecko) " +
+                        "Chrome/124.0.0.0 Safari/537.36"
+            )
+            .header(
+                "Accept",
+                "application/rss+xml,application/xml;q=0.9,text/xml;q=0.8,*/*;q=0.7"
+            )
+            .header("Accept-Language", "en-US,en;q=0.9")
             .GET()
             .build()
 

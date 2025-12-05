@@ -9,6 +9,8 @@ const val MEDIUM_ANDROID_DEVELOPERS_URL = "https://medium.com/feed/androiddevelo
 const val MEDIUM_GOOGLE_DEVELOPER_EXPERTS_URL = "https://medium.com/feed/google-developer-experts"
 const val PRO_ANDROID_DEV_URL = "https://proandroiddev.com/feed"
 const val ANDROID_WEEKLY_URL = "https://androidweekly.net/rss"
+const val ANDROID_WEEKLY_FALLBACK_URL =
+    "https://us12.campaign-archive.com/feed?u=40eb7ecc10ccd770b0980bcd9&id=a8f40b73cc"
 const val HABR_ANDROID_URL = "https://habr.com/ru/rss/hubs/android_dev/articles/all/?fl=ru"
 const val GITHUB_TRENDING_KOTLIN_URL = "https://github.com/trending/kotlin?since=daily&spoken_language_code=en"
 val GITHUB_REPOS = listOf(
