@@ -6,10 +6,14 @@ import news.androidstudioblog.AndroidStudioBlogItem
 import news.androidstudioblog.AndroidStudioBlogProvider
 import news.androidweekly.AndroidWeeklyItem
 import news.androidweekly.AndroidWeeklyProvider
+import news.androidauthority.AndroidAuthorityItem
+import news.androidauthority.AndroidAuthorityProvider
 import news.devto.DevToItem
 import news.devto.DevToProvider
 import news.firebaseblog.FirebaseBlogItem
 import news.firebaseblog.FirebaseBlogProvider
+import news.githubblog.GithubBlogItem
+import news.githubblog.GithubBlogProvider
 import news.github.GithubReleaseItem
 import news.github.GithubReleasesProvider
 import news.githubtrending.GithubTrendingKotlinItem
@@ -24,6 +28,8 @@ import news.mediumandroid.MediumAndroidItem
 import news.mediumandroid.MediumAndroidProvider
 import news.mediumgoogle.MediumGoogleItem
 import news.mediumgoogle.MediumGoogleProvider
+import news.ninetofivegoogle.NineToFiveGoogleItem
+import news.ninetofivegoogle.NineToFiveGoogleProvider
 import news.proandroiddev.ProAndroidDevItem
 import news.proandroiddev.ProAndroidDevProvider
 import news.techradar.TechRadarItem
@@ -69,6 +75,13 @@ fun main() {
         provider = AndroidStudioBlogProvider
     )
 
+    val androidAuthorityItems = collectItems(
+        enabled = ANDROID_AUTHORITY_ENABLED,
+        name = "Android Authority",
+        lastCheck = lastCheck,
+        provider = AndroidAuthorityProvider
+    )
+
     val firebaseBlogItems = collectItems(
         enabled = FIREBASE_BLOG_ENABLED,
         name = "Firebase Blog",
@@ -81,6 +94,13 @@ fun main() {
         name = "Kotlin Blog",
         lastCheck = lastCheck,
         provider = KotlinBlogProvider
+    )
+
+    val githubBlogItems = collectItems(
+        enabled = GITHUB_BLOG_ENABLED,
+        name = "GitHub Blog",
+        lastCheck = lastCheck,
+        provider = GithubBlogProvider
     )
 
     val jetBrainsBlogItems = collectItems(
@@ -116,6 +136,13 @@ fun main() {
         name = "Android Weekly",
         lastCheck = lastCheck,
         provider = AndroidWeeklyProvider
+    )
+
+    val nineToFiveGoogleItems = collectItems(
+        enabled = NINE_TO_FIVE_GOOGLE_ENABLED,
+        name = "9to5Google",
+        lastCheck = lastCheck,
+        provider = NineToFiveGoogleProvider
     )
 
     val proAndroidDevItems = collectItems(
@@ -160,13 +187,16 @@ fun main() {
         youtubeItems = youtubeItems,
         androidBlogItems = androidBlogItems,
         androidStudioBlogItems = androidStudioBlogItems,
+        androidAuthorityItems = androidAuthorityItems,
         firebaseBlogItems = firebaseBlogItems,
         kotlinBlogItems = kotlinBlogItems,
+        githubBlogItems = githubBlogItems,
         jetBrainsBlogItems = jetBrainsBlogItems,
         mediumGoogleItems = mediumGoogleItems,
         mediumAndroidItems = mediumAndroidItems,
         devToAndroidItems = devToAndroidItems,
         androidWeeklyItems = androidWeeklyItems,
+        nineToFiveGoogleItems = nineToFiveGoogleItems,
         proAndroidDevItems = proAndroidDevItems,
         techRadarItems = techRadarItems,
         habrAndroidItems = habrAndroidItems,
@@ -175,13 +205,16 @@ fun main() {
         youtubeEnabled = YOUTUBE_ENABLED,
         androidBlogEnabled = ANDROID_BLOG_ENABLED,
         androidStudioBlogEnabled = ANDROID_STUDIO_BLOG_ENABLED,
+        androidAuthorityEnabled = ANDROID_AUTHORITY_ENABLED,
         firebaseBlogEnabled = FIREBASE_BLOG_ENABLED,
         kotlinBlogEnabled = KOTLIN_BLOG_ENABLED,
+        githubBlogEnabled = GITHUB_BLOG_ENABLED,
         jetBrainsBlogEnabled = JETBRAINS_BLOG_ENABLED,
         mediumGoogleEnabled = MEDIUM_GOOGLE_ENABLED,
         mediumAndroidEnabled = MEDIUM_ANDROID_ENABLED,
         devToAndroidEnabled = DEV_TO_ANDROID_ENABLED,
         androidWeeklyEnabled = ANDROID_WEEKLY_ENABLED,
+        nineToFiveGoogleEnabled = NINE_TO_FIVE_GOOGLE_ENABLED,
         proAndroidDevEnabled = PRO_ANDROID_DEV_ENABLED,
         techRadarEnabled = TECHRADAR_ANDROID_ENABLED,
         habrAndroidEnabled = HABR_ANDROID_ENABLED,
@@ -205,13 +238,16 @@ private fun buildMessages(
     youtubeItems: List<YoutubeItem>,
     androidBlogItems: List<AndroidBlogItem>,
     androidStudioBlogItems: List<AndroidStudioBlogItem>,
+    androidAuthorityItems: List<AndroidAuthorityItem>,
     firebaseBlogItems: List<FirebaseBlogItem>,
     kotlinBlogItems: List<KotlinBlogItem>,
+    githubBlogItems: List<GithubBlogItem>,
     jetBrainsBlogItems: List<JetBrainsBlogItem>,
     mediumGoogleItems: List<MediumGoogleItem>,
     mediumAndroidItems: List<MediumAndroidItem>,
     devToAndroidItems: List<DevToItem>,
     androidWeeklyItems: List<AndroidWeeklyItem>,
+    nineToFiveGoogleItems: List<NineToFiveGoogleItem>,
     proAndroidDevItems: List<ProAndroidDevItem>,
     techRadarItems: List<TechRadarItem>,
     habrAndroidItems: List<HabrAndroidItem>,
@@ -220,13 +256,16 @@ private fun buildMessages(
     youtubeEnabled: Boolean,
     androidBlogEnabled: Boolean,
     androidStudioBlogEnabled: Boolean,
+    androidAuthorityEnabled: Boolean,
     firebaseBlogEnabled: Boolean,
     kotlinBlogEnabled: Boolean,
+    githubBlogEnabled: Boolean,
     jetBrainsBlogEnabled: Boolean,
     mediumGoogleEnabled: Boolean,
     mediumAndroidEnabled: Boolean,
     devToAndroidEnabled: Boolean,
     androidWeeklyEnabled: Boolean,
+    nineToFiveGoogleEnabled: Boolean,
     proAndroidDevEnabled: Boolean,
     techRadarEnabled: Boolean,
     habrAndroidEnabled: Boolean,
@@ -272,6 +311,17 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ ANDROID AUTHORITY</b>")
+                append("\n\n")
+                append("Свежие материалы Android Authority о платформе и индустрии.")
+                append("\n\n")
+            },
+            enabled = androidAuthorityEnabled,
+            items = androidAuthorityItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
                 append("<b>НОВЫЕ ПОСТЫ FIREBASE BLOG</b>")
                 append("\n\n")
                 append("Обновления и гайды по сервисам Firebase для мобильной разработки.")
@@ -290,6 +340,17 @@ private fun buildMessages(
             },
             enabled = kotlinBlogEnabled,
             items = kotlinBlogItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ GITHUB BLOG</b>")
+                append("\n\n")
+                append("Новости и анонсы платформы GitHub из официального блога.")
+                append("\n\n")
+            },
+            enabled = githubBlogEnabled,
+            items = githubBlogItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
@@ -334,6 +395,17 @@ private fun buildMessages(
             },
             enabled = devToAndroidEnabled,
             items = devToAndroidItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<b>НОВЫЕ ПОСТЫ 9TO5GOOGLE</b>")
+                append("\n\n")
+                append("Последние статьи и обзоры с сайта 9to5Google.")
+                append("\n\n")
+            },
+            enabled = nineToFiveGoogleEnabled,
+            items = nineToFiveGoogleItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
@@ -432,10 +504,6 @@ private fun defaultLine(
         item.author?.let { author ->
             append("\nАвтор: ")
             append(escapeHtml(author))
-        }
-        item.summary?.let { summary ->
-            append("\n")
-            append(escapeHtml(summary))
         }
         if (item.categories.isNotEmpty()) {
             append("\nТеги: ")
