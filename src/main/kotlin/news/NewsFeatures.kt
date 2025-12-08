@@ -15,3 +15,6 @@ const val MEDIUM_GOOGLE_ENABLED = true
 const val PRO_ANDROID_DEV_ENABLED = true
 const val NINE_TO_FIVE_GOOGLE_ENABLED = true
 const val YOUTUBE_ENABLED = true
+const val ANDROID_AUTHORITY_ENABLED = true
+const val GITHUB_BLOG_ENABLED = true
+const val TECHRADAR_ANDROID_ENABLED = true
