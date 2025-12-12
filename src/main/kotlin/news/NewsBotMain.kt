@@ -1,21 +1,21 @@
 package news
 
+import news.androidauthority.AndroidAuthorityItem
+import news.androidauthority.AndroidAuthorityProvider
 import news.androidblog.AndroidBlogItem
 import news.androidblog.AndroidBlogProvider
 import news.androidstudioblog.AndroidStudioBlogItem
 import news.androidstudioblog.AndroidStudioBlogProvider
 import news.androidweekly.AndroidWeeklyItem
 import news.androidweekly.AndroidWeeklyProvider
-import news.androidauthority.AndroidAuthorityItem
-import news.androidauthority.AndroidAuthorityProvider
 import news.devto.DevToItem
 import news.devto.DevToProvider
 import news.firebaseblog.FirebaseBlogItem
 import news.firebaseblog.FirebaseBlogProvider
-import news.githubblog.GithubBlogItem
-import news.githubblog.GithubBlogProvider
 import news.github.GithubReleaseItem
 import news.github.GithubReleasesProvider
+import news.githubblog.GithubBlogItem
+import news.githubblog.GithubBlogProvider
 import news.githubtrending.GithubTrendingKotlinItem
 import news.githubtrending.GithubTrendingKotlinProvider
 import news.habr.HabrAndroidItem
@@ -278,9 +278,7 @@ private fun buildMessages(
     val sections = listOf(
         MessageSection(
             header = buildString {
-                append("<b>НОВЫЕ YOUTUBE-ВИДЕО</b>")
-                append("\n\n")
-                append("Свежие ролики с ${YOUTUBE_CHANNELS.size} отслеживаемых каналов про Android.")
+                append("<b>YOUTUBE</b>")
                 append("\n\n")
             },
             enabled = youtubeEnabled,
@@ -289,9 +287,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>НОВЫЕ ПОСТЫ ANDROID DEVELOPERS BLOG</b>")
-                append("\n\n")
-                append("Последние материалы с официального блога Android команды Google.")
+                append("<b>ANDROID DEVELOPERS BLOG</b>")
                 append("\n\n")
             },
             enabled = androidBlogEnabled,
@@ -300,9 +296,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>НОВЫЕ ПОСТЫ ANDROID STUDIO BLOG</b>")
-                append("\n\n")
-                append("Новости и советы по Android Studio и инструментам разработки.")
+                append("<b>ANDROID STUDIO BLOG</b>")
                 append("\n\n")
             },
             enabled = androidStudioBlogEnabled,
@@ -311,9 +305,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>НОВЫЕ ПОСТЫ ANDROID AUTHORITY</b>")
-                append("\n\n")
-                append("Свежие материалы Android Authority о платформе и индустрии.")
+                append("<b>ANDROID AUTHORITY</b>")
                 append("\n\n")
             },
             enabled = androidAuthorityEnabled,
@@ -322,9 +314,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>НОВЫЕ ПОСТЫ FIREBASE BLOG</b>")
-                append("\n\n")
-                append("Обновления и гайды по сервисам Firebase для мобильной разработки.")
+                append("<b>FIREBASE BLOG</b>")
                 append("\n\n")
             },
             enabled = firebaseBlogEnabled,
@@ -333,9 +323,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>НОВЫЕ ПОСТЫ KOTLIN BLOG</b>")
-                append("\n\n")
-                append("Свежие записи о языке Kotlin и экосистеме от JetBrains/Google.")
+                append("<b>KOTLIN BLOG</b>")
                 append("\n\n")
             },
             enabled = kotlinBlogEnabled,
@@ -344,9 +332,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>НОВЫЕ ПОСТЫ GITHUB BLOG</b>")
-                append("\n\n")
-                append("Новости и анонсы платформы GitHub из официального блога.")
+                append("<b>GITHUB BLOG</b>")
                 append("\n\n")
             },
             enabled = githubBlogEnabled,
@@ -355,9 +341,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>НОВЫЕ ПОСТЫ JETBRAINS BLOG</b>")
-                append("\n\n")
-                append("Анонсы продуктов, статьи и новости из основного блога JetBrains.")
+                append("<b>JETBRAINS BLOG</b>")
                 append("\n\n")
             },
             enabled = jetBrainsBlogEnabled,
@@ -366,9 +350,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>НОВЫЕ ПОСТЫ GOOGLE DEVELOPER EXPERTS</b>")
-                append("\n\n")
-                append("Подборка публикаций от экспертов GDE по Android/Kotlin.")
+                append("<b>MEDIUM GOOGLE DEVELOPER EXPERTS</b>")
                 append("\n\n")
             },
             enabled = mediumGoogleEnabled,
@@ -377,9 +359,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>НОВЫЕ ПОСТЫ ANDROID DEVELOPERS</b>")
-                append("\n\n")
-                append("Материалы команды Android в Medium о практиках и новинках платформы.")
+                append("<b>MEDIUM ANDROID DEVELOPERS</b>")
                 append("\n\n")
             },
             enabled = mediumAndroidEnabled,
@@ -388,9 +368,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>НОВЫЕ ПОСТЫ DEV.TO</b>")
-                append("\n\n")
-                append("Публикации с тегом Android от сообщества разработчиков.")
+                append("<b>DEV.TO</b>")
                 append("\n\n")
             },
             enabled = devToAndroidEnabled,
@@ -399,9 +377,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>НОВЫЕ ПОСТЫ 9TO5GOOGLE</b>")
-                append("\n\n")
-                append("Последние статьи и обзоры с сайта 9to5Google.")
+                append("<b>9TO5GOOGLE</b>")
                 append("\n\n")
             },
             enabled = nineToFiveGoogleEnabled,
@@ -410,9 +386,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>НОВЫЕ ВЫПУСКИ ANDROID WEEKLY</b>")
-                append("\n\n")
-                append("Последний номер рассылки Android Weekly с подборкой статей и инструментов.")
+                append("<b>ANDROID WEEKLY</b>")
                 append("\n\n")
             },
             enabled = androidWeeklyEnabled,
@@ -421,9 +395,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>НОВЫЕ ПОСТЫ PROANDROIDDEV</b>")
-                append("\n\n")
-                append("Заметки и разборы от авторов ProAndroidDev про Android-разработку.")
+                append("<b>PROANDROIDDEV</b>")
                 append("\n\n")
             },
             enabled = proAndroidDevEnabled,
@@ -432,9 +404,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>ANDROID НА TECHRADAR</b>")
-                append("\n\n")
-                append("Подборка свежих материалов раздела Android на TechRadar.")
+                append("<b>TECHRADAR</b>")
                 append("\n\n")
             },
             enabled = techRadarEnabled,
@@ -443,9 +413,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>НОВЫЕ ПОСТЫ C ХАБРА</b>")
-                append("\n\n")
-                append("Новые публикации с Хабра по Android/Kotlin из отслеживаемых блогов.")
+                append("<b>HABR</b>")
                 append("\n\n")
             },
             enabled = habrAndroidEnabled,
@@ -454,9 +422,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>НОВЫЕ РЕЛИЗЫ НА GITHUB</b>")
-                append("\n\n")
-                append("Свежие релизные версии ${GITHUB_REPOS.size} отслеживаемых open-source проектов Android/Kotlin.")
+                append("<b>GITHUB RELEASES</b>")
                 append("\n\n")
             },
             enabled = githubReleasesEnabled,
@@ -466,8 +432,6 @@ private fun buildMessages(
         MessageSection(
             header = buildString {
                 append("<b>GITHUB TRENDING</b>")
-                append("\n\n")
-                append("Cписок топовых Kotlin-репозиториев из GitHub Trending за ${Instant.now().atZone(zone).format(DateTimeFormatter.ofPattern("d MMMM", Locale.of("ru")))}.")
                 append("\n\n")
             },
             enabled = githubTrendingKotlinEnabled,
