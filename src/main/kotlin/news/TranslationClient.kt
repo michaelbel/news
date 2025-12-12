@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Translation client powered by Hugging Face Inference API using the
+ * Translation client powered by Hugging Face router (HF Inference) using the
  * `Helsinki-NLP/opus-mt-en-ru` model. This keeps infrastructure light while
  * delivering reasonable EN→RU quality on a free tier.
  *
@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 object TranslationClient {
 
     private const val endpoint =
-        "https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-en-ru"
+        "https://router.huggingface.co/hf-inference/models/Helsinki-NLP/opus-mt-en-ru"
 
     private const val targetLang = "ru"
 
@@ -52,7 +52,7 @@ object TranslationClient {
 
         cache[text]?.let { return it }
 
-        val payload = """{\n  \"inputs\": \"${escapeJson(text)}\"\n}"""
+        val payload = """{"inputs": "${escapeJson(text)}"}"""
 
         val request = HttpRequest.newBuilder()
             .uri(URI(endpoint))
