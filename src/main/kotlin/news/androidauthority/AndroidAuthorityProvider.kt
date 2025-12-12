@@ -74,14 +74,16 @@ object AndroidAuthorityProvider : NewsProvider<AndroidAuthorityItem> {
             return emptyList()
         }
 
+        val sanitizedXml = sanitizeXml(xml)
+
         val doc = try {
             val builder = factory.newDocumentBuilder()
             builder
-                .parse(xml.byteInputStream())
+                .parse(sanitizedXml.byteInputStream())
                 .apply { documentElement.normalize() }
         } catch (e: Exception) {
             logWarn("AndroidAuthority: failed to parse XML: ${e.message}")
-            logWarn("AndroidAuthority raw snippet: ${xml.take(300)}")
+            logWarn("AndroidAuthority raw snippet: ${sanitizedXml.take(300)}")
             return emptyList()
         }
 
@@ -168,5 +170,15 @@ object AndroidAuthorityProvider : NewsProvider<AndroidAuthorityItem> {
             logWarn("AndroidAuthority: cannot parse pubDate '$raw': ${e.message}")
             null
         }
+    }
+
+    private fun sanitizeXml(xml: String): String {
+        val invalidCharsRegex = Regex("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\uFFFE\\uFFFF]")
+        if (!invalidCharsRegex.containsMatchIn(xml)) {
+            return xml
+        }
+
+        logWarn("AndroidAuthority: removed invalid XML control characters from feed")
+        return invalidCharsRegex.replace(xml, "")
     }
 }
