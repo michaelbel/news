@@ -92,6 +92,8 @@ object AndroidAuthorityProvider : NewsProvider<AndroidAuthorityItem> {
         var totalItems = 0
         var parsedItems = 0
         var afterFilterItems = 0
+        var translatedTitles = 0
+        var translationFallbacks = 0
 
         val result = mutableListOf<AndroidAuthorityItem>()
 
@@ -137,8 +139,17 @@ object AndroidAuthorityProvider : NewsProvider<AndroidAuthorityItem> {
                 .takeUnless { it.isNullOrEmpty() }
                 ?: "(no title)"
 
-            val translatedTitle = TranslationClient.translateToTarget(safeTitle, sourceLang = "en")
-                ?: safeTitle
+            val translatedTitle = TranslationClient.translateToTarget(
+                text = safeTitle,
+                sourceLang = "en",
+                context = "AndroidAuthority title"
+            )
+
+            val finalTitle = translatedTitle?.also { translatedTitles += 1 } ?: run {
+                translationFallbacks += 1
+                logWarn("AndroidAuthority: translation failed, keeping original title='${safeTitle.take(80)}'")
+                safeTitle
+            }
 
             val url = linkHref
                 ?.trim()
@@ -147,7 +158,7 @@ object AndroidAuthorityProvider : NewsProvider<AndroidAuthorityItem> {
 
             result += AndroidAuthorityItem(
                 published = published,
-                title = translatedTitle,
+                title = finalTitle,
                 url = url,
                 author = cleanText(author),
                 summary = cleanAndTruncate(description),
@@ -157,7 +168,8 @@ object AndroidAuthorityProvider : NewsProvider<AndroidAuthorityItem> {
 
         logInfo(
             "AndroidAuthority: items total=$totalItems, parsed=$parsedItems, " +
-                    "afterFilter=$afterFilterItems, result=${result.size}"
+                    "afterFilter=$afterFilterItems, result=${result.size}, " +
+                    "translated=$translatedTitles, translationFallbacks=$translationFallbacks"
         )
 
         return result.sortedBy { it.published }

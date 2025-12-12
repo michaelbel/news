@@ -39,12 +39,12 @@ object TranslationClient {
 
     private val warnedMissingToken = AtomicBoolean(false)
 
-    fun translateToTarget(text: String, sourceLang: String? = null): String? {
+    fun translateToTarget(text: String, sourceLang: String? = null, context: String? = null): String? {
         val token = apiToken
         if (token == null) {
             if (warnedMissingToken.compareAndSet(false, true)) {
                 logWarn(
-                    "Translate: HUGGING_FACE_TOKEN is not set, skipping translations"
+                    "Translate${contextSuffix(context)}: HUGGING_FACE_TOKEN is not set, skipping translations"
                 )
             }
             return null
@@ -66,26 +66,29 @@ object TranslationClient {
         val response = try {
             client.send(request, HttpResponse.BodyHandlers.ofString())
         } catch (e: Exception) {
-            logWarn("Translate: failed to call Hugging Face: ${e.message}")
+            logWarn("Translate${contextSuffix(context)}: failed to call Hugging Face: ${e.message}")
             return null
         }
 
         if (response.statusCode() !in 200..299) {
             logWarn(
-                "Translate: non-2xx status ${response.statusCode()}, body=${response.body().take(200)}"
+                "Translate${contextSuffix(context)}: non-2xx status ${response.statusCode()}, body=${response.body().take(200)}"
             )
             return null
         }
 
         val translated = parseTranslatedText(response.body())
         if (translated == null) {
-            logWarn("Translate: cannot parse response body: ${response.body().take(200)}")
+            logWarn(
+                "Translate${contextSuffix(context)}: cannot parse response body: ${response.body().take(200)}"
+            )
             return null
         }
 
         cache[text] = translated
         logInfo(
-            "Translate: '${text.take(40)}' -> '${translated.take(40)}', target=$targetLang, model=Helsinki-NLP/opus-mt-en-ru"
+            "Translate${contextSuffix(context)}: '${text.take(40)}' -> '${translated.take(40)}', " +
+                    "target=$targetLang, model=Helsinki-NLP/opus-mt-en-ru"
         )
         return translated
     }
@@ -106,12 +109,19 @@ object TranslationClient {
     }
 
     private fun parseTranslatedText(body: String): String? {
-        val regex = Regex("\"translation_text\"\\s*:\\s*\"(.*?)\"", RegexOption.DOT_MATCHES_ALL)
-        val match = regex.find(body) ?: return null
+        val translationRegex = Regex("\"translation_text\"\\s*:\\s*\"(.*?)\"", RegexOption.DOT_MATCHES_ALL)
+        val generatedRegex = Regex("\"generated_text\"\\s*:\\s*\"(.*?)\"", RegexOption.DOT_MATCHES_ALL)
+
+        val match = translationRegex.find(body) ?: generatedRegex.find(body) ?: return null
+
         return match.groupValues.getOrNull(1)
             ?.replace("\\n", "\n")
             ?.replace("\\r", "\r")
             ?.replace("\\\"", "\"")
             ?.replace("\\/", "/")
+    }
+
+    private fun contextSuffix(context: String?): String {
+        return context?.let { " [$it]" } ?: ""
     }
 }
