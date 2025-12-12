@@ -368,7 +368,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>DEV.TO</b>")
+                append("<b>DEVTO</b>")
                 append("\n\n")
             },
             enabled = devToAndroidEnabled,
@@ -512,11 +512,9 @@ private fun formatGithubTrendingLine(
             append(escapeHtml(item.description))
             append("\n")
         }
-        append("⭐️ ")
-        append(item.stars)
-        append(" • ")
-        append("👤 ")
-        append(item.forks)
+        append("⭐️${item.stars}")
+        append(" ")
+        append("👤${item.forks}")
         append("\n\n")
     }
 }

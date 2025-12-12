@@ -2,6 +2,7 @@ package news.androidauthority
 
 import news.ANDROID_AUTHORITY_URL
 import news.NewsProvider
+import news.TranslationClient
 import news.cleanAndTruncate
 import news.cleanText
 import news.logInfo
@@ -134,6 +135,9 @@ object AndroidAuthorityProvider : NewsProvider<AndroidAuthorityItem> {
                 .takeUnless { it.isNullOrEmpty() }
                 ?: "(no title)"
 
+            val translatedTitle = TranslationClient.translateToTarget(safeTitle, sourceLang = "en")
+                ?: safeTitle
+
             val url = linkHref
                 ?.trim()
                 .takeUnless { it.isNullOrEmpty() }
@@ -141,7 +145,7 @@ object AndroidAuthorityProvider : NewsProvider<AndroidAuthorityItem> {
 
             result += AndroidAuthorityItem(
                 published = published,
-                title = safeTitle,
+                title = translatedTitle,
                 url = url,
                 author = cleanText(author),
                 summary = cleanAndTruncate(description),
