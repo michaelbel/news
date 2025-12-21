@@ -38,8 +38,16 @@ object TranslationClient {
     private val cache = ConcurrentHashMap<String, String>()
 
     private val warnedMissingToken = AtomicBoolean(false)
+    private val warnedTranslationsDisabled = AtomicBoolean(false)
 
     fun translateToTarget(text: String, sourceLang: String? = null, context: String? = null): String? {
+        if (!TRANSLATION_ENABLED) {
+            if (warnedTranslationsDisabled.compareAndSet(false, true)) {
+                logWarn("Translate${contextSuffix(context)}: translations are disabled, skipping")
+            }
+            return null
+        }
+
         val token = apiToken
         if (token == null) {
             if (warnedMissingToken.compareAndSet(false, true)) {

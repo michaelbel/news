@@ -18,3 +18,4 @@ const val YOUTUBE_ENABLED = true
 const val ANDROID_AUTHORITY_ENABLED = true
 const val GITHUB_BLOG_ENABLED = true
 const val TECHRADAR_ANDROID_ENABLED = true
+const val TRANSLATION_ENABLED = false
