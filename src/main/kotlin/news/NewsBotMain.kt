@@ -278,7 +278,7 @@ private fun buildMessages(
     val sections = listOf(
         MessageSection(
             header = buildString {
-                append("<b>YOUTUBE</b>")
+                append("<tg-emoji emoji-id=\"5321283442577527159\">▶️</tg-emoji> <b>YOUTUBE</b>")
                 append("\n\n")
             },
             enabled = youtubeEnabled,
