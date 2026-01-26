@@ -287,7 +287,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>ANDROID DEVELOPERS BLOG</b>")
+                append("<tg-emoji emoji-id=\"5321471557850130882\">▶️</tg-emoji> <b>ANDROID DEVELOPERS BLOG</b>")
                 append("\n\n")
             },
             enabled = androidBlogEnabled,
@@ -296,7 +296,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>ANDROID STUDIO BLOG</b>")
+                append("<tg-emoji emoji-id=\"5323664267503756290\">▶️</tg-emoji> <b>ANDROID STUDIO BLOG</b>")
                 append("\n\n")
             },
             enabled = androidStudioBlogEnabled,
@@ -305,7 +305,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>ANDROID AUTHORITY</b>")
+                append("<tg-emoji emoji-id=\"5321471557850130882\">▶️</tg-emoji> <b>ANDROID AUTHORITY</b>")
                 append("\n\n")
             },
             enabled = androidAuthorityEnabled,
@@ -314,7 +314,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>FIREBASE BLOG</b>")
+                append("<tg-emoji emoji-id=\"5321379748629205271\">▶️</tg-emoji> <b>FIREBASE BLOG</b>")
                 append("\n\n")
             },
             enabled = firebaseBlogEnabled,
@@ -323,7 +323,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>KOTLIN BLOG</b>")
+                append("<tg-emoji emoji-id=\"5208461085572632559\">▶️</tg-emoji> <b>KOTLIN BLOG</b>")
                 append("\n\n")
             },
             enabled = kotlinBlogEnabled,
@@ -332,7 +332,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>GITHUB BLOG</b>")
+                append("<tg-emoji emoji-id=\"5321190645514130346\">▶️</tg-emoji> <b>GITHUB BLOG</b>")
                 append("\n\n")
             },
             enabled = githubBlogEnabled,
@@ -341,7 +341,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>JETBRAINS BLOG</b>")
+                append("<tg-emoji emoji-id=\"5332725171029560146\">▶️</tg-emoji> <b>JETBRAINS BLOG</b>")
                 append("\n\n")
             },
             enabled = jetBrainsBlogEnabled,
@@ -350,7 +350,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>MEDIUM GOOGLE DEVELOPER EXPERTS</b>")
+                append("<tg-emoji emoji-id=\"5208912452275701983\">▶️</tg-emoji> <b>MEDIUM GOOGLE DEVELOPER EXPERTS</b>")
                 append("\n\n")
             },
             enabled = mediumGoogleEnabled,
@@ -359,7 +359,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>MEDIUM ANDROID DEVELOPERS</b>")
+                append("<tg-emoji emoji-id=\"5368646963233312962\">▶️</tg-emoji> <b>MEDIUM ANDROID DEVELOPERS</b>")
                 append("\n\n")
             },
             enabled = mediumAndroidEnabled,
@@ -368,7 +368,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>DEVTO</b>")
+                append("<tg-emoji emoji-id=\"5321105600866716102\">▶️</tg-emoji> <b>DEVTO</b>")
                 append("\n\n")
             },
             enabled = devToAndroidEnabled,
@@ -377,7 +377,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>9TO5GOOGLE</b>")
+                append("<tg-emoji emoji-id=\"5321413970928621177\">▶️</tg-emoji> <b>9TO5GOOGLE</b>")
                 append("\n\n")
             },
             enabled = nineToFiveGoogleEnabled,
@@ -386,7 +386,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>ANDROID WEEKLY</b>")
+                append("<tg-emoji emoji-id=\"5321471557850130882\">▶️</tg-emoji> <b>ANDROID WEEKLY</b>")
                 append("\n\n")
             },
             enabled = androidWeeklyEnabled,
@@ -395,7 +395,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>PROANDROIDDEV</b>")
+                append("<tg-emoji emoji-id=\"5368646963233312962\">▶️</tg-emoji> <b>PROANDROIDDEV</b>")
                 append("\n\n")
             },
             enabled = proAndroidDevEnabled,
@@ -404,7 +404,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>TECHRADAR</b>")
+                append("<tg-emoji emoji-id=\"5321189082146051942\">▶️</tg-emoji> <b>TECHRADAR</b>")
                 append("\n\n")
             },
             enabled = techRadarEnabled,
@@ -413,7 +413,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>HABR</b>")
+                append("<tg-emoji emoji-id=\"5321324279126577604\">▶️</tg-emoji> <b>HABR</b>")
                 append("\n\n")
             },
             enabled = habrAndroidEnabled,
@@ -422,7 +422,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>GITHUB RELEASES</b>")
+                append("<tg-emoji emoji-id=\"5321190645514130346\">▶️</tg-emoji> <b>GITHUB RELEASES</b>")
                 append("\n\n")
             },
             enabled = githubReleasesEnabled,
@@ -431,7 +431,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>GITHUB TRENDING</b>")
+                append("<tg-emoji emoji-id=\"5321190645514130346\">▶️</tg-emoji> <b>GITHUB TRENDING</b>")
                 append("\n\n")
             },
             enabled = githubTrendingKotlinEnabled,
