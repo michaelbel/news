@@ -1,12 +1,16 @@
 package news
 
 const val ANDROID_BLOG_URL = "http://android-developers.googleblog.com/atom.xml"
+const val ANDROIDX_RELEASE_NOTES_URL = "https://developer.android.com/feeds/androidx-release-notes.xml"
 const val ANDROID_STUDIO_BLOG_URL = "https://androidstudio.googleblog.com/feeds/posts/default"
 const val ANDROID_AUTHORITY_URL = "https://www.androidauthority.com/feed/"
+const val ANDROID_POLICE_URL = "https://www.androidpolice.com/feed/"
 const val FIREBASE_BLOG_URL = "https://firebase.blog/rss.xml"
+const val GRADLE_BLOG_URL = "https://feed.gradle.org/blog.atom"
 const val GITHUB_BLOG_URL = "https://github.blog/feed/"
 const val JETBRAINS_BLOG_URL = "https://blog.jetbrains.com/feed/"
 const val KOTLIN_BLOG_URL = "https://blog.jetbrains.com/kotlin/feed/"
+const val KOTLIN_DISCUSSIONS_URL = "https://discuss.kotlinlang.org/posts.rss"
 const val DEV_TO_ANDROID_URL = "https://dev.to/feed/tag/android"
 const val MEDIUM_ANDROID_DEVELOPERS_URL = "https://medium.com/feed/androiddevelopers"
 const val MEDIUM_GOOGLE_DEVELOPER_EXPERTS_URL = "https://medium.com/feed/google-developer-experts"

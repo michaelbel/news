@@ -4,14 +4,20 @@ import news.androidauthority.AndroidAuthorityItem
 import news.androidauthority.AndroidAuthorityProvider
 import news.androidblog.AndroidBlogItem
 import news.androidblog.AndroidBlogProvider
+import news.androidpolice.AndroidPoliceItem
+import news.androidpolice.AndroidPoliceProvider
 import news.androidstudioblog.AndroidStudioBlogItem
 import news.androidstudioblog.AndroidStudioBlogProvider
 import news.androidweekly.AndroidWeeklyItem
 import news.androidweekly.AndroidWeeklyProvider
+import news.androidx.AndroidxReleaseNotesItem
+import news.androidx.AndroidxReleaseNotesProvider
 import news.devto.DevToItem
 import news.devto.DevToProvider
 import news.firebaseblog.FirebaseBlogItem
 import news.firebaseblog.FirebaseBlogProvider
+import news.gradleblog.GradleBlogItem
+import news.gradleblog.GradleBlogProvider
 import news.github.GithubReleaseItem
 import news.github.GithubReleasesProvider
 import news.githubblog.GithubBlogItem
@@ -30,6 +36,8 @@ import news.jetbrainsblog.JetBrainsBlogItem
 import news.jetbrainsblog.JetBrainsBlogProvider
 import news.kotlinblog.KotlinBlogItem
 import news.kotlinblog.KotlinBlogProvider
+import news.kotlindiscussions.KotlinDiscussionsItem
+import news.kotlindiscussions.KotlinDiscussionsProvider
 import news.mediumandroid.MediumAndroidItem
 import news.mediumandroid.MediumAndroidProvider
 import news.mediumgoogle.MediumGoogleItem
@@ -74,6 +82,13 @@ fun main() {
         provider = AndroidBlogProvider
     )
 
+    val androidxReleaseNotesItems = collectItems(
+        enabled = ANDROIDX_RELEASE_NOTES_ENABLED,
+        name = "AndroidX Release Notes",
+        lastCheck = lastCheck,
+        provider = AndroidxReleaseNotesProvider
+    )
+
     val androidStudioBlogItems = collectItems(
         enabled = ANDROID_STUDIO_BLOG_ENABLED,
         name = "Android Studio Blog",
@@ -88,6 +103,13 @@ fun main() {
         provider = AndroidAuthorityProvider
     )
 
+    val androidPoliceItems = collectItems(
+        enabled = ANDROID_POLICE_ENABLED,
+        name = "Android Police",
+        lastCheck = lastCheck,
+        provider = AndroidPoliceProvider
+    )
+
     val firebaseBlogItems = collectItems(
         enabled = FIREBASE_BLOG_ENABLED,
         name = "Firebase Blog",
@@ -100,6 +122,20 @@ fun main() {
         name = "Kotlin Blog",
         lastCheck = lastCheck,
         provider = KotlinBlogProvider
+    )
+
+    val kotlinDiscussionsItems = collectItems(
+        enabled = KOTLIN_DISCUSSIONS_ENABLED,
+        name = "Kotlin Discussions",
+        lastCheck = lastCheck,
+        provider = KotlinDiscussionsProvider
+    )
+
+    val gradleBlogItems = collectItems(
+        enabled = GRADLE_BLOG_ENABLED,
+        name = "Gradle Blog",
+        lastCheck = lastCheck,
+        provider = GradleBlogProvider
     )
 
     val githubBlogItems = collectItems(
@@ -213,10 +249,14 @@ fun main() {
     val messages = buildMessages(
         youtubeItems = youtubeItems,
         androidBlogItems = androidBlogItems,
+        androidxReleaseNotesItems = androidxReleaseNotesItems,
         androidStudioBlogItems = androidStudioBlogItems,
         androidAuthorityItems = androidAuthorityItems,
+        androidPoliceItems = androidPoliceItems,
         firebaseBlogItems = firebaseBlogItems,
         kotlinBlogItems = kotlinBlogItems,
+        kotlinDiscussionsItems = kotlinDiscussionsItems,
+        gradleBlogItems = gradleBlogItems,
         githubBlogItems = githubBlogItems,
         jetBrainsBlogItems = jetBrainsBlogItems,
         mediumGoogleItems = mediumGoogleItems,
@@ -234,10 +274,14 @@ fun main() {
         githubTrendingKotlinItems = githubTrendingKotlinItems,
         youtubeEnabled = YOUTUBE_ENABLED,
         androidBlogEnabled = ANDROID_BLOG_ENABLED,
+        androidxReleaseNotesEnabled = ANDROIDX_RELEASE_NOTES_ENABLED,
         androidStudioBlogEnabled = ANDROID_STUDIO_BLOG_ENABLED,
         androidAuthorityEnabled = ANDROID_AUTHORITY_ENABLED,
+        androidPoliceEnabled = ANDROID_POLICE_ENABLED,
         firebaseBlogEnabled = FIREBASE_BLOG_ENABLED,
         kotlinBlogEnabled = KOTLIN_BLOG_ENABLED,
+        kotlinDiscussionsEnabled = KOTLIN_DISCUSSIONS_ENABLED,
+        gradleBlogEnabled = GRADLE_BLOG_ENABLED,
         githubBlogEnabled = GITHUB_BLOG_ENABLED,
         jetBrainsBlogEnabled = JETBRAINS_BLOG_ENABLED,
         mediumGoogleEnabled = MEDIUM_GOOGLE_ENABLED,
@@ -270,10 +314,14 @@ fun main() {
 private fun buildMessages(
     youtubeItems: List<YoutubeItem>,
     androidBlogItems: List<AndroidBlogItem>,
+    androidxReleaseNotesItems: List<AndroidxReleaseNotesItem>,
     androidStudioBlogItems: List<AndroidStudioBlogItem>,
     androidAuthorityItems: List<AndroidAuthorityItem>,
+    androidPoliceItems: List<AndroidPoliceItem>,
     firebaseBlogItems: List<FirebaseBlogItem>,
     kotlinBlogItems: List<KotlinBlogItem>,
+    kotlinDiscussionsItems: List<KotlinDiscussionsItem>,
+    gradleBlogItems: List<GradleBlogItem>,
     githubBlogItems: List<GithubBlogItem>,
     jetBrainsBlogItems: List<JetBrainsBlogItem>,
     mediumGoogleItems: List<MediumGoogleItem>,
@@ -291,10 +339,14 @@ private fun buildMessages(
     githubTrendingKotlinItems: List<GithubTrendingKotlinItem>,
     youtubeEnabled: Boolean,
     androidBlogEnabled: Boolean,
+    androidxReleaseNotesEnabled: Boolean,
     androidStudioBlogEnabled: Boolean,
     androidAuthorityEnabled: Boolean,
+    androidPoliceEnabled: Boolean,
     firebaseBlogEnabled: Boolean,
     kotlinBlogEnabled: Boolean,
+    kotlinDiscussionsEnabled: Boolean,
+    gradleBlogEnabled: Boolean,
     githubBlogEnabled: Boolean,
     jetBrainsBlogEnabled: Boolean,
     mediumGoogleEnabled: Boolean,
@@ -335,6 +387,15 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
+                append("<tg-emoji emoji-id=\"5321471557850130882\">▶️</tg-emoji> <b>ANDROIDX RELEASE NOTES</b>")
+                append("\n\n")
+            },
+            enabled = androidxReleaseNotesEnabled,
+            items = androidxReleaseNotesItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
                 append("<tg-emoji emoji-id=\"5323664267503756290\">▶️</tg-emoji> <b>ANDROID STUDIO BLOG</b>")
                 append("\n\n")
             },
@@ -353,6 +414,15 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
+                append("<b>ANDROID POLICE</b>")
+                append("\n\n")
+            },
+            enabled = androidPoliceEnabled,
+            items = androidPoliceItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
                 append("<tg-emoji emoji-id=\"5321379748629205271\">▶️</tg-emoji> <b>FIREBASE BLOG</b>")
                 append("\n\n")
             },
@@ -367,6 +437,24 @@ private fun buildMessages(
             },
             enabled = kotlinBlogEnabled,
             items = kotlinBlogItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<tg-emoji emoji-id=\"5208461085572632559\">▶️</tg-emoji> <b>KOTLIN DISCUSSIONS</b>")
+                append("\n\n")
+            },
+            enabled = kotlinDiscussionsEnabled,
+            items = kotlinDiscussionsItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<b>GRADLE BLOG</b>")
+                append("\n\n")
+            },
+            enabled = gradleBlogEnabled,
+            items = gradleBlogItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
