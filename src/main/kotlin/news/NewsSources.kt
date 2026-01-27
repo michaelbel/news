@@ -16,6 +16,9 @@ const val NINE_TO_FIVE_GOOGLE_URL = "https://9to5google.com/feed/"
 const val ANDROID_WEEKLY_URL = "https://androidweekly.net/rss"
 const val ANDROID_WEEKLY_FALLBACK_URL = "https://us12.campaign-archive.com/feed?u=40eb7ecc10ccd770b0980bcd9&id=a8f40b73cc"
 const val HABR_ANDROID_URL = "https://habr.com/ru/rss/hubs/android_dev/articles/all/?fl=ru"
+const val HABR_AI_URL = "https://habr.com/ru/rss/hubs/artificial_intelligence/articles/all/?fl=ru"
+const val HABR_PROGRAMMING_URL = "https://habr.com/ru/rss/hubs/programming/articles/all/?fl=ru"
+const val HABR_CAREER_URL = "https://habr.com/ru/rss/hubs/career/articles/all/?fl=ru"
 const val GITHUB_TRENDING_KOTLIN_URL = "https://github.com/trending/kotlin?since=daily&spoken_language_code=en"
 val GITHUB_REPOS = listOf(
     "https://github.com/google/dagger",

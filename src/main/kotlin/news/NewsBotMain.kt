@@ -18,8 +18,14 @@ import news.githubblog.GithubBlogItem
 import news.githubblog.GithubBlogProvider
 import news.githubtrending.GithubTrendingKotlinItem
 import news.githubtrending.GithubTrendingKotlinProvider
+import news.habr.HabrAiItem
+import news.habr.HabrAiProvider
 import news.habr.HabrAndroidItem
 import news.habr.HabrAndroidProvider
+import news.habr.HabrCareerItem
+import news.habr.HabrCareerProvider
+import news.habr.HabrProgrammingItem
+import news.habr.HabrProgrammingProvider
 import news.jetbrainsblog.JetBrainsBlogItem
 import news.jetbrainsblog.JetBrainsBlogProvider
 import news.kotlinblog.KotlinBlogItem
@@ -161,9 +167,30 @@ fun main() {
 
     val habrAndroidItems = collectItems(
         enabled = HABR_ANDROID_ENABLED,
-        name = "Habr Android",
+        name = "HABR ANDROID",
         lastCheck = lastCheck,
         provider = HabrAndroidProvider
+    )
+
+    val habrAiItems = collectItems(
+        enabled = HABR_AI_ENABLED,
+        name = "HABR AI",
+        lastCheck = lastCheck,
+        provider = HabrAiProvider
+    )
+
+    val habrProgrammingItems = collectItems(
+        enabled = HABR_PROGRAMMING_ENABLED,
+        name = "HABR PROGRAMMING",
+        lastCheck = lastCheck,
+        provider = HabrProgrammingProvider
+    )
+
+    val habrCareerItems = collectItems(
+        enabled = HABR_CAREER_ENABLED,
+        name = "HABR CAREER",
+        lastCheck = lastCheck,
+        provider = HabrCareerProvider
     )
 
     val githubReleaseItems = collectItems(
@@ -200,6 +227,9 @@ fun main() {
         proAndroidDevItems = proAndroidDevItems,
         techRadarItems = techRadarItems,
         habrAndroidItems = habrAndroidItems,
+        habrAiItems = habrAiItems,
+        habrProgrammingItems = habrProgrammingItems,
+        habrCareerItems = habrCareerItems,
         githubReleaseItems = githubReleaseItems,
         githubTrendingKotlinItems = githubTrendingKotlinItems,
         youtubeEnabled = YOUTUBE_ENABLED,
@@ -218,6 +248,9 @@ fun main() {
         proAndroidDevEnabled = PRO_ANDROID_DEV_ENABLED,
         techRadarEnabled = TECHRADAR_ANDROID_ENABLED,
         habrAndroidEnabled = HABR_ANDROID_ENABLED,
+        habrAiEnabled = HABR_AI_ENABLED,
+        habrProgrammingEnabled = HABR_PROGRAMMING_ENABLED,
+        habrCareerEnabled = HABR_CAREER_ENABLED,
         githubReleasesEnabled = GITHUB_RELEASES_ENABLED,
         githubTrendingKotlinEnabled = GITHUB_TRENDING_KOTLIN_ENABLED
     )
@@ -251,6 +284,9 @@ private fun buildMessages(
     proAndroidDevItems: List<ProAndroidDevItem>,
     techRadarItems: List<TechRadarItem>,
     habrAndroidItems: List<HabrAndroidItem>,
+    habrAiItems: List<HabrAiItem>,
+    habrProgrammingItems: List<HabrProgrammingItem>,
+    habrCareerItems: List<HabrCareerItem>,
     githubReleaseItems: List<GithubReleaseItem>,
     githubTrendingKotlinItems: List<GithubTrendingKotlinItem>,
     youtubeEnabled: Boolean,
@@ -269,6 +305,9 @@ private fun buildMessages(
     proAndroidDevEnabled: Boolean,
     techRadarEnabled: Boolean,
     habrAndroidEnabled: Boolean,
+    habrAiEnabled: Boolean,
+    habrProgrammingEnabled: Boolean,
+    habrCareerEnabled: Boolean,
     githubReleasesEnabled: Boolean,
     githubTrendingKotlinEnabled: Boolean
 ): List<String> {
@@ -413,11 +452,38 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<tg-emoji emoji-id=\"5321324279126577604\">▶️</tg-emoji> <b>HABR</b>")
+                append("<tg-emoji emoji-id=\"5321324279126577604\">▶️</tg-emoji> <b>HABR ANDROID</b>")
                 append("\n\n")
             },
             enabled = habrAndroidEnabled,
             items = habrAndroidItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<tg-emoji emoji-id=\"5321324279126577604\">▶️</tg-emoji> <b>HABR AI</b>")
+                append("\n\n")
+            },
+            enabled = habrAiEnabled,
+            items = habrAiItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<tg-emoji emoji-id=\"5321324279126577604\">▶️</tg-emoji> <b>HABR PROGRAMMING</b>")
+                append("\n\n")
+            },
+            enabled = habrProgrammingEnabled,
+            items = habrProgrammingItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<tg-emoji emoji-id=\"5321324279126577604\">▶️</tg-emoji> <b>HABR CAREER</b>")
+                append("\n\n")
+            },
+            enabled = habrCareerEnabled,
+            items = habrCareerItems,
             formatLine = ::defaultLine
         ),
         MessageSection(
