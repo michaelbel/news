@@ -1,54 +1,31 @@
 package news
 
-import news.androidauthority.AndroidAuthorityItem
 import news.androidauthority.AndroidAuthorityProvider
-import news.androidblog.AndroidBlogItem
 import news.androidblog.AndroidBlogProvider
-import news.androidpolice.AndroidPoliceItem
 import news.androidpolice.AndroidPoliceProvider
-import news.androidstudioblog.AndroidStudioBlogItem
 import news.androidstudioblog.AndroidStudioBlogProvider
-import news.androidweekly.AndroidWeeklyItem
 import news.androidweekly.AndroidWeeklyProvider
-import news.androidx.AndroidxReleaseNotesItem
 import news.androidx.AndroidxReleaseNotesProvider
-import news.devto.DevToItem
 import news.devto.DevToProvider
-import news.firebaseblog.FirebaseBlogItem
 import news.firebaseblog.FirebaseBlogProvider
-import news.gradleblog.GradleBlogItem
 import news.gradleblog.GradleBlogProvider
 import news.github.GithubReleaseItem
 import news.github.GithubReleasesProvider
-import news.githubblog.GithubBlogItem
 import news.githubblog.GithubBlogProvider
 import news.githubtrending.GithubTrendingKotlinItem
 import news.githubtrending.GithubTrendingKotlinProvider
-import news.habr.HabrAiItem
 import news.habr.HabrAiProvider
-import news.habr.HabrAndroidItem
 import news.habr.HabrAndroidProvider
-import news.habr.HabrCareerItem
 import news.habr.HabrCareerProvider
-import news.habr.HabrProgrammingItem
 import news.habr.HabrProgrammingProvider
-import news.jetbrainsblog.JetBrainsBlogItem
 import news.jetbrainsblog.JetBrainsBlogProvider
-import news.kotlinblog.KotlinBlogItem
 import news.kotlinblog.KotlinBlogProvider
-import news.kotlindiscussions.KotlinDiscussionsItem
 import news.kotlindiscussions.KotlinDiscussionsProvider
-import news.mediumandroid.MediumAndroidItem
 import news.mediumandroid.MediumAndroidProvider
-import news.mediumgoogle.MediumGoogleItem
 import news.mediumgoogle.MediumGoogleProvider
-import news.ninetofivegoogle.NineToFiveGoogleItem
 import news.ninetofivegoogle.NineToFiveGoogleProvider
-import news.proandroiddev.ProAndroidDevItem
 import news.proandroiddev.ProAndroidDevProvider
-import news.techradar.TechRadarItem
 import news.techradar.TechRadarProvider
-import news.youtube.YoutubeItem
 import news.youtube.YoutubeProvider
 import java.net.URI
 import java.net.http.HttpClient
@@ -312,29 +289,29 @@ fun main() {
 }
 
 private fun buildMessages(
-    youtubeItems: List<YoutubeItem>,
-    androidBlogItems: List<AndroidBlogItem>,
-    androidxReleaseNotesItems: List<AndroidxReleaseNotesItem>,
-    androidStudioBlogItems: List<AndroidStudioBlogItem>,
-    androidAuthorityItems: List<AndroidAuthorityItem>,
-    androidPoliceItems: List<AndroidPoliceItem>,
-    firebaseBlogItems: List<FirebaseBlogItem>,
-    kotlinBlogItems: List<KotlinBlogItem>,
-    kotlinDiscussionsItems: List<KotlinDiscussionsItem>,
-    gradleBlogItems: List<GradleBlogItem>,
-    githubBlogItems: List<GithubBlogItem>,
-    jetBrainsBlogItems: List<JetBrainsBlogItem>,
-    mediumGoogleItems: List<MediumGoogleItem>,
-    mediumAndroidItems: List<MediumAndroidItem>,
-    devToAndroidItems: List<DevToItem>,
-    androidWeeklyItems: List<AndroidWeeklyItem>,
-    nineToFiveGoogleItems: List<NineToFiveGoogleItem>,
-    proAndroidDevItems: List<ProAndroidDevItem>,
-    techRadarItems: List<TechRadarItem>,
-    habrAndroidItems: List<HabrAndroidItem>,
-    habrAiItems: List<HabrAiItem>,
-    habrProgrammingItems: List<HabrProgrammingItem>,
-    habrCareerItems: List<HabrCareerItem>,
+    youtubeItems: List<SimpleNewsItem>,
+    androidBlogItems: List<SimpleNewsItem>,
+    androidxReleaseNotesItems: List<SimpleNewsItem>,
+    androidStudioBlogItems: List<SimpleNewsItem>,
+    androidAuthorityItems: List<SimpleNewsItem>,
+    androidPoliceItems: List<SimpleNewsItem>,
+    firebaseBlogItems: List<SimpleNewsItem>,
+    kotlinBlogItems: List<SimpleNewsItem>,
+    kotlinDiscussionsItems: List<SimpleNewsItem>,
+    gradleBlogItems: List<SimpleNewsItem>,
+    githubBlogItems: List<SimpleNewsItem>,
+    jetBrainsBlogItems: List<SimpleNewsItem>,
+    mediumGoogleItems: List<SimpleNewsItem>,
+    mediumAndroidItems: List<SimpleNewsItem>,
+    devToAndroidItems: List<SimpleNewsItem>,
+    androidWeeklyItems: List<SimpleNewsItem>,
+    nineToFiveGoogleItems: List<SimpleNewsItem>,
+    proAndroidDevItems: List<SimpleNewsItem>,
+    techRadarItems: List<SimpleNewsItem>,
+    habrAndroidItems: List<SimpleNewsItem>,
+    habrAiItems: List<SimpleNewsItem>,
+    habrProgrammingItems: List<SimpleNewsItem>,
+    habrCareerItems: List<SimpleNewsItem>,
     githubReleaseItems: List<GithubReleaseItem>,
     githubTrendingKotlinItems: List<GithubTrendingKotlinItem>,
     youtubeEnabled: Boolean,

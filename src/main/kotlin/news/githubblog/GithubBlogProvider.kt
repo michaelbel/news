@@ -1,4 +1,5 @@
 package news.githubblog
+import news.SimpleNewsItem
 
 import news.GITHUB_BLOG_URL
 import news.NewsProvider
@@ -15,7 +16,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object GithubBlogProvider: NewsProvider<GithubBlogItem> {
+object GithubBlogProvider: NewsProvider<SimpleNewsItem> {
 
     private const val FEED_URL = GITHUB_BLOG_URL
 
@@ -25,12 +26,12 @@ object GithubBlogProvider: NewsProvider<GithubBlogItem> {
 
     private val rfc1123Formatter: DateTimeFormatter = DateTimeFormatter.RFC_1123_DATE_TIME
 
-    override fun fetchItems(lastCheck: Instant): List<GithubBlogItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }
 
-        val result = mutableListOf<GithubBlogItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         logInfo("GithubBlog: fetching $FEED_URL")
 
@@ -127,7 +128,7 @@ object GithubBlogProvider: NewsProvider<GithubBlogItem> {
                     .takeUnless { it.isNullOrEmpty() }
                 ?: continue
 
-            result += GithubBlogItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,

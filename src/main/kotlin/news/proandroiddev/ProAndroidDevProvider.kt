@@ -1,4 +1,5 @@
 package news.proandroiddev
+import news.SimpleNewsItem
 
 import news.NewsProvider
 import news.PRO_ANDROID_DEV_URL
@@ -18,7 +19,7 @@ import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 import javax.xml.parsers.DocumentBuilderFactory
 
-object ProAndroidDevProvider: NewsProvider<ProAndroidDevItem> {
+object ProAndroidDevProvider: NewsProvider<SimpleNewsItem> {
 
     private const val FEED_URL: String = PRO_ANDROID_DEV_URL
 
@@ -47,7 +48,7 @@ object ProAndroidDevProvider: NewsProvider<ProAndroidDevItem> {
             .build()
     }
 
-    override fun fetchItems(lastCheck: Instant): List<ProAndroidDevItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = false
         }
@@ -83,7 +84,7 @@ object ProAndroidDevProvider: NewsProvider<ProAndroidDevItem> {
         }
 
         val nodes = doc.getElementsByTagName("item")
-        val result = mutableListOf<ProAndroidDevItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         var total = 0
         var parsed = 0
@@ -129,7 +130,7 @@ object ProAndroidDevProvider: NewsProvider<ProAndroidDevItem> {
             parsed += 1
             afterFilter += 1
 
-            result += ProAndroidDevItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,

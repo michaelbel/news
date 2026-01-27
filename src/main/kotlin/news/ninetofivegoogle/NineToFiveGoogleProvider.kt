@@ -1,4 +1,5 @@
 package news.ninetofivegoogle
+import news.SimpleNewsItem
 
 import news.NINE_TO_FIVE_GOOGLE_URL
 import news.NewsProvider
@@ -15,19 +16,19 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object NineToFiveGoogleProvider : NewsProvider<NineToFiveGoogleItem> {
+object NineToFiveGoogleProvider : NewsProvider<SimpleNewsItem> {
 
     private const val FEED_URL = NINE_TO_FIVE_GOOGLE_URL
 
     private val client: HttpClient = HttpClient.newHttpClient()
     private val rfc1123Formatter: DateTimeFormatter = DateTimeFormatter.RFC_1123_DATE_TIME
 
-    override fun fetchItems(lastCheck: Instant): List<NineToFiveGoogleItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }
 
-        val result = mutableListOf<NineToFiveGoogleItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         logInfo("9to5Google: fetching $FEED_URL")
 
@@ -106,7 +107,7 @@ object NineToFiveGoogleProvider : NewsProvider<NineToFiveGoogleItem> {
                 .takeUnless { it.isNullOrEmpty() }
                 ?: continue
 
-            result += NineToFiveGoogleItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,

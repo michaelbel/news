@@ -1,4 +1,5 @@
 package news.androidpolice
+import news.SimpleNewsItem
 
 import news.ANDROID_POLICE_URL
 import news.NewsProvider
@@ -16,7 +17,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object AndroidPoliceProvider: NewsProvider<AndroidPoliceItem> {
+object AndroidPoliceProvider: NewsProvider<SimpleNewsItem> {
 
     private const val FEED_URL = ANDROID_POLICE_URL
 
@@ -27,12 +28,12 @@ object AndroidPoliceProvider: NewsProvider<AndroidPoliceItem> {
     private val rfc1123Formatter: DateTimeFormatter =
         DateTimeFormatter.RFC_1123_DATE_TIME
 
-    override fun fetchItems(lastCheck: Instant): List<AndroidPoliceItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }
 
-        val result = mutableListOf<AndroidPoliceItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         logInfo("AndroidPolice: fetching $FEED_URL")
 
@@ -100,7 +101,7 @@ object AndroidPoliceProvider: NewsProvider<AndroidPoliceItem> {
                 .takeUnless { it.isNullOrEmpty() }
                 ?: return
 
-            result += AndroidPoliceItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,

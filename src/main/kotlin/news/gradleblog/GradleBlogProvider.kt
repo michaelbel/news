@@ -1,4 +1,5 @@
 package news.gradleblog
+import news.SimpleNewsItem
 
 import news.GRADLE_BLOG_URL
 import news.NewsProvider
@@ -16,7 +17,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object GradleBlogProvider: NewsProvider<GradleBlogItem> {
+object GradleBlogProvider: NewsProvider<SimpleNewsItem> {
 
     private const val FEED_URL = GRADLE_BLOG_URL
 
@@ -27,12 +28,12 @@ object GradleBlogProvider: NewsProvider<GradleBlogItem> {
     private val rfc1123Formatter: DateTimeFormatter =
         DateTimeFormatter.RFC_1123_DATE_TIME
 
-    override fun fetchItems(lastCheck: Instant): List<GradleBlogItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }
 
-        val result = mutableListOf<GradleBlogItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         logInfo("GradleBlog: fetching $FEED_URL")
 
@@ -100,7 +101,7 @@ object GradleBlogProvider: NewsProvider<GradleBlogItem> {
                 .takeUnless { it.isNullOrEmpty() }
                 ?: return
 
-            result += GradleBlogItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,

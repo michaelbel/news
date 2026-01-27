@@ -1,4 +1,5 @@
 package news.techradar
+import news.SimpleNewsItem
 
 import news.NewsProvider
 import news.TECHRADAR_ANDROID_URL
@@ -12,7 +13,7 @@ import java.net.http.HttpResponse
 import java.time.Instant
 import java.time.OffsetDateTime
 
-object TechRadarProvider: NewsProvider<TechRadarItem> {
+object TechRadarProvider: NewsProvider<SimpleNewsItem> {
 
     private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 
@@ -44,7 +45,7 @@ object TechRadarProvider: NewsProvider<TechRadarItem> {
         pattern = """(?is)<time[^>]+datetime="([^"]+)"""
     )
 
-    override fun fetchItems(lastCheck: Instant): List<TechRadarItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val client = HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build()
@@ -85,7 +86,7 @@ object TechRadarProvider: NewsProvider<TechRadarItem> {
         }
 
         val seenUrls = mutableSetOf<String>()
-        val result = mutableListOf<TechRadarItem>()
+        val result = mutableListOf<SimpleNewsItem>()
         var totalItems = 0
         var parsedItems = 0
 
@@ -101,7 +102,7 @@ object TechRadarProvider: NewsProvider<TechRadarItem> {
             parsedItems += 1
             if (published <= lastCheck) continue
 
-            result += TechRadarItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = cleanupHtml(titleRaw),
                 url = normalizedUrl

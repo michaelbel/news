@@ -1,4 +1,5 @@
 package news.mediumandroid
+import news.SimpleNewsItem
 
 import news.MEDIUM_ANDROID_DEVELOPERS_URL
 import news.NewsProvider
@@ -14,17 +15,17 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object MediumAndroidProvider: NewsProvider<MediumAndroidItem> {
+object MediumAndroidProvider: NewsProvider<SimpleNewsItem> {
 
     private const val FEED_URL = MEDIUM_ANDROID_DEVELOPERS_URL
 
-    override fun fetchItems(lastCheck: Instant): List<MediumAndroidItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val client = HttpClient.newHttpClient()
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = false
         }
 
-        val result = mutableListOf<MediumAndroidItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         System.err.println("==== Medium Android: fetching $FEED_URL")
 
@@ -113,7 +114,7 @@ object MediumAndroidProvider: NewsProvider<MediumAndroidItem> {
                 .takeUnless { it.isNullOrEmpty() }
                 ?: continue
 
-            result += MediumAndroidItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,

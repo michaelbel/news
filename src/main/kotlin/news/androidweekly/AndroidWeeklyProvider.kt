@@ -1,4 +1,5 @@
 package news.androidweekly
+import news.SimpleNewsItem
 
 import news.ANDROID_WEEKLY_FALLBACK_URL
 import news.ANDROID_WEEKLY_URL
@@ -17,7 +18,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object AndroidWeeklyProvider: NewsProvider<AndroidWeeklyItem> {
+object AndroidWeeklyProvider: NewsProvider<SimpleNewsItem> {
 
     private val feedUrls = listOf(
         ANDROID_WEEKLY_URL,
@@ -31,12 +32,12 @@ object AndroidWeeklyProvider: NewsProvider<AndroidWeeklyItem> {
     private val rfc1123Formatter: DateTimeFormatter =
         DateTimeFormatter.RFC_1123_DATE_TIME
 
-    override fun fetchItems(lastCheck: Instant): List<AndroidWeeklyItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }
 
-        val result = mutableListOf<AndroidWeeklyItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         var chosenFeed: String? = null
         var xml: String? = null
@@ -159,7 +160,7 @@ object AndroidWeeklyProvider: NewsProvider<AndroidWeeklyItem> {
                 .takeUnless { it.isNullOrEmpty() }
                 ?: continue
 
-            result += AndroidWeeklyItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,

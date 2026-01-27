@@ -1,4 +1,5 @@
 package news.kotlinblog
+import news.SimpleNewsItem
 
 import news.KOTLIN_BLOG_URL
 import news.NewsProvider
@@ -15,7 +16,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object KotlinBlogProvider: NewsProvider<KotlinBlogItem> {
+object KotlinBlogProvider: NewsProvider<SimpleNewsItem> {
 
     private const val FEED_URL = KOTLIN_BLOG_URL
 
@@ -26,12 +27,12 @@ object KotlinBlogProvider: NewsProvider<KotlinBlogItem> {
     private val rfc1123Formatter: DateTimeFormatter =
         DateTimeFormatter.RFC_1123_DATE_TIME
 
-    override fun fetchItems(lastCheck: Instant): List<KotlinBlogItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }
 
-        val result = mutableListOf<KotlinBlogItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         logInfo("KotlinBlog: fetching $FEED_URL")
 
@@ -124,7 +125,7 @@ object KotlinBlogProvider: NewsProvider<KotlinBlogItem> {
                 .takeUnless { it.isNullOrEmpty() }
                 ?: continue
 
-            result += KotlinBlogItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,

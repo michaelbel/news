@@ -1,4 +1,5 @@
 package news.kotlindiscussions
+import news.SimpleNewsItem
 
 import news.KOTLIN_DISCUSSIONS_URL
 import news.NewsProvider
@@ -16,7 +17,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object KotlinDiscussionsProvider: NewsProvider<KotlinDiscussionsItem> {
+object KotlinDiscussionsProvider: NewsProvider<SimpleNewsItem> {
 
     private const val FEED_URL = KOTLIN_DISCUSSIONS_URL
 
@@ -27,12 +28,12 @@ object KotlinDiscussionsProvider: NewsProvider<KotlinDiscussionsItem> {
     private val rfc1123Formatter: DateTimeFormatter =
         DateTimeFormatter.RFC_1123_DATE_TIME
 
-    override fun fetchItems(lastCheck: Instant): List<KotlinDiscussionsItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }
 
-        val result = mutableListOf<KotlinDiscussionsItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         logInfo("KotlinDiscussions: fetching $FEED_URL")
 
@@ -100,7 +101,7 @@ object KotlinDiscussionsProvider: NewsProvider<KotlinDiscussionsItem> {
                 .takeUnless { it.isNullOrEmpty() }
                 ?: return
 
-            result += KotlinDiscussionsItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,

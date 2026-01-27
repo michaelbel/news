@@ -1,4 +1,5 @@
 package news.jetbrainsblog
+import news.SimpleNewsItem
 
 import news.JETBRAINS_BLOG_URL
 import news.NewsProvider
@@ -15,7 +16,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object JetBrainsBlogProvider: NewsProvider<JetBrainsBlogItem> {
+object JetBrainsBlogProvider: NewsProvider<SimpleNewsItem> {
 
     private const val FEED_URL = JETBRAINS_BLOG_URL
 
@@ -25,12 +26,12 @@ object JetBrainsBlogProvider: NewsProvider<JetBrainsBlogItem> {
 
     private val rfc1123Formatter: DateTimeFormatter = DateTimeFormatter.RFC_1123_DATE_TIME
 
-    override fun fetchItems(lastCheck: Instant): List<JetBrainsBlogItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }
 
-        val result = mutableListOf<JetBrainsBlogItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         logInfo("JetBrainsBlog: fetching $FEED_URL")
 
@@ -127,7 +128,7 @@ object JetBrainsBlogProvider: NewsProvider<JetBrainsBlogItem> {
                     .takeUnless { it.isNullOrEmpty() }
                 ?: continue
 
-            result += JetBrainsBlogItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,

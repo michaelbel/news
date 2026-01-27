@@ -1,4 +1,5 @@
 package news.habr
+import news.SimpleNewsItem
 
 import news.HABR_CAREER_URL
 import news.NewsProvider
@@ -15,7 +16,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object HabrCareerProvider: NewsProvider<HabrCareerItem> {
+object HabrCareerProvider: NewsProvider<SimpleNewsItem> {
 
     private const val FEED_URL = HABR_CAREER_URL
 
@@ -26,12 +27,12 @@ object HabrCareerProvider: NewsProvider<HabrCareerItem> {
     private val rfc1123Formatter: DateTimeFormatter =
         DateTimeFormatter.RFC_1123_DATE_TIME
 
-    override fun fetchItems(lastCheck: Instant): List<HabrCareerItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }
 
-        val result = mutableListOf<HabrCareerItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         logInfo("HabrCareer: fetching $FEED_URL")
 
@@ -123,7 +124,7 @@ object HabrCareerProvider: NewsProvider<HabrCareerItem> {
                 .takeUnless { it.isNullOrEmpty() }
                 ?: continue
 
-            result += HabrCareerItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,

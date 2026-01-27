@@ -1,4 +1,5 @@
 package news.firebaseblog
+import news.SimpleNewsItem
 
 import news.FIREBASE_BLOG_URL
 import news.NewsProvider
@@ -17,7 +18,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object FirebaseBlogProvider: NewsProvider<FirebaseBlogItem> {
+object FirebaseBlogProvider: NewsProvider<SimpleNewsItem> {
 
     private const val FEED_URL = FIREBASE_BLOG_URL
 
@@ -25,7 +26,7 @@ object FirebaseBlogProvider: NewsProvider<FirebaseBlogItem> {
         .followRedirects(Redirect.NORMAL)
         .build()
 
-    override fun fetchItems(lastCheck: Instant): List<FirebaseBlogItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = false
         }
@@ -66,7 +67,7 @@ object FirebaseBlogProvider: NewsProvider<FirebaseBlogItem> {
 
         val items = doc.getElementsByTagName("item")
 
-        val result = mutableListOf<FirebaseBlogItem>()
+        val result = mutableListOf<SimpleNewsItem>()
         var total = 0
         var parsed = 0
         var afterFilter = 0
@@ -114,7 +115,7 @@ object FirebaseBlogProvider: NewsProvider<FirebaseBlogItem> {
                 .takeUnless { it.isNullOrEmpty() }
                 ?: continue
 
-            result += FirebaseBlogItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,

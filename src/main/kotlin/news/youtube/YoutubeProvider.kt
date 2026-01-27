@@ -1,4 +1,5 @@
 package news.youtube
+import news.SimpleNewsItem
 
 import news.NewsProvider
 import news.Timestamp
@@ -11,9 +12,9 @@ import java.net.http.HttpResponse
 import java.time.Instant
 import javax.xml.parsers.DocumentBuilderFactory
 
-object YoutubeProvider: NewsProvider<YoutubeItem> {
+object YoutubeProvider: NewsProvider<SimpleNewsItem> {
 
-    override fun fetchItems(lastCheck: Instant): List<YoutubeItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val feeds = YOUTUBE_CHANNELS
         if (feeds.isEmpty()) return emptyList()
 
@@ -22,7 +23,7 @@ object YoutubeProvider: NewsProvider<YoutubeItem> {
             isNamespaceAware = true
         }
 
-        val result = mutableListOf<YoutubeItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         for (feed in feeds) {
             System.err.println("==== YouTube: fetching $feed")
@@ -119,7 +120,7 @@ object YoutubeProvider: NewsProvider<YoutubeItem> {
                     else -> ""
                 }
 
-                result += YoutubeItem(
+                result += SimpleNewsItem(
                     published = published,
                     title = safeTitle,
                     url = url,

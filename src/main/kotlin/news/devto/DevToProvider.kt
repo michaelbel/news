@@ -1,4 +1,5 @@
 package news.devto
+import news.SimpleNewsItem
 
 import news.DEV_TO_ANDROID_URL
 import news.NewsProvider
@@ -16,7 +17,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object DevToProvider: NewsProvider<DevToItem> {
+object DevToProvider: NewsProvider<SimpleNewsItem> {
 
     private const val FEED_URL = DEV_TO_ANDROID_URL
 
@@ -24,7 +25,7 @@ object DevToProvider: NewsProvider<DevToItem> {
         .followRedirects(Redirect.NORMAL)
         .build()
 
-    override fun fetchItems(lastCheck: Instant): List<DevToItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = false
         }
@@ -74,7 +75,7 @@ object DevToProvider: NewsProvider<DevToItem> {
         }
 
         val items = doc.getElementsByTagName("item")
-        val result = mutableListOf<DevToItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         var total = 0
         var parsed = 0
@@ -121,7 +122,7 @@ object DevToProvider: NewsProvider<DevToItem> {
                 .takeUnless { it.isNullOrEmpty() }
                 ?: continue
 
-            result += DevToItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,

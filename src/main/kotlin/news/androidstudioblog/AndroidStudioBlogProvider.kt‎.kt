@@ -2,6 +2,7 @@ package news.androidstudioblog
 
 import news.ANDROID_STUDIO_BLOG_URL
 import news.NewsProvider
+import news.SimpleNewsItem
 import news.Timestamp
 import news.cleanAndTruncate
 import news.cleanText
@@ -12,9 +13,9 @@ import java.net.http.HttpResponse
 import java.time.Instant
 import javax.xml.parsers.DocumentBuilderFactory
 
-object AndroidStudioBlogProvider: NewsProvider<AndroidStudioBlogItem> {
+object AndroidStudioBlogProvider: NewsProvider<SimpleNewsItem> {
 
-    override fun fetchItems(lastCheck: Instant): List<AndroidStudioBlogItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val feedUrl = ANDROID_STUDIO_BLOG_URL
 
         val client = HttpClient.newHttpClient()
@@ -22,7 +23,7 @@ object AndroidStudioBlogProvider: NewsProvider<AndroidStudioBlogItem> {
             isNamespaceAware = true
         }
 
-        val result = mutableListOf<AndroidStudioBlogItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         System.err.println("==== AndroidStudioBlog: fetching $feedUrl")
 
@@ -109,7 +110,7 @@ object AndroidStudioBlogProvider: NewsProvider<AndroidStudioBlogItem> {
 
             val url = linkHref ?: continue
 
-            result += AndroidStudioBlogItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,

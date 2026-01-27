@@ -1,4 +1,5 @@
 package news.androidblog
+import news.SimpleNewsItem
 
 import news.ANDROID_BLOG_URL
 import news.NewsProvider
@@ -12,9 +13,9 @@ import java.net.http.HttpResponse
 import java.time.Instant
 import javax.xml.parsers.DocumentBuilderFactory
 
-object AndroidBlogProvider: NewsProvider<AndroidBlogItem> {
+object AndroidBlogProvider: NewsProvider<SimpleNewsItem> {
 
-    override fun fetchItems(lastCheck: Instant): List<AndroidBlogItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val feedUrl = ANDROID_BLOG_URL
 
         val client = HttpClient.newHttpClient()
@@ -22,7 +23,7 @@ object AndroidBlogProvider: NewsProvider<AndroidBlogItem> {
             isNamespaceAware = true
         }
 
-        val result = mutableListOf<AndroidBlogItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         System.err.println("==== AndroidBlog: fetching $feedUrl")
 
@@ -119,7 +120,7 @@ object AndroidBlogProvider: NewsProvider<AndroidBlogItem> {
 
             val url = linkHref ?: continue
 
-            result += AndroidBlogItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,

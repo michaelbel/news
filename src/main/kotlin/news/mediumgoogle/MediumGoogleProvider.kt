@@ -1,4 +1,5 @@
 package news.mediumgoogle
+import news.SimpleNewsItem
 
 import news.MEDIUM_GOOGLE_DEVELOPER_EXPERTS_URL
 import news.NewsProvider
@@ -13,17 +14,17 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object MediumGoogleProvider: NewsProvider<MediumGoogleItem> {
+object MediumGoogleProvider: NewsProvider<SimpleNewsItem> {
 
     private const val FEED_URL = MEDIUM_GOOGLE_DEVELOPER_EXPERTS_URL
 
-    override fun fetchItems(lastCheck: Instant): List<MediumGoogleItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val client = HttpClient.newHttpClient()
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = false
         }
 
-        val result = mutableListOf<MediumGoogleItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         System.err.println("==== Medium Google: fetching $FEED_URL")
 
@@ -111,7 +112,7 @@ object MediumGoogleProvider: NewsProvider<MediumGoogleItem> {
                 .takeUnless { it.isNullOrEmpty() }
                 ?: continue
 
-            result += MediumGoogleItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,

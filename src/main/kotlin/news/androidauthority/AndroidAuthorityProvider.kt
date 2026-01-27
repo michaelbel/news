@@ -1,4 +1,5 @@
 package news.androidauthority
+import news.SimpleNewsItem
 
 import news.ANDROID_AUTHORITY_URL
 import news.NewsProvider
@@ -18,7 +19,7 @@ import java.time.format.DateTimeFormatter
 import javax.xml.XMLConstants
 import javax.xml.parsers.DocumentBuilderFactory
 
-object AndroidAuthorityProvider : NewsProvider<AndroidAuthorityItem> {
+object AndroidAuthorityProvider : NewsProvider<SimpleNewsItem> {
 
     private const val FEED_URL = ANDROID_AUTHORITY_URL
 
@@ -42,7 +43,7 @@ object AndroidAuthorityProvider : NewsProvider<AndroidAuthorityItem> {
 
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.RFC_1123_DATE_TIME
 
-    override fun fetchItems(lastCheck: Instant): List<AndroidAuthorityItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         logInfo("AndroidAuthority: fetching $FEED_URL")
 
         val request = HttpRequest.newBuilder()
@@ -95,7 +96,7 @@ object AndroidAuthorityProvider : NewsProvider<AndroidAuthorityItem> {
         var translatedTitles = 0
         var translationFallbacks = 0
 
-        val result = mutableListOf<AndroidAuthorityItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         for (i in 0 until items.length) {
             totalItems += 1
@@ -156,7 +157,7 @@ object AndroidAuthorityProvider : NewsProvider<AndroidAuthorityItem> {
                 .takeUnless { it.isNullOrEmpty() }
                 ?: continue
 
-            result += AndroidAuthorityItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = finalTitle,
                 url = url,

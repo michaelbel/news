@@ -1,4 +1,5 @@
 package news.androidx
+import news.SimpleNewsItem
 
 import news.ANDROIDX_RELEASE_NOTES_URL
 import news.NewsProvider
@@ -16,7 +17,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-object AndroidxReleaseNotesProvider: NewsProvider<AndroidxReleaseNotesItem> {
+object AndroidxReleaseNotesProvider: NewsProvider<SimpleNewsItem> {
 
     private const val FEED_URL = ANDROIDX_RELEASE_NOTES_URL
 
@@ -27,12 +28,12 @@ object AndroidxReleaseNotesProvider: NewsProvider<AndroidxReleaseNotesItem> {
     private val rfc1123Formatter: DateTimeFormatter =
         DateTimeFormatter.RFC_1123_DATE_TIME
 
-    override fun fetchItems(lastCheck: Instant): List<AndroidxReleaseNotesItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }
 
-        val result = mutableListOf<AndroidxReleaseNotesItem>()
+        val result = mutableListOf<SimpleNewsItem>()
 
         logInfo("AndroidXReleaseNotes: fetching $FEED_URL")
 
@@ -100,7 +101,7 @@ object AndroidxReleaseNotesProvider: NewsProvider<AndroidxReleaseNotesItem> {
                 .takeUnless { it.isNullOrEmpty() }
                 ?: return
 
-            result += AndroidxReleaseNotesItem(
+            result += SimpleNewsItem(
                 published = published,
                 title = safeTitle,
                 url = url,
