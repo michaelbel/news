@@ -7,7 +7,6 @@ import java.net.http.HttpClient
 import java.net.http.HttpClient.Redirect
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import java.security.cert.X509Certificate
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -537,7 +536,7 @@ object AndroidBlogProvider: NewsProvider<SimpleNewsItem> {
     override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
         return fetchSimpleAtomFeed(
             logPrefix = "AndroidBlog",
-            feedUrl = ANDROID_BLOG_URL,
+            feedUrl = ANDROID_DEVELOPERS_BLOG_URL,
             lastCheck = lastCheck,
             summaryProvider = { cleanAndTruncate(it.summary) }
         )

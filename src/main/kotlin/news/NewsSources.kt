@@ -1,6 +1,6 @@
 package news
 
-const val ANDROID_BLOG_URL = "http://android-developers.googleblog.com/atom.xml"
+const val ANDROID_DEVELOPERS_BLOG_URL = "http://android-developers.googleblog.com/atom.xml"
 const val ANDROIDX_RELEASE_NOTES_URL = "https://developer.android.com/feeds/androidx-release-notes.xml"
 const val ANDROID_STUDIO_BLOG_URL = "https://androidstudio.googleblog.com/feeds/posts/default"
 const val ANDROID_AUTHORITY_URL = "https://www.androidauthority.com/feed/"
