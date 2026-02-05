@@ -366,7 +366,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>ANDROID POLICE</b>")
+                append("<tg-emoji emoji-id=\"5190702632754253267\">▶️</tg-emoji> <b>ANDROID POLICE</b>")
                 append("\n\n")
             },
             enabled = androidPoliceEnabled,
@@ -402,7 +402,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<b>GRADLE BLOG</b>")
+                append("<tg-emoji emoji-id=\"5321469715309152734\">▶️</tg-emoji> <b>GRADLE BLOG</b>")
                 append("\n\n")
             },
             enabled = gradleBlogEnabled,
@@ -429,7 +429,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<tg-emoji emoji-id=\"5208912452275701983\">▶️</tg-emoji> <b>MEDIUM GOOGLE DEVELOPER EXPERTS</b>")
+                append("<tg-emoji emoji-id=\"5208912452275701983\">▶️</tg-emoji> <b>GOOGLE DEVELOPER EXPERTS MEDIUM</b>")
                 append("\n\n")
             },
             enabled = mediumGoogleEnabled,
@@ -438,7 +438,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<tg-emoji emoji-id=\"5368646963233312962\">▶️</tg-emoji> <b>MEDIUM ANDROID DEVELOPERS</b>")
+                append("<tg-emoji emoji-id=\"5368646963233312962\">▶️</tg-emoji> <b>ANDROID DEVELOPERS MEDIUM</b>")
                 append("\n\n")
             },
             enabled = mediumAndroidEnabled,
