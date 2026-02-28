@@ -1,7 +1,5 @@
 package news
 
-import news.github.GithubReleaseItem
-import news.githubtrending.GithubTrendingKotlinItem
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpClient.Redirect
@@ -24,7 +22,6 @@ private data class RssItemFields(
     val title: String?,
     val linkHref: String?,
     val pubDateStr: String?,
-    val author: String?,
     val description: String?,
     val content: String?,
     val categories: List<String>
@@ -35,7 +32,6 @@ private data class AtomEntryFields(
     val linkHref: String?,
     val publishedStr: String?,
     val updatedStr: String?,
-    val author: String?,
     val summary: String?,
     val categories: List<String>
 )
@@ -107,7 +103,6 @@ private fun parseRssItems(doc: org.w3c.dom.Document): List<RssItemFields> {
         var title: String? = null
         var linkHref: String? = null
         var pubDateStr: String? = null
-        var author: String? = null
         var description: String? = null
         var content: String? = null
         val categories = mutableListOf<String>()
@@ -118,7 +113,6 @@ private fun parseRssItems(doc: org.w3c.dom.Document): List<RssItemFields> {
                 "title" -> title = node.textContent
                 "link" -> linkHref = node.textContent
                 "pubdate" -> pubDateStr = node.textContent
-                "dc:creator", "author" -> author = node.textContent
                 "description" -> description = node.textContent
                 "content:encoded" -> content = node.textContent
                 "category" -> cleanText(node.textContent)?.let { categories += it }
@@ -129,7 +123,6 @@ private fun parseRssItems(doc: org.w3c.dom.Document): List<RssItemFields> {
             title = title,
             linkHref = linkHref,
             pubDateStr = pubDateStr,
-            author = author,
             description = description,
             content = content,
             categories = categories
@@ -151,7 +144,6 @@ private fun parseAtomEntries(doc: org.w3c.dom.Document): List<AtomEntryFields> {
         var updatedStr: String? = null
         var title: String? = null
         var linkHref: String? = null
-        var author: String? = null
         var summary: String? = null
         val categories = mutableListOf<String>()
 
@@ -169,15 +161,6 @@ private fun parseAtomEntries(doc: org.w3c.dom.Document): List<AtomEntryFields> {
                         linkHref = href
                     }
                 }
-                "author" -> {
-                    val nameNode = node.childNodes
-                        .let { authorChildren ->
-                            (0 until authorChildren.length)
-                                .map(authorChildren::item)
-                                .firstOrNull { it.nodeName == "name" }
-                        }
-                    author = nameNode?.textContent ?: node.textContent
-                }
                 "category" -> {
                     val term = node.attributes?.getNamedItem("term")?.nodeValue
                     val label = term ?: node.textContent
@@ -191,7 +174,6 @@ private fun parseAtomEntries(doc: org.w3c.dom.Document): List<AtomEntryFields> {
             linkHref = linkHref,
             publishedStr = publishedStr,
             updatedStr = updatedStr,
-            author = author,
             summary = summary,
             categories = categories
         )
@@ -245,7 +227,6 @@ private fun buildSimpleItemsFromRss(
             published = published,
             title = safeTitle,
             url = url,
-            author = cleanText(item.author),
             summary = summaryProvider(item),
             categories = item.categories
         )
@@ -299,7 +280,6 @@ private fun buildSimpleItemsFromAtom(
             published = published,
             title = safeTitle,
             url = url,
-            author = cleanText(item.author),
             summary = summaryProvider(item),
             categories = item.categories
         )
@@ -443,7 +423,6 @@ object AndroidAuthorityProvider : NewsProvider<SimpleNewsItem> {
             var title: String? = null
             var linkHref: String? = null
             var pubDateStr: String? = null
-            var author: String? = null
             var description: String? = null
             val categories = mutableListOf<String>()
 
@@ -453,7 +432,6 @@ object AndroidAuthorityProvider : NewsProvider<SimpleNewsItem> {
                     "title" -> title = node.textContent
                     "link" -> linkHref = node.textContent
                     "pubdate" -> pubDateStr = node.textContent
-                    "dc:creator", "author" -> author = node.textContent
                     "description", "content:encoded" -> description = node.textContent
                     "category" -> cleanText(node.textContent)?.let { categories += it }
                 }
@@ -497,7 +475,6 @@ object AndroidAuthorityProvider : NewsProvider<SimpleNewsItem> {
                 published = published,
                 title = finalTitle,
                 url = url,
-                author = cleanText(author),
                 summary = cleanAndTruncate(description),
                 categories = categories
             )
@@ -740,7 +717,6 @@ object GithubReleasesProvider: NewsProvider<GithubReleaseItem> {
                 var updatedStr: String? = null
                 var title: String? = null
                 var linkHref: String? = null
-                var author: String? = null
                 var content: String? = null
                 val categories = mutableListOf(label)
 
@@ -750,15 +726,6 @@ object GithubReleasesProvider: NewsProvider<GithubReleaseItem> {
                         "published" -> publishedStr = node.textContent
                         "updated" -> updatedStr = node.textContent
                         "title" -> title = node.textContent
-                        "author" -> {
-                            val nameNode = node.childNodes
-                                .let { nodes ->
-                                    (0 until nodes.length)
-                                        .map(nodes::item)
-                                        .firstOrNull { it.nodeName.equals("name", ignoreCase = true) }
-                                }
-                            author = nameNode?.textContent ?: node.textContent
-                        }
                         "link" -> {
                             val rel = node.attributes?.getNamedItem("rel")?.nodeValue
                             if (rel == "alternate") {
@@ -793,7 +760,6 @@ object GithubReleasesProvider: NewsProvider<GithubReleaseItem> {
                     repo = label,
                     title = safeTitle,
                     url = url,
-                    author = cleanText(author),
                     summary = cleanAndTruncate(content),
                     categories = categories
                 )
@@ -1144,37 +1110,27 @@ object YoutubeProvider: NewsProvider<SimpleNewsItem> {
                 val entry = entries.item(i)
                 val children = entry.childNodes
 
-            var publishedStr: String? = null
-            var title: String? = null
-            var videoId: String? = null
-            var linkHref: String? = null
-            var author: String? = null
+                var publishedStr: String? = null
+                var title: String? = null
+                var videoId: String? = null
+                var linkHref: String? = null
 
-            for (j in 0 until children.length) {
-                val node = children.item(j)
-                when (node.nodeName) {
-                    "published" -> publishedStr = node.textContent
-                    "title" -> title = node.textContent
-                    "yt:videoId" -> videoId = node.textContent
-                    "author" -> {
-                        val nameNode = node.childNodes
-                            .let { nodes ->
-                                (0 until nodes.length)
-                                    .map(nodes::item)
-                                    .firstOrNull { it.nodeName == "name" }
+                for (j in 0 until children.length) {
+                    val node = children.item(j)
+                    when (node.nodeName) {
+                        "published" -> publishedStr = node.textContent
+                        "title" -> title = node.textContent
+                        "yt:videoId" -> videoId = node.textContent
+                        "link" -> {
+                            val rel = node.attributes?.getNamedItem("rel")?.nodeValue
+                            if (rel == "alternate") {
+                                linkHref = node.attributes
+                                    ?.getNamedItem("href")
+                                    ?.nodeValue
                             }
-                        author = nameNode?.textContent ?: node.textContent
-                    }
-                    "link" -> {
-                        val rel = node.attributes?.getNamedItem("rel")?.nodeValue
-                        if (rel == "alternate") {
-                            linkHref = node.attributes
-                                ?.getNamedItem("href")
-                                ?.nodeValue
                         }
                     }
                 }
-            }
 
                 if (publishedStr == null) continue
                 val published = Timestamp.parseIso(publishedStr) ?: continue
@@ -1197,8 +1153,7 @@ object YoutubeProvider: NewsProvider<SimpleNewsItem> {
                 result += SimpleNewsItem(
                     published = published,
                     title = safeTitle,
-                    url = url,
-                    author = cleanText(author)
+                    url = url
                 )
             }
 

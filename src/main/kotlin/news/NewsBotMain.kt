@@ -1,7 +1,5 @@
 package news
 
-import news.github.GithubReleaseItem
-import news.githubtrending.GithubTrendingKotlinItem
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -461,7 +459,7 @@ private fun buildMessages(
             },
             enabled = nineToFiveGoogleEnabled,
             items = nineToFiveGoogleItems,
-            formatLine = ::defaultLine
+            formatLine = ::defaultLineWithoutTags
         ),
         MessageSection(
             header = buildString {
@@ -560,6 +558,19 @@ private fun defaultLine(
     item: NewsItem,
     zone: ZoneId,
     dateFormatter: DateTimeFormatter
+): String = buildDefaultLine(item, zone, dateFormatter, includeTags = true)
+
+private fun defaultLineWithoutTags(
+    item: NewsItem,
+    zone: ZoneId,
+    dateFormatter: DateTimeFormatter
+): String = buildDefaultLine(item, zone, dateFormatter, includeTags = false)
+
+private fun buildDefaultLine(
+    item: NewsItem,
+    zone: ZoneId,
+    dateFormatter: DateTimeFormatter,
+    includeTags: Boolean
 ): String {
     val local = item.published.atZone(zone)
     val dateStr = local.format(dateFormatter)
@@ -571,11 +582,7 @@ private fun defaultLine(
         append("</a>")
         append("\n")
         append(dateStr)
-        item.author?.let { author ->
-            append("\nАвтор: ")
-            append(escapeHtml(author))
-        }
-        if (item.categories.isNotEmpty()) {
+        if (includeTags && item.categories.isNotEmpty()) {
             append("\nТеги: ")
             append(escapeHtml(item.categories.joinToString(", ")))
         }
