@@ -188,9 +188,16 @@ fun main() {
 
     val githubTrendingKotlinItems = collectItems(
         enabled = GITHUB_TRENDING_KOTLIN_ENABLED,
-        name = "GitHub trending Kotlin",
+        name = "GitHub Trending: Kotlin",
         lastCheck = lastCheck,
         provider = GithubTrendingKotlinProvider
+    )
+
+    val githubTrendingAllItems = collectItems(
+        enabled = GITHUB_TRENDING_ALL_ENABLED,
+        name = "GitHub Trending: All",
+        lastCheck = lastCheck,
+        provider = GithubTrendingAllProvider
     )
 
     endSection()
@@ -222,6 +229,7 @@ fun main() {
         habrCareerItems = habrCareerItems,
         githubReleaseItems = githubReleaseItems,
         githubTrendingKotlinItems = githubTrendingKotlinItems,
+        githubTrendingAllItems = githubTrendingAllItems,
         youtubeEnabled = YOUTUBE_ENABLED,
         androidBlogEnabled = ANDROID_BLOG_ENABLED,
         androidxReleaseNotesEnabled = ANDROIDX_RELEASE_NOTES_ENABLED,
@@ -246,7 +254,8 @@ fun main() {
         habrProgrammingEnabled = HABR_PROGRAMMING_ENABLED,
         habrCareerEnabled = HABR_CAREER_ENABLED,
         githubReleasesEnabled = GITHUB_RELEASES_ENABLED,
-        githubTrendingKotlinEnabled = GITHUB_TRENDING_KOTLIN_ENABLED
+        githubTrendingKotlinEnabled = GITHUB_TRENDING_KOTLIN_ENABLED,
+        githubTrendingAllEnabled = GITHUB_TRENDING_ALL_ENABLED
     )
     logInfo("Built messages count: ${messages.size}")
     endSection()
@@ -286,7 +295,8 @@ private fun buildMessages(
     habrProgrammingItems: List<SimpleNewsItem>,
     habrCareerItems: List<SimpleNewsItem>,
     githubReleaseItems: List<GithubReleaseItem>,
-    githubTrendingKotlinItems: List<GithubTrendingKotlinItem>,
+    githubTrendingKotlinItems: List<GithubTrendingItem>,
+    githubTrendingAllItems: List<GithubTrendingItem>,
     youtubeEnabled: Boolean,
     androidBlogEnabled: Boolean,
     androidxReleaseNotesEnabled: Boolean,
@@ -311,7 +321,8 @@ private fun buildMessages(
     habrProgrammingEnabled: Boolean,
     habrCareerEnabled: Boolean,
     githubReleasesEnabled: Boolean,
-    githubTrendingKotlinEnabled: Boolean
+    githubTrendingKotlinEnabled: Boolean,
+    githubTrendingAllEnabled: Boolean
 ): List<String> {
     val zone = ZoneId.of("Europe/Moscow")
     val dateFormatter = DateTimeFormatter.ofPattern("d LLL 'в' HH:mm", Locale.of("ru"))
@@ -535,12 +546,21 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<tg-emoji emoji-id=\"5321190645514130346\">▶️</tg-emoji> <b>GITHUB TRENDING</b>")
+                append("<tg-emoji emoji-id=\"5321190645514130346\">▶️</tg-emoji> <b>GITHUB TRENDING: KOTLIN</b>")
                 append("\n\n")
             },
             enabled = githubTrendingKotlinEnabled,
             items = githubTrendingKotlinItems,
-            formatLine = ::formatGithubTrendingLine
+            formatLine = { item, _, _ -> formatGithubTrendingLine(item) }
+        ),
+        MessageSection(
+            header = buildString {
+                append("<tg-emoji emoji-id=\"5321190645514130346\">▶️</tg-emoji> <b>GITHUB TRENDING: ALL</b>")
+                append("\n\n")
+            },
+            enabled = githubTrendingAllEnabled,
+            items = githubTrendingAllItems,
+            formatLine = { item, _, _ -> formatGithubTrendingLine(item) }
         )
     )
 
@@ -609,11 +629,7 @@ private fun formatGithubLine(
     }
 }
 
-private fun formatGithubTrendingLine(
-    item: GithubTrendingKotlinItem,
-    zone: ZoneId,
-    dateFormatter: DateTimeFormatter
-): String {
+private fun formatGithubTrendingLine(item: GithubTrendingItem): String {
     return buildString {
         append("<a href=\"")
         append(escapeHtml(item.url))

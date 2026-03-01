@@ -27,7 +27,7 @@ data class GithubReleaseItem(
     override val categories: List<String> = emptyList()
 ): NewsItem
 
-data class GithubTrendingKotlinItem(
+data class GithubTrendingItem(
     override val published: Instant,
     override val title: String,
     override val url: String,

@@ -7,6 +7,7 @@ const val ANDROID_WEEKLY_ENABLED = true
 const val FIREBASE_BLOG_ENABLED = true
 const val GRADLE_BLOG_ENABLED = true
 const val GITHUB_RELEASES_ENABLED = true
+const val GITHUB_TRENDING_ALL_ENABLED = true
 const val GITHUB_TRENDING_KOTLIN_ENABLED = true
 const val HABR_ANDROID_ENABLED = true
 const val HABR_AI_ENABLED = true

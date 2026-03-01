@@ -23,6 +23,7 @@ const val HABR_ANDROID_URL = "https://habr.com/ru/rss/hubs/android_dev/articles/
 const val HABR_AI_URL = "https://habr.com/ru/rss/hubs/artificial_intelligence/articles/all/?fl=ru"
 const val HABR_PROGRAMMING_URL = "https://habr.com/ru/rss/hubs/programming/articles/all/?fl=ru"
 const val HABR_CAREER_URL = "https://habr.com/ru/rss/hubs/career/articles/all/?fl=ru"
+const val GITHUB_TRENDING_ALL_URL = "https://github.com/trending?since=daily&spoken_language_code=en"
 const val GITHUB_TRENDING_KOTLIN_URL = "https://github.com/trending/kotlin?since=daily&spoken_language_code=en"
 val GITHUB_REPOS = listOf(
     "https://github.com/google/dagger",
