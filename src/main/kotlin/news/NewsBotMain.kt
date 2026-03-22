@@ -7,7 +7,6 @@ import java.net.http.HttpResponse
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 private const val TELEGRAM_MAX_LEN = 3500
 
@@ -325,7 +324,7 @@ private fun buildMessages(
     githubTrendingAllEnabled: Boolean
 ): List<String> {
     val zone = ZoneId.of("Europe/Moscow")
-    val dateFormatter = DateTimeFormatter.ofPattern("d LLL 'в' HH:mm", Locale.of("ru"))
+    val dateFormatter = DateTimeFormatter.ofPattern("dd.MM 'в' HH:mm")
 
     val sections = listOf(
         MessageSection(
@@ -578,19 +577,18 @@ private fun defaultLine(
     item: NewsItem,
     zone: ZoneId,
     dateFormatter: DateTimeFormatter
-): String = buildDefaultLine(item, zone, dateFormatter, includeTags = true)
+): String = buildDefaultLine(item, zone, dateFormatter)
 
 private fun defaultLineWithoutTags(
     item: NewsItem,
     zone: ZoneId,
     dateFormatter: DateTimeFormatter
-): String = buildDefaultLine(item, zone, dateFormatter, includeTags = false)
+): String = buildDefaultLine(item, zone, dateFormatter)
 
 private fun buildDefaultLine(
     item: NewsItem,
     zone: ZoneId,
-    dateFormatter: DateTimeFormatter,
-    includeTags: Boolean
+    dateFormatter: DateTimeFormatter
 ): String {
     val local = item.published.atZone(zone)
     val dateStr = local.format(dateFormatter)
@@ -602,10 +600,6 @@ private fun buildDefaultLine(
         append("</a>")
         append("\n")
         append(dateStr)
-        if (includeTags && item.categories.isNotEmpty()) {
-            append("\nТеги: ")
-            append(escapeHtml(item.categories.joinToString(", ")))
-        }
         append("\n\n")
     }
 }
