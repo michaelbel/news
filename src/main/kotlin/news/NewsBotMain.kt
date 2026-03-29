@@ -580,7 +580,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<tg-emoji emoji-id=\"5408986202315458622\">▶️</tg-emoji> <b>VC.RU КАРЬЕРА</b>")
+                append("<tg-emoji emoji-id=\"5408986202315458622\">▶️</tg-emoji> <b>VCRU КАРЬЕРА</b>")
                 append("\n\n")
             },
             enabled = vcRuCareerEnabled,
@@ -589,7 +589,7 @@ private fun buildMessages(
         ),
         MessageSection(
             header = buildString {
-                append("<tg-emoji emoji-id=\"5408986202315458622\">▶️</tg-emoji> <b>VC.RU РАЗРАБОТКА</b>")
+                append("<tg-emoji emoji-id=\"5408986202315458622\">▶️</tg-emoji> <b>VCRU РАЗРАБОТКА</b>")
                 append("\n\n")
             },
             enabled = vcRuDevelopmentEnabled,
