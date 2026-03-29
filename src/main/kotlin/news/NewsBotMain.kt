@@ -178,6 +178,34 @@ fun main() {
         provider = HabrCareerProvider
     )
 
+    val vcRuCareerItems = collectItems(
+        enabled = VC_RU_CAREER_ENABLED,
+        name = "VC.RU CAREER",
+        lastCheck = lastCheck,
+        provider = VcRuCareerProvider
+    )
+
+    val vcRuDevelopmentItems = collectItems(
+        enabled = VC_RU_DEVELOPMENT_ENABLED,
+        name = "VC.RU DEVELOPMENT",
+        lastCheck = lastCheck,
+        provider = VcRuDevelopmentProvider
+    )
+
+    val dtfSoftwareItems = collectItems(
+        enabled = DTF_SOFTWARE_ENABLED,
+        name = "DTF SOFTWARE",
+        lastCheck = lastCheck,
+        provider = DtfSoftwareProvider
+    )
+
+    val dtfMobileItems = collectItems(
+        enabled = DTF_MOBILE_ENABLED,
+        name = "DTF MOBILE",
+        lastCheck = lastCheck,
+        provider = DtfMobileProvider
+    )
+
     val githubReleaseItems = collectItems(
         enabled = GITHUB_RELEASES_ENABLED,
         name = "GitHub releases",
@@ -226,6 +254,10 @@ fun main() {
         habrAiItems = habrAiItems,
         habrProgrammingItems = habrProgrammingItems,
         habrCareerItems = habrCareerItems,
+        vcRuCareerItems = vcRuCareerItems,
+        vcRuDevelopmentItems = vcRuDevelopmentItems,
+        dtfSoftwareItems = dtfSoftwareItems,
+        dtfMobileItems = dtfMobileItems,
         githubReleaseItems = githubReleaseItems,
         githubTrendingKotlinItems = githubTrendingKotlinItems,
         githubTrendingAllItems = githubTrendingAllItems,
@@ -252,6 +284,10 @@ fun main() {
         habrAiEnabled = HABR_AI_ENABLED,
         habrProgrammingEnabled = HABR_PROGRAMMING_ENABLED,
         habrCareerEnabled = HABR_CAREER_ENABLED,
+        vcRuCareerEnabled = VC_RU_CAREER_ENABLED,
+        vcRuDevelopmentEnabled = VC_RU_DEVELOPMENT_ENABLED,
+        dtfSoftwareEnabled = DTF_SOFTWARE_ENABLED,
+        dtfMobileEnabled = DTF_MOBILE_ENABLED,
         githubReleasesEnabled = GITHUB_RELEASES_ENABLED,
         githubTrendingKotlinEnabled = GITHUB_TRENDING_KOTLIN_ENABLED,
         githubTrendingAllEnabled = GITHUB_TRENDING_ALL_ENABLED
@@ -293,6 +329,10 @@ private fun buildMessages(
     habrAiItems: List<SimpleNewsItem>,
     habrProgrammingItems: List<SimpleNewsItem>,
     habrCareerItems: List<SimpleNewsItem>,
+    vcRuCareerItems: List<SimpleNewsItem>,
+    vcRuDevelopmentItems: List<SimpleNewsItem>,
+    dtfSoftwareItems: List<SimpleNewsItem>,
+    dtfMobileItems: List<SimpleNewsItem>,
     githubReleaseItems: List<GithubReleaseItem>,
     githubTrendingKotlinItems: List<GithubTrendingItem>,
     githubTrendingAllItems: List<GithubTrendingItem>,
@@ -319,6 +359,10 @@ private fun buildMessages(
     habrAiEnabled: Boolean,
     habrProgrammingEnabled: Boolean,
     habrCareerEnabled: Boolean,
+    vcRuCareerEnabled: Boolean,
+    vcRuDevelopmentEnabled: Boolean,
+    dtfSoftwareEnabled: Boolean,
+    dtfMobileEnabled: Boolean,
     githubReleasesEnabled: Boolean,
     githubTrendingKotlinEnabled: Boolean,
     githubTrendingAllEnabled: Boolean
@@ -532,6 +576,42 @@ private fun buildMessages(
             },
             enabled = habrCareerEnabled,
             items = habrCareerItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<tg-emoji emoji-id=\"5408986202315458622\">▶️</tg-emoji> <b>VC.RU КАРЬЕРА</b>")
+                append("\n\n")
+            },
+            enabled = vcRuCareerEnabled,
+            items = vcRuCareerItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<tg-emoji emoji-id=\"5408986202315458622\">▶️</tg-emoji> <b>VC.RU РАЗРАБОТКА</b>")
+                append("\n\n")
+            },
+            enabled = vcRuDevelopmentEnabled,
+            items = vcRuDevelopmentItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<tg-emoji emoji-id=\"5409314415126286185\">▶️</tg-emoji> <b>DTF СОФТ</b>")
+                append("\n\n")
+            },
+            enabled = dtfSoftwareEnabled,
+            items = dtfSoftwareItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<tg-emoji emoji-id=\"5409314415126286185\">▶️</tg-emoji> <b>DTF МОБАЙЛ</b>")
+                append("\n\n")
+            },
+            enabled = dtfMobileEnabled,
+            items = dtfMobileItems,
             formatLine = ::defaultLine
         ),
         MessageSection(

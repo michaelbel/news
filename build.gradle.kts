@@ -10,6 +10,10 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    implementation("org.jsoup:jsoup:1.18.3")
+}
+
 application {
     mainClass.set("news.NewsBotMainKt")
 }

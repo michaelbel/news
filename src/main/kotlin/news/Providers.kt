@@ -10,6 +10,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.XMLConstants
 import javax.xml.parsers.DocumentBuilderFactory
+import org.jsoup.Jsoup
 
 private val defaultClient: HttpClient = HttpClient.newBuilder()
     .followRedirects(Redirect.NORMAL)
@@ -333,6 +334,76 @@ private fun fetchSimpleAtomOrRssFeed(
         val items = parseRssItems(doc)
         buildSimpleItemsFromRss(logPrefix, items, lastCheck, rssSummaryProvider)
     }
+}
+
+private fun fetchSimpleOsnovaCommunityFeed(
+    logPrefix: String,
+    pageUrl: String,
+    articlePathPrefix: String,
+    lastCheck: Instant
+): List<SimpleNewsItem> {
+    logInfo("$logPrefix: fetching $pageUrl")
+
+    val request = HttpRequest.newBuilder()
+        .uri(URI(pageUrl))
+        .header(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+                "AppleWebKit/537.36 (KHTML, like Gecko) " +
+                "Chrome/124.0.0.0 Safari/537.36"
+        )
+        .header("Accept-Language", "ru-RU,ru;q=0.9,en;q=0.8")
+        .GET()
+        .build()
+
+    val html = try {
+        val response = defaultClient.send(request, HttpResponse.BodyHandlers.ofString())
+        logInfo("$logPrefix: HTTP status for $pageUrl = ${response.statusCode()}")
+        if (response.statusCode() !in 200..299) {
+            logWarn(
+                "$logPrefix: non-2xx status for $pageUrl, " +
+                    "body snippet=${response.body().take(300)}"
+            )
+            return emptyList()
+        }
+        response.body()
+    } catch (e: Exception) {
+        logWarn("$logPrefix: failed to fetch $pageUrl: ${e.message}")
+        return emptyList()
+    }
+
+    val cards = Jsoup.parse(html, pageUrl)
+        .select(".subsite-feed__content .content.content--short")
+
+    val result = linkedMapOf<String, SimpleNewsItem>()
+
+    for (card in cards) {
+        val titleLink = card.selectFirst(".content__body .content-title a[href]") ?: continue
+        val href = titleLink.absUrl("href").ifBlank { titleLink.attr("href") }
+        val path = runCatching { URI(href).path }.getOrNull() ?: continue
+        if (!path.startsWith("$articlePathPrefix/")) continue
+
+        val datetimeRaw = card.selectFirst("time[datetime]")?.attr("datetime") ?: continue
+        val published = Timestamp.parseIso(datetimeRaw)
+        if (published == null) {
+            logWarn("$logPrefix: cannot parse published '$datetimeRaw'")
+            continue
+        }
+        if (published <= lastCheck) continue
+
+        val title = cleanText(titleLink.text()) ?: continue
+        result.putIfAbsent(
+            href,
+            SimpleNewsItem(
+                published = published,
+                title = title,
+                url = href
+            )
+        )
+    }
+
+    logInfo("$logPrefix: cards total=${cards.size}, result=${result.size}")
+    return result.values.sortedBy { it.published }
 }
 
 object AndroidAuthorityProvider : NewsProvider<SimpleNewsItem> {
@@ -986,6 +1057,50 @@ object HabrProgrammingProvider: NewsProvider<SimpleNewsItem> {
             logPrefix = "HabrProgramming",
             feedUrl = HABR_PROGRAMMING_URL,
             lastCheck = lastCheck,
+        )
+    }
+}
+
+object VcRuCareerProvider: NewsProvider<SimpleNewsItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
+        return fetchSimpleOsnovaCommunityFeed(
+            logPrefix = "VcRuCareer",
+            pageUrl = VC_RU_CAREER_URL,
+            articlePathPrefix = "/hr",
+            lastCheck = lastCheck
+        )
+    }
+}
+
+object VcRuDevelopmentProvider: NewsProvider<SimpleNewsItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
+        return fetchSimpleOsnovaCommunityFeed(
+            logPrefix = "VcRuDevelopment",
+            pageUrl = VC_RU_DEVELOPMENT_URL,
+            articlePathPrefix = "/dev",
+            lastCheck = lastCheck
+        )
+    }
+}
+
+object DtfSoftwareProvider: NewsProvider<SimpleNewsItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
+        return fetchSimpleOsnovaCommunityFeed(
+            logPrefix = "DtfSoftware",
+            pageUrl = DTF_SOFTWARE_URL,
+            articlePathPrefix = "/software",
+            lastCheck = lastCheck
+        )
+    }
+}
+
+object DtfMobileProvider: NewsProvider<SimpleNewsItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> {
+        return fetchSimpleOsnovaCommunityFeed(
+            logPrefix = "DtfMobile",
+            pageUrl = DTF_MOBILE_URL,
+            articlePathPrefix = "/mobile",
+            lastCheck = lastCheck
         )
     }
 }
