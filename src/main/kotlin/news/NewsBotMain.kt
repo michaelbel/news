@@ -227,6 +227,27 @@ fun main() {
         provider = GithubTrendingAllProvider
     )
 
+    val redditAndroidDevItems = collectItems(
+        enabled = REDDIT_ANDROIDDEV_ENABLED,
+        name = "Reddit: androiddev",
+        lastCheck = lastCheck,
+        provider = RedditAndroidDevProvider
+    )
+
+    val redditKotlinItems = collectItems(
+        enabled = REDDIT_KOTLIN_ENABLED,
+        name = "Reddit: Kotlin",
+        lastCheck = lastCheck,
+        provider = RedditKotlinProvider
+    )
+
+    val redditMobileDevItems = collectItems(
+        enabled = REDDIT_MOBILEDEV_ENABLED,
+        name = "Reddit: mobiledev",
+        lastCheck = lastCheck,
+        provider = RedditMobileDevProvider
+    )
+
     endSection()
 
     logSection("Build messages")
@@ -261,6 +282,9 @@ fun main() {
         githubReleaseItems = githubReleaseItems,
         githubTrendingKotlinItems = githubTrendingKotlinItems,
         githubTrendingAllItems = githubTrendingAllItems,
+        redditAndroidDevItems = redditAndroidDevItems,
+        redditKotlinItems = redditKotlinItems,
+        redditMobileDevItems = redditMobileDevItems,
         youtubeEnabled = YOUTUBE_ENABLED,
         androidBlogEnabled = ANDROID_BLOG_ENABLED,
         androidxReleaseNotesEnabled = ANDROIDX_RELEASE_NOTES_ENABLED,
@@ -290,7 +314,10 @@ fun main() {
         dtfMobileEnabled = DTF_MOBILE_ENABLED,
         githubReleasesEnabled = GITHUB_RELEASES_ENABLED,
         githubTrendingKotlinEnabled = GITHUB_TRENDING_KOTLIN_ENABLED,
-        githubTrendingAllEnabled = GITHUB_TRENDING_ALL_ENABLED
+        githubTrendingAllEnabled = GITHUB_TRENDING_ALL_ENABLED,
+        redditAndroidDevEnabled = REDDIT_ANDROIDDEV_ENABLED,
+        redditKotlinEnabled = REDDIT_KOTLIN_ENABLED,
+        redditMobileDevEnabled = REDDIT_MOBILEDEV_ENABLED
     )
     logInfo("Built messages count: ${messages.size}")
     endSection()
@@ -336,6 +363,9 @@ private fun buildMessages(
     githubReleaseItems: List<GithubReleaseItem>,
     githubTrendingKotlinItems: List<GithubTrendingItem>,
     githubTrendingAllItems: List<GithubTrendingItem>,
+    redditAndroidDevItems: List<SimpleNewsItem>,
+    redditKotlinItems: List<SimpleNewsItem>,
+    redditMobileDevItems: List<SimpleNewsItem>,
     youtubeEnabled: Boolean,
     androidBlogEnabled: Boolean,
     androidxReleaseNotesEnabled: Boolean,
@@ -365,7 +395,10 @@ private fun buildMessages(
     dtfMobileEnabled: Boolean,
     githubReleasesEnabled: Boolean,
     githubTrendingKotlinEnabled: Boolean,
-    githubTrendingAllEnabled: Boolean
+    githubTrendingAllEnabled: Boolean,
+    redditAndroidDevEnabled: Boolean,
+    redditKotlinEnabled: Boolean,
+    redditMobileDevEnabled: Boolean
 ): List<String> {
     val zone = ZoneId.of("Europe/Moscow")
     val dateFormatter = DateTimeFormatter.ofPattern("dd.MM 'в' HH:mm")
@@ -640,6 +673,33 @@ private fun buildMessages(
             enabled = githubTrendingAllEnabled,
             items = githubTrendingAllItems,
             formatLine = { item, _, _ -> formatGithubTrendingLine(item) }
+        ),
+        MessageSection(
+            header = buildString {
+                append("<tg-emoji emoji-id=\"5323326266462457730\">▶️</tg-emoji> <b>REDDIT: ANDROIDDEV</b>")
+                append("\n\n")
+            },
+            enabled = redditAndroidDevEnabled,
+            items = redditAndroidDevItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<tg-emoji emoji-id=\"5323326266462457730\">▶️</tg-emoji> <b>REDDIT: KOTLIN</b>")
+                append("\n\n")
+            },
+            enabled = redditKotlinEnabled,
+            items = redditKotlinItems,
+            formatLine = ::defaultLine
+        ),
+        MessageSection(
+            header = buildString {
+                append("<tg-emoji emoji-id=\"5323326266462457730\">▶️</tg-emoji> <b>REDDIT: MOBILEDEV</b>")
+                append("\n\n")
+            },
+            enabled = redditMobileDevEnabled,
+            items = redditMobileDevItems,
+            formatLine = ::defaultLine
         )
     )
 

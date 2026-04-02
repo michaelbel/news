@@ -29,6 +29,9 @@ const val DTF_SOFTWARE_URL = "https://dtf.ru/software"
 const val DTF_MOBILE_URL = "https://dtf.ru/mobile"
 const val GITHUB_TRENDING_ALL_URL = "https://github.com/trending?since=daily&spoken_language_code=en"
 const val GITHUB_TRENDING_KOTLIN_URL = "https://github.com/trending/kotlin?since=daily&spoken_language_code=en"
+const val REDDIT_ANDROIDDEV_URL = "https://www.reddit.com/r/androiddev/.rss?limit=25"
+const val REDDIT_KOTLIN_URL = "https://www.reddit.com/r/Kotlin/.rss?limit=25"
+const val REDDIT_MOBILEDEV_URL = "https://www.reddit.com/r/mobiledev/.rss?limit=25"
 val GITHUB_REPOS = listOf(
     "https://github.com/google/dagger",
     "https://github.com/google/gson",

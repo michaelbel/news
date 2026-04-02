@@ -1301,3 +1301,38 @@ object YoutubeProvider: NewsProvider<SimpleNewsItem> {
         return result.sortedBy { it.published }
     }
 }
+
+private fun fetchRedditFeed(
+    logPrefix: String,
+    feedUrl: String,
+    lastCheck: Instant
+): List<SimpleNewsItem> {
+    val xml = fetchXml(
+        logPrefix = logPrefix,
+        feedUrl = feedUrl,
+        headers = mapOf("User-Agent" to "news-bot/1.0 by news-aggregator")
+    ) ?: return emptyList()
+    val doc = parseXml(logPrefix, xml) ?: return emptyList()
+    val atomEntries = parseAtomEntries(doc)
+    return if (atomEntries.isNotEmpty()) {
+        buildSimpleItemsFromAtom(logPrefix, atomEntries, lastCheck)
+    } else {
+        val rssItems = parseRssItems(doc)
+        buildSimpleItemsFromRss(logPrefix, rssItems, lastCheck)
+    }
+}
+
+object RedditAndroidDevProvider : NewsProvider<SimpleNewsItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> =
+        fetchRedditFeed("RedditAndroidDev", REDDIT_ANDROIDDEV_URL, lastCheck)
+}
+
+object RedditKotlinProvider : NewsProvider<SimpleNewsItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> =
+        fetchRedditFeed("RedditKotlin", REDDIT_KOTLIN_URL, lastCheck)
+}
+
+object RedditMobileDevProvider : NewsProvider<SimpleNewsItem> {
+    override fun fetchItems(lastCheck: Instant): List<SimpleNewsItem> =
+        fetchRedditFeed("RedditMobileDev", REDDIT_MOBILEDEV_URL, lastCheck)
+}

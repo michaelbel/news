@@ -31,4 +31,8 @@ const val ANDROID_POLICE_ENABLED = true
 const val GITHUB_BLOG_ENABLED = true
 const val TECHRADAR_ANDROID_ENABLED = true
 
+const val REDDIT_ANDROIDDEV_ENABLED = true
+const val REDDIT_KOTLIN_ENABLED = true
+const val REDDIT_MOBILEDEV_ENABLED = true
+
 const val TRANSLATION_ENABLED = false

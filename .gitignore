@@ -3,3 +3,4 @@
 /build
 /bin
 gradle/gradle-daemon-jvm.properties
+.claude
