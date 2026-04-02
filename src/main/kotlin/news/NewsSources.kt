@@ -90,7 +90,7 @@ val GITHUB_REPOS = listOf(
     "https://github.com/detekt/detekt",
     "https://github.com/pinterest/ktlint",
     "https://github.com/ChuckerTeam/chucker",
-    "https://github.com/bumptech/glide"
+    "https://github.com/openai/codex"
 )
 val YOUTUBE_CHANNELS = listOf(
     "https://www.youtube.com/feeds/videos.xml?channel_id=UCVHFbqXqoYvEWM1Ddxl0QDg", // AndroidDevelopers
