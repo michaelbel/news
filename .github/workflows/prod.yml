@@ -16,7 +16,6 @@ jobs:
   send-news:
     runs-on: ubuntu-24.04
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
       CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       THREAD_ID: ${{ secrets.TELEGRAM_THREAD_ID }}
@@ -24,12 +23,12 @@ jobs:
 
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: setup jdk 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '21'
