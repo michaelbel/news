@@ -1,6 +1,7 @@
-.idea
-.gradle
-/build
-/bin
+.idea/*
+!.idea/icon.svg
+.gradle/
+.claude/
+/build/
+/bin/
 gradle/gradle-daemon-jvm.properties
-.claude
