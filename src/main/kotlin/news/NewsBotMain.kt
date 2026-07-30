@@ -14,6 +14,11 @@ fun main() {
     logSection("Timestamp & last check")
     val lastCheck = Timestamp.readLastCheck()
     logInfo("Last check instant: $lastCheck")
+    val githubTrendingLastSentDate = Timestamp.readGithubTrendingLastDate()
+    logInfo("GitHub Trending last sent date: $githubTrendingLastSentDate")
+    val shouldSendGithubTrending = Timestamp.shouldSendGithubTrending(
+        lastSentDate = githubTrendingLastSentDate
+    )
     endSection()
 
     logSection("Collect sources")
@@ -214,14 +219,14 @@ fun main() {
     )
 
     val githubTrendingKotlinItems = collectItems(
-        enabled = GITHUB_TRENDING_KOTLIN_ENABLED,
+        enabled = GITHUB_TRENDING_KOTLIN_ENABLED && shouldSendGithubTrending,
         name = "GitHub Trending: Kotlin",
         lastCheck = lastCheck,
         provider = GithubTrendingKotlinProvider
     )
 
     val githubTrendingAllItems = collectItems(
-        enabled = GITHUB_TRENDING_ALL_ENABLED,
+        enabled = GITHUB_TRENDING_ALL_ENABLED && shouldSendGithubTrending,
         name = "GitHub Trending: All",
         lastCheck = lastCheck,
         provider = GithubTrendingAllProvider
@@ -313,8 +318,8 @@ fun main() {
         dtfSoftwareEnabled = DTF_SOFTWARE_ENABLED,
         dtfMobileEnabled = DTF_MOBILE_ENABLED,
         githubReleasesEnabled = GITHUB_RELEASES_ENABLED,
-        githubTrendingKotlinEnabled = GITHUB_TRENDING_KOTLIN_ENABLED,
-        githubTrendingAllEnabled = GITHUB_TRENDING_ALL_ENABLED,
+        githubTrendingKotlinEnabled = GITHUB_TRENDING_KOTLIN_ENABLED && shouldSendGithubTrending,
+        githubTrendingAllEnabled = GITHUB_TRENDING_ALL_ENABLED && shouldSendGithubTrending,
         redditAndroidDevEnabled = REDDIT_ANDROIDDEV_ENABLED,
         redditKotlinEnabled = REDDIT_KOTLIN_ENABLED,
         redditMobileDevEnabled = REDDIT_MOBILEDEV_ENABLED
@@ -328,8 +333,16 @@ fun main() {
     }
 
     logSection("Send to Telegram")
-    sendTelegram(messages)
+    val sent = sendTelegram(messages)
     endSection()
+
+    val githubTrendingItemsSent = sent && (
+        githubTrendingKotlinItems.isNotEmpty() ||
+            githubTrendingAllItems.isNotEmpty()
+    )
+    if (githubTrendingItemsSent) {
+        Timestamp.writeGithubTrendingLastDate()
+    }
 }
 
 private fun buildMessages(
@@ -849,14 +862,14 @@ private fun extractRetryAfterSeconds(body: String): Long? {
     return value.toLongOrNull()
 }
 
-private fun sendTelegram(messages: List<String>) {
+private fun sendTelegram(messages: List<String>): Boolean {
     val token = System.getenv("TELEGRAM_TOKEN").orEmpty()
     val chatId = System.getenv("CHAT_ID").orEmpty()
     val threadId = System.getenv("THREAD_ID").orEmpty()
 
     if (token.isBlank() || chatId.isBlank()) {
         logWarn("TELEGRAM_TOKEN or CHAT_ID not set, skip send")
-        return
+        return false
     }
 
     val url = "https://api.telegram.org/bot$token/sendMessage"
@@ -917,4 +930,6 @@ private fun sendTelegram(messages: List<String>) {
             error("Telegram send failed for message #${index + 1} with status $status")
         }
     }
+
+    return true
 }

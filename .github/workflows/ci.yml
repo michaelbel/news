@@ -50,9 +50,23 @@ jobs:
           fi
           echo "value=$VALUE" >> "$GITHUB_OUTPUT"
 
+      - name: read GitHub Trending timestamp
+        id: github_trending_timestamp
+        run: |
+          if [ -f github_trending_timestamp_debug.txt ]; then
+            VALUE="$(tr -d '\n' < github_trending_timestamp_debug.txt)"
+            echo "Using existing GitHub Trending date: $VALUE"
+          else
+            VALUE=""
+            echo "github_trending_timestamp_debug.txt not found"
+          fi
+          echo "value=$VALUE" >> "$GITHUB_OUTPUT"
+
       - name: run news bot (Kotlin)
         env:
           LAST_CHECK: ${{ steps.timestamp.outputs.value }}
+          GITHUB_TRENDING_LAST_DATE: ${{ steps.github_trending_timestamp.outputs.value }}
+          GITHUB_TRENDING_TIMESTAMP_FILE: github_trending_timestamp_debug.txt
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID_DEBUG }}
           THREAD_ID: ${{ secrets.TELEGRAM_THREAD_ID_DEBUG }}
@@ -74,7 +88,7 @@ jobs:
           git pull --rebase origin main
           git stash pop || true
 
-          git add timestamp_debug.txt
+          git add timestamp_debug.txt github_trending_timestamp_debug.txt
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else

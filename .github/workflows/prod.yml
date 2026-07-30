@@ -51,9 +51,23 @@ jobs:
           fi
           echo "value=$VALUE" >> "$GITHUB_OUTPUT"
 
+      - name: read GitHub Trending timestamp
+        id: github_trending_timestamp
+        run: |
+          if [ -f github_trending_timestamp.txt ]; then
+            VALUE="$(tr -d '\n' < github_trending_timestamp.txt)"
+            echo "Using existing GitHub Trending date: $VALUE"
+          else
+            VALUE=""
+            echo "github_trending_timestamp.txt not found"
+          fi
+          echo "value=$VALUE" >> "$GITHUB_OUTPUT"
+
       - name: run news bot (Kotlin)
         env:
           LAST_CHECK: ${{ steps.timestamp.outputs.value }}
+          GITHUB_TRENDING_LAST_DATE: ${{ steps.github_trending_timestamp.outputs.value }}
+          GITHUB_TRENDING_TIMESTAMP_FILE: github_trending_timestamp.txt
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           THREAD_ID: ${{ secrets.TELEGRAM_THREAD_ID }}
@@ -70,7 +84,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add timestamp.txt
+          git add timestamp.txt github_trending_timestamp.txt
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
