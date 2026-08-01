@@ -22,235 +22,270 @@ fun main() {
     endSection()
 
     logSection("Collect sources")
+    val seenTitles = mutableSetOf<String>()
+
     val youtubeItems = collectItems(
         enabled = YOUTUBE_ENABLED,
         name = "YouTube",
         lastCheck = lastCheck,
-        provider = YoutubeProvider
+        provider = YoutubeProvider,
+        seenTitles = seenTitles
     )
 
     val androidBlogItems = collectItems(
         enabled = ANDROID_BLOG_ENABLED,
         name = "Android Developers Blog",
         lastCheck = lastCheck,
-        provider = AndroidBlogProvider
+        provider = AndroidBlogProvider,
+        seenTitles = seenTitles
     )
 
     val androidxReleaseNotesItems = collectItems(
         enabled = ANDROIDX_RELEASE_NOTES_ENABLED,
         name = "AndroidX Release Notes",
         lastCheck = lastCheck,
-        provider = AndroidxReleaseNotesProvider
+        provider = AndroidxReleaseNotesProvider,
+        seenTitles = seenTitles
     )
 
     val androidStudioBlogItems = collectItems(
         enabled = ANDROID_STUDIO_BLOG_ENABLED,
         name = "Android Studio Blog",
         lastCheck = lastCheck,
-        provider = AndroidStudioBlogProvider
+        provider = AndroidStudioBlogProvider,
+        seenTitles = seenTitles
     )
 
     val androidAuthorityItems = collectItems(
         enabled = ANDROID_AUTHORITY_ENABLED,
         name = "Android Authority",
         lastCheck = lastCheck,
-        provider = AndroidAuthorityProvider
+        provider = AndroidAuthorityProvider,
+        seenTitles = seenTitles
     )
 
     val androidPoliceItems = collectItems(
         enabled = ANDROID_POLICE_ENABLED,
         name = "Android Police",
         lastCheck = lastCheck,
-        provider = AndroidPoliceProvider
+        provider = AndroidPoliceProvider,
+        seenTitles = seenTitles
     )
 
     val firebaseBlogItems = collectItems(
         enabled = FIREBASE_BLOG_ENABLED,
         name = "Firebase Blog",
         lastCheck = lastCheck,
-        provider = FirebaseBlogProvider
+        provider = FirebaseBlogProvider,
+        seenTitles = seenTitles
     )
 
     val kotlinBlogItems = collectItems(
         enabled = KOTLIN_BLOG_ENABLED,
         name = "Kotlin Blog",
         lastCheck = lastCheck,
-        provider = KotlinBlogProvider
+        provider = KotlinBlogProvider,
+        seenTitles = seenTitles
     )
 
     val kotlinDiscussionsItems = collectItems(
         enabled = KOTLIN_DISCUSSIONS_ENABLED,
         name = "Kotlin Discussions",
         lastCheck = lastCheck,
-        provider = KotlinDiscussionsProvider
+        provider = KotlinDiscussionsProvider,
+        seenTitles = seenTitles
     )
 
     val gradleBlogItems = collectItems(
         enabled = GRADLE_BLOG_ENABLED,
         name = "Gradle Blog",
         lastCheck = lastCheck,
-        provider = GradleBlogProvider
+        provider = GradleBlogProvider,
+        seenTitles = seenTitles
     )
 
     val githubBlogItems = collectItems(
         enabled = GITHUB_BLOG_ENABLED,
         name = "GitHub Blog",
         lastCheck = lastCheck,
-        provider = GithubBlogProvider
+        provider = GithubBlogProvider,
+        seenTitles = seenTitles
     )
 
     val jetBrainsBlogItems = collectItems(
         enabled = JETBRAINS_BLOG_ENABLED,
         name = "JetBrains Blog",
         lastCheck = lastCheck,
-        provider = JetBrainsBlogProvider
+        provider = JetBrainsBlogProvider,
+        seenTitles = seenTitles
     )
 
     val mediumGoogleItems = collectItems(
         enabled = MEDIUM_GOOGLE_ENABLED,
         name = "Medium Google",
         lastCheck = lastCheck,
-        provider = MediumGoogleProvider
+        provider = MediumGoogleProvider,
+        seenTitles = seenTitles
     )
 
     val mediumAndroidItems = collectItems(
         enabled = MEDIUM_ANDROID_ENABLED,
         name = "Medium Android",
         lastCheck = lastCheck,
-        provider = MediumAndroidProvider
+        provider = MediumAndroidProvider,
+        seenTitles = seenTitles
     )
 
     val devToAndroidItems = collectItems(
         enabled = DEV_TO_ANDROID_ENABLED,
         name = "Dev.to Android",
         lastCheck = lastCheck,
-        provider = DevToProvider
+        provider = DevToProvider,
+        seenTitles = seenTitles
     )
 
     val androidWeeklyItems = collectItems(
         enabled = ANDROID_WEEKLY_ENABLED,
         name = "Android Weekly",
         lastCheck = lastCheck,
-        provider = AndroidWeeklyProvider
+        provider = AndroidWeeklyProvider,
+        seenTitles = seenTitles
     )
 
     val nineToFiveGoogleItems = collectItems(
         enabled = NINE_TO_FIVE_GOOGLE_ENABLED,
         name = "9to5Google",
         lastCheck = lastCheck,
-        provider = NineToFiveGoogleProvider
+        provider = NineToFiveGoogleProvider,
+        seenTitles = seenTitles
     )
 
     val proAndroidDevItems = collectItems(
         enabled = PRO_ANDROID_DEV_ENABLED,
         name = "ProAndroidDev",
         lastCheck = lastCheck,
-        provider = ProAndroidDevProvider
+        provider = ProAndroidDevProvider,
+        seenTitles = seenTitles
     )
 
     val techRadarItems = collectItems(
         enabled = TECHRADAR_ANDROID_ENABLED,
         name = "TechRadar Android",
         lastCheck = lastCheck,
-        provider = TechRadarProvider
+        provider = TechRadarProvider,
+        seenTitles = seenTitles
     )
 
     val habrAndroidItems = collectItems(
         enabled = HABR_ANDROID_ENABLED,
         name = "HABR ANDROID",
         lastCheck = lastCheck,
-        provider = HabrAndroidProvider
+        provider = HabrAndroidProvider,
+        seenTitles = seenTitles
     )
 
     val habrAiItems = collectItems(
         enabled = HABR_AI_ENABLED,
         name = "HABR AI",
         lastCheck = lastCheck,
-        provider = HabrAiProvider
+        provider = HabrAiProvider,
+        seenTitles = seenTitles
     )
 
     val habrProgrammingItems = collectItems(
         enabled = HABR_PROGRAMMING_ENABLED,
         name = "HABR PROGRAMMING",
         lastCheck = lastCheck,
-        provider = HabrProgrammingProvider
+        provider = HabrProgrammingProvider,
+        seenTitles = seenTitles
     )
 
     val habrCareerItems = collectItems(
         enabled = HABR_CAREER_ENABLED,
         name = "HABR CAREER",
         lastCheck = lastCheck,
-        provider = HabrCareerProvider
+        provider = HabrCareerProvider,
+        seenTitles = seenTitles
     )
 
     val vcRuCareerItems = collectItems(
         enabled = VC_RU_CAREER_ENABLED,
         name = "VC.RU CAREER",
         lastCheck = lastCheck,
-        provider = VcRuCareerProvider
+        provider = VcRuCareerProvider,
+        seenTitles = seenTitles
     )
 
     val vcRuDevelopmentItems = collectItems(
         enabled = VC_RU_DEVELOPMENT_ENABLED,
         name = "VC.RU DEVELOPMENT",
         lastCheck = lastCheck,
-        provider = VcRuDevelopmentProvider
+        provider = VcRuDevelopmentProvider,
+        seenTitles = seenTitles
     )
 
     val dtfSoftwareItems = collectItems(
         enabled = DTF_SOFTWARE_ENABLED,
         name = "DTF SOFTWARE",
         lastCheck = lastCheck,
-        provider = DtfSoftwareProvider
+        provider = DtfSoftwareProvider,
+        seenTitles = seenTitles
     )
 
     val dtfMobileItems = collectItems(
         enabled = DTF_MOBILE_ENABLED,
         name = "DTF MOBILE",
         lastCheck = lastCheck,
-        provider = DtfMobileProvider
+        provider = DtfMobileProvider,
+        seenTitles = seenTitles
     )
 
     val githubReleaseItems = collectItems(
         enabled = GITHUB_RELEASES_ENABLED,
         name = "GitHub releases",
         lastCheck = lastCheck,
-        provider = GithubReleasesProvider
+        provider = GithubReleasesProvider,
+        seenTitles = seenTitles
     )
 
     val githubTrendingKotlinItems = collectItems(
         enabled = GITHUB_TRENDING_KOTLIN_ENABLED && shouldSendGithubTrending,
         name = "GitHub Trending: Kotlin",
         lastCheck = lastCheck,
-        provider = GithubTrendingKotlinProvider
+        provider = GithubTrendingKotlinProvider,
+        seenTitles = seenTitles
     )
 
     val githubTrendingAllItems = collectItems(
         enabled = GITHUB_TRENDING_ALL_ENABLED && shouldSendGithubTrending,
         name = "GitHub Trending: All",
         lastCheck = lastCheck,
-        provider = GithubTrendingAllProvider
+        provider = GithubTrendingAllProvider,
+        seenTitles = seenTitles
     )
 
     val redditAndroidDevItems = collectItems(
         enabled = REDDIT_ANDROIDDEV_ENABLED,
         name = "Reddit: androiddev",
         lastCheck = lastCheck,
-        provider = RedditAndroidDevProvider
+        provider = RedditAndroidDevProvider,
+        seenTitles = seenTitles
     )
 
     val redditKotlinItems = collectItems(
         enabled = REDDIT_KOTLIN_ENABLED,
         name = "Reddit: Kotlin",
         lastCheck = lastCheck,
-        provider = RedditKotlinProvider
+        provider = RedditKotlinProvider,
+        seenTitles = seenTitles
     )
 
     val redditMobileDevItems = collectItems(
         enabled = REDDIT_MOBILEDEV_ENABLED,
         name = "Reddit: mobiledev",
         lastCheck = lastCheck,
-        provider = RedditMobileDevProvider
+        provider = RedditMobileDevProvider,
+        seenTitles = seenTitles
     )
 
     endSection()
@@ -836,7 +871,8 @@ private fun <T: NewsItem> collectItems(
     enabled: Boolean,
     name: String,
     lastCheck: Instant,
-    provider: NewsProvider<T>
+    provider: NewsProvider<T>,
+    seenTitles: MutableSet<String>
 ): List<T> {
     if (!enabled) {
         logInfo("$name parsing disabled by feature flag")
@@ -844,8 +880,16 @@ private fun <T: NewsItem> collectItems(
     }
 
     val items = provider.fetchItems(lastCheck)
-    logInfo("$name items collected (after filter): ${items.size}")
-    return items
+    val deduped = items.filter { item ->
+        val key = normalizeForDedup(item.title)
+        key.isEmpty() || seenTitles.add(key)
+    }
+    val duplicatesRemoved = items.size - deduped.size
+    if (duplicatesRemoved > 0) {
+        logInfo("$name duplicates removed (already seen in earlier source): $duplicatesRemoved")
+    }
+    logInfo("$name items collected (after filter): ${deduped.size}")
+    return deduped
 }
 
 private fun escapeHtml(text: String): String {

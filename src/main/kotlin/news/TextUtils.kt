@@ -12,3 +12,10 @@ fun cleanAndTruncate(value: String?, maxLength: Int = 280): String? {
     if (cleaned.length <= maxLength) return cleaned
     return cleaned.take(maxLength - 3) + "..."
 }
+
+fun normalizeForDedup(value: String): String {
+    return value
+        .lowercase()
+        .replace("[^\\p{L}\\p{Nd}]+".toRegex(), " ")
+        .trim()
+}
