@@ -447,19 +447,17 @@ private fun buildMessages(
     redditAndroidDevEnabled: Boolean,
     redditKotlinEnabled: Boolean,
     redditMobileDevEnabled: Boolean
-): List<String> {
+): List<TelegramMessage> {
     val zone = ZoneId.of("Europe/Moscow")
     val dateFormatter = DateTimeFormatter.ofPattern("dd.MM 'в' HH:mm")
 
     val sections = listOf(
         MessageSection(
-            header = buildString {
-                append("<tg-emoji emoji-id=\"5321283442577527159\">▶️</tg-emoji> <b>YOUTUBE</b>")
-                append("\n\n")
-            },
+            header = "▶️ *YOUTUBE*\n\n",
             enabled = youtubeEnabled,
             items = youtubeItems,
-            formatLine = ::defaultLine
+            rich = true,
+            formatLine = ::richLine
         ),
         MessageSection(
             header = buildString {
@@ -660,40 +658,32 @@ private fun buildMessages(
             formatLine = ::defaultLine
         ),
         MessageSection(
-            header = buildString {
-                append("<tg-emoji emoji-id=\"5408986202315458622\">▶️</tg-emoji> <b>VCRU КАРЬЕРА</b>")
-                append("\n\n")
-            },
+            header = "▶️ *VCRU КАРЬЕРА*\n\n",
             enabled = vcRuCareerEnabled,
             items = vcRuCareerItems,
-            formatLine = ::defaultLine
+            rich = true,
+            formatLine = ::richLine
         ),
         MessageSection(
-            header = buildString {
-                append("<tg-emoji emoji-id=\"5408986202315458622\">▶️</tg-emoji> <b>VCRU РАЗРАБОТКА</b>")
-                append("\n\n")
-            },
+            header = "▶️ *VCRU РАЗРАБОТКА*\n\n",
             enabled = vcRuDevelopmentEnabled,
             items = vcRuDevelopmentItems,
-            formatLine = ::defaultLine
+            rich = true,
+            formatLine = ::richLine
         ),
         MessageSection(
-            header = buildString {
-                append("<tg-emoji emoji-id=\"5409314415126286185\">▶️</tg-emoji> <b>DTF СОФТ</b>")
-                append("\n\n")
-            },
+            header = "▶️ *DTF СОФТ*\n\n",
             enabled = dtfSoftwareEnabled,
             items = dtfSoftwareItems,
-            formatLine = ::defaultLine
+            rich = true,
+            formatLine = ::richLine
         ),
         MessageSection(
-            header = buildString {
-                append("<tg-emoji emoji-id=\"5409314415126286185\">▶️</tg-emoji> <b>DTF МОБАЙЛ</b>")
-                append("\n\n")
-            },
+            header = "▶️ *DTF МОБАЙЛ*\n\n",
             enabled = dtfMobileEnabled,
             items = dtfMobileItems,
-            formatLine = ::defaultLine
+            rich = true,
+            formatLine = ::richLine
         ),
         MessageSection(
             header = buildString {
@@ -754,10 +744,16 @@ private fun buildMessages(
     return sections.flatMap { section -> buildSectionMessages(section, zone, dateFormatter) }
 }
 
+private data class TelegramMessage(
+    val text: String,
+    val rich: Boolean
+)
+
 private data class MessageSection<T: NewsItem>(
     val header: String,
     val enabled: Boolean,
     val items: List<T>,
+    val rich: Boolean = false,
     val formatLine: (T, ZoneId, DateTimeFormatter) -> String
 )
 
@@ -791,6 +787,51 @@ private fun buildDefaultLine(
         append("\n\n")
     }
 }
+
+private fun richLine(
+    item: NewsItem,
+    zone: ZoneId,
+    dateFormatter: DateTimeFormatter
+): String = buildRichLine(item, zone, dateFormatter)
+
+private fun buildRichLine(
+    item: NewsItem,
+    zone: ZoneId,
+    dateFormatter: DateTimeFormatter
+): String {
+    val local = item.published.atZone(zone)
+    val dateStr = local.format(dateFormatter)
+    return buildString {
+        append("[")
+        append(escapeMarkdown(item.title))
+        append("](")
+        append(safeMarkdownUrl(item.url))
+        append(")")
+        append("\n")
+        append(dateStr)
+        append("\n")
+        val imageUrl = item.imageUrl
+        if (!imageUrl.isNullOrBlank()) {
+            append("\n![](")
+            append(safeMarkdownUrl(imageUrl))
+            append(")\n")
+        }
+        append("\n")
+    }
+}
+
+private fun escapeMarkdown(text: String): String {
+    val specialChars = "\\`*_{}[]()#+-.!>~|"
+    return buildString {
+        for (c in text) {
+            if (c in specialChars) append('\\')
+            append(c)
+        }
+    }
+}
+
+private fun safeMarkdownUrl(url: String): String =
+    url.replace(")", "%29").replace(" ", "%20")
 
 private fun formatGithubLine(
     item: GithubReleaseItem,
@@ -834,18 +875,18 @@ private fun <T: NewsItem> buildSectionMessages(
     section: MessageSection<T>,
     zone: ZoneId,
     dateFormatter: DateTimeFormatter
-): List<String> {
+): List<TelegramMessage> {
     if (!section.enabled) return emptyList()
     if (section.items.isEmpty()) return emptyList()
 
     val builder = StringBuilder()
-    val result = mutableListOf<String>()
+    val result = mutableListOf<TelegramMessage>()
     var isFirstChunk = true
 
     fun flushChunk() {
         val text = builder.toString().trim()
         if (text.isNotEmpty()) {
-            result += text
+            result += TelegramMessage(text, section.rich)
         }
         builder.setLength(0)
     }
@@ -906,7 +947,14 @@ private fun extractRetryAfterSeconds(body: String): Long? {
     return value.toLongOrNull()
 }
 
-private fun sendTelegram(messages: List<String>): Boolean {
+private fun jsonEscape(text: String): String {
+    return text
+        .replace("\\", "\\\\")
+        .replace("\"", "\\\"")
+        .replace("\n", "\\n")
+}
+
+private fun sendTelegram(messages: List<TelegramMessage>): Boolean {
     val token = System.getenv("TELEGRAM_TOKEN").orEmpty()
     val chatId = System.getenv("CHAT_ID").orEmpty()
     val threadId = System.getenv("THREAD_ID").orEmpty()
@@ -916,17 +964,14 @@ private fun sendTelegram(messages: List<String>): Boolean {
         return false
     }
 
-    val url = "https://api.telegram.org/bot$token/sendMessage"
     val client = HttpClient.newHttpClient()
 
-    messages.forEachIndexed { index, rawText ->
+    messages.forEachIndexed { index, message ->
         logInfo("Preparing to send Telegram message #${index + 1}")
-        logInfo("Text length = ${rawText.length}")
+        logInfo("Text length = ${message.text.length}, rich = ${message.rich}")
 
-        val jsonText = rawText
-            .replace("\\", "\\\\")
-            .replace("\"", "\\\"")
-            .replace("\n", "\\n")
+        val method = if (message.rich) "sendRichMessage" else "sendMessage"
+        val url = "https://api.telegram.org/bot$token/$method"
 
         val payload = buildString {
             append("{")
@@ -934,9 +979,15 @@ private fun sendTelegram(messages: List<String>): Boolean {
             if (threadId.isNotBlank()) {
                 append("\"message_thread_id\":\"").append(threadId).append("\",")
             }
-            append("\"text\":\"").append(jsonText).append("\",")
-            append("\"disable_web_page_preview\":true,")
-            append("\"parse_mode\":\"HTML\"")
+            if (message.rich) {
+                append("\"rich_message\":{\"markdown\":\"")
+                append(jsonEscape(message.text))
+                append("\"}")
+            } else {
+                append("\"text\":\"").append(jsonEscape(message.text)).append("\",")
+                append("\"disable_web_page_preview\":true,")
+                append("\"parse_mode\":\"HTML\"")
+            }
             append("}")
         }
 
