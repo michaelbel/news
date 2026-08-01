@@ -802,6 +802,13 @@ private fun buildRichLine(
     val local = item.published.atZone(zone)
     val dateStr = local.format(dateFormatter)
     return buildString {
+        val imageUrl = item.imageUrl
+        if (!imageUrl.isNullOrBlank()) {
+            append("![](")
+            append(safeMarkdownUrl(imageUrl))
+            append(")")
+            append("\n")
+        }
         append("[")
         append(escapeMarkdown(item.title))
         append("](")
@@ -809,14 +816,7 @@ private fun buildRichLine(
         append(")")
         append("\n")
         append(dateStr)
-        append("\n")
-        val imageUrl = item.imageUrl
-        if (!imageUrl.isNullOrBlank()) {
-            append("\n![](")
-            append(safeMarkdownUrl(imageUrl))
-            append(")\n")
-        }
-        append("\n")
+        append("\n\n")
     }
 }
 
