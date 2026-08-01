@@ -821,6 +821,8 @@ object GithubReleasesProvider: NewsProvider<GithubReleaseItem> {
                     .takeUnless { it.isNullOrEmpty() }
                     ?: "(no title)"
 
+                if (isPreReleaseVersion(safeTitle)) continue
+
                 val url = linkHref
                     ?.trim()
                     .takeUnless { it.isNullOrEmpty() }
@@ -857,6 +859,14 @@ object GithubReleasesProvider: NewsProvider<GithubReleaseItem> {
             System.err.println("GitHub releases: cannot parse date '$raw': ${e.message}")
             null
         }
+    }
+
+    private val preReleaseVersionRegex = Regex(
+        pattern = """(?i)[-.](alpha|beta|dev|preview)\d*(?![a-z])"""
+    )
+
+    private fun isPreReleaseVersion(title: String): Boolean {
+        return preReleaseVersionRegex.containsMatchIn(title)
     }
 }
 
