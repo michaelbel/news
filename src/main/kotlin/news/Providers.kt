@@ -392,16 +392,12 @@ private fun fetchSimpleOsnovaCommunityFeed(
         if (published <= lastCheck) continue
 
         val title = cleanText(titleLink.text()) ?: continue
-        val imageUrl = card.selectFirst(".block-wrapper--media img[src]")
-            ?.absUrl("src")
-            ?.ifBlank { null }
         result.putIfAbsent(
             href,
             SimpleNewsItem(
                 published = published,
                 title = title,
-                url = href,
-                imageUrl = imageUrl
+                url = href
             )
         )
     }
@@ -1261,7 +1257,6 @@ object YoutubeProvider: NewsProvider<SimpleNewsItem> {
                 var title: String? = null
                 var videoId: String? = null
                 var linkHref: String? = null
-                var thumbnailUrl: String? = null
 
                 for (j in 0 until children.length) {
                     val node = children.item(j)
@@ -1275,17 +1270,6 @@ object YoutubeProvider: NewsProvider<SimpleNewsItem> {
                                 linkHref = node.attributes
                                     ?.getNamedItem("href")
                                     ?.nodeValue
-                            }
-                        }
-                        "media:group" -> {
-                            val mediaChildren = node.childNodes
-                            for (k in 0 until mediaChildren.length) {
-                                val mediaNode = mediaChildren.item(k)
-                                if (mediaNode.nodeName == "media:thumbnail") {
-                                    thumbnailUrl = mediaNode.attributes
-                                        ?.getNamedItem("url")
-                                        ?.nodeValue
-                                }
                             }
                         }
                     }
@@ -1312,8 +1296,7 @@ object YoutubeProvider: NewsProvider<SimpleNewsItem> {
                 result += SimpleNewsItem(
                     published = published,
                     title = safeTitle,
-                    url = url,
-                    imageUrl = thumbnailUrl
+                    url = url
                 )
             }
 
