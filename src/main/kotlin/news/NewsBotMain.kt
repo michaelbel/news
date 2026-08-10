@@ -810,12 +810,6 @@ private fun buildRichLine(
         append("\n")
         append(dateStr)
         append("\n")
-        val imageUrl = item.imageUrl
-        if (!imageUrl.isNullOrBlank()) {
-            append("\n![](")
-            append(safeMarkdownUrl(imageUrl))
-            append(")\n")
-        }
         append("\n")
     }
 }
